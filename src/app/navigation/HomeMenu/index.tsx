@@ -9,6 +9,7 @@ import Home from '../../screens/Home';
 import ToggleSideMenu from '../../components/HomeMenu/ToggleSideMenu';
 import DeliveryAddressSelect from '../../components/HomeMenu/DeliveryAddressSelect';
 import Avatar from '../../components/HomeMenu/Avatar';
+import HeaderBackButton from '../../components/Buttons/HeaderBackButton';
 
 const HomeStack = createBottomTabNavigator();
 
@@ -71,6 +72,13 @@ const HomeMenu = () => {
               focused={focused}
             />
           ),
+          headerLeft: () => <HeaderBackButton />,
+          title: 'Delivery Address',
+          headerTitleStyle: {
+            color: '#fff',
+            fontFamily: 'SofiaPro-Medium',
+            fontSize: 18,
+          },
         }}
         name="DeliveryAddress"
         component={DeliveryAddress}

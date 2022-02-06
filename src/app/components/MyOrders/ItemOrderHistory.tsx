@@ -1,4 +1,4 @@
-import {Button, Image, Text, View} from 'react-native-ui-lib';
+import {Button, Image, Text, TouchableOpacity, View} from 'react-native-ui-lib';
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
@@ -13,7 +13,14 @@ const ItemOrderHistory = ({data}: IItemOrderHistory) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
 
   return (
-    <View bg-dark padding-18 marginB-20 style={styles.container}>
+    <TouchableOpacity
+      bg-dark
+      padding-18
+      marginB-20
+      style={styles.container}
+      onPress={() => {
+        navigation.navigate('OrderDetails');
+      }}>
       <View row spread marginB-24>
         <View row>
           <View center style={styles.imageWrap} marginR-15>
@@ -36,7 +43,7 @@ const ItemOrderHistory = ({data}: IItemOrderHistory) => {
 
             <Text
               white
-              marginB-11
+              marginB-5
               textSemiBold
               style={styles.name}
               onPress={() => {
@@ -76,7 +83,7 @@ const ItemOrderHistory = ({data}: IItemOrderHistory) => {
           </Text>
         </Button>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

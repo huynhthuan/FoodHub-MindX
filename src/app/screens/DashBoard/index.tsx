@@ -32,7 +32,7 @@ const SideMenuDrawer = createDrawerNavigator();
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   return (
     <DrawerContentScrollView {...props} style={styles.drawerContent}>
-      <View marginB-33 paddingT-44>
+      <View marginB-33 paddingT-44 paddingL-32>
         <View style={styles.avatarWrap} marginB-23>
           <Image assetName="avatar" assetGroup="images" style={styles.image} />
         </View>
@@ -45,7 +45,12 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       </View>
       <DrawerItemList {...props} />
 
-      <Button bg-primary marginT-20 style={styles.btnLogout} marginB-32>
+      <Button
+        bg-primary
+        marginT-20
+        marginL-32
+        style={styles.btnLogout}
+        marginB-32>
         <Image assetName="logout" marginR-9 assetGroup="icons" />
         <Text white style={styles.textLogout} textRegular>
           Log Out
@@ -73,7 +78,7 @@ const DashBoard = () => {
         drawerType: 'back',
         headerShown: false,
         drawerItemStyle: {
-          marginLeft: 0,
+          marginHorizontal: 25,
         },
         drawerLabelStyle: {
           color: '#fff',
@@ -153,7 +158,6 @@ export default DashBoard;
 const styles = StyleSheet.create({
   drawerContent: {
     backgroundColor: '#2D2D3A',
-    paddingLeft: 32,
   },
   avatarWrap: {
     width: 85,

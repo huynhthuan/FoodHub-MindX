@@ -17,7 +17,6 @@ import HeaderBackButton from './src/app/components/Buttons/HeaderBackButton';
 import BindPhone from './src/app/screens/BindPhone';
 import Verification from './src/app/screens/Verification';
 import ResetPassword from './src/app/screens/ResetPassword';
-import HomeMenu from './src/app/navigation/HomeMenu';
 import FoodDetails from './src/app/screens/FoodDetails';
 import HeaderBackButtonDetails from './src/app/components/Buttons/HeaderBackButtonDetails';
 import AgencyDetails from './src/app/screens/AgencyDetails';
@@ -25,6 +24,10 @@ import Search from './src/app/screens/Search';
 import Avatar from './src/app/components/HomeMenu/Avatar';
 import Filter from './src/app/screens/Filter';
 import DashBoard from './src/app/screens/DashBoard';
+import OrderDetails from './src/app/screens/OrderDetails';
+import MyProfile from './src/app/screens/MyProfile';
+import DeliveryDetails from './src/app/screens/DeliveryDetails';
+import AddDeliveryAddress from './src/app/screens/AddDeliveryAddress';
 
 const MainStack = createNativeStackNavigator();
 
@@ -45,6 +48,10 @@ export type MainStackParamList = {
   Category: undefined;
   Cart: undefined;
   Payment: undefined;
+  OrderDetails: undefined;
+  MyProfile: undefined;
+  DeliveryDetails: undefined;
+  AddDeliveryAddress: undefined;
 };
 
 const optionsAuthScreen = {
@@ -129,7 +136,6 @@ const App = () => {
               fontFamily: 'SofiaPro-Medium',
               fontSize: 18,
             },
-            headerStyle: {},
           }}
         />
         <MainStack.Screen
@@ -153,6 +159,79 @@ const App = () => {
         {/* <MainStack.Screen name="Category" component={Category} /> */}
         {/* <MainStack.Screen name="Cart" component={Cart} /> */}
         {/* <MainStack.Screen name="Payment" component={Payment} /> */}
+        <MainStack.Screen
+          name="MyProfile"
+          component={MyProfile}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            title: '',
+            headerLeft: () => (
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
+            ),
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              color: '#ffffff',
+              fontFamily: 'SofiaPro-Medium',
+              fontSize: 18,
+            },
+          }}
+        />
+        <MainStack.Screen
+          name="OrderDetails"
+          component={OrderDetails}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            title: 'Order Details',
+            headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
+            headerLeft: () => (
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
+            ),
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              color: '#ffffff',
+              fontFamily: 'SofiaPro-Medium',
+              fontSize: 18,
+            },
+          }}
+        />
+        <MainStack.Screen
+          name="DeliveryDetails"
+          component={DeliveryDetails}
+          options={{
+            headerTransparent: true,
+            headerShown: true,
+            title: 'Edit Delivery Address',
+            headerLeft: () => (
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
+            ),
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              color: '#ffffff',
+              fontFamily: 'SofiaPro-Medium',
+              fontSize: 18,
+            },
+          }}
+        />
+        <MainStack.Screen
+          name="AddDeliveryAddress"
+          component={AddDeliveryAddress}
+          options={{
+            headerTransparent: true,
+            headerShown: true,
+            title: 'Add Delivery Address',
+            headerLeft: () => (
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
+            ),
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              color: '#ffffff',
+              fontFamily: 'SofiaPro-Medium',
+              fontSize: 18,
+            },
+          }}
+        />
       </MainStack.Navigator>
     </NavigationContainer>
   );

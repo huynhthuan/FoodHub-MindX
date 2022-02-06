@@ -1,11 +1,5 @@
 import {Button, Image, Incubator, Text, View} from 'react-native-ui-lib';
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {StyleSheet, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {getScreenWidth} from '../../utilities/helpers';

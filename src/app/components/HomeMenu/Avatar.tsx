@@ -1,16 +1,15 @@
 import {Image, TouchableOpacity, View} from 'react-native-ui-lib';
 import React from 'react';
 import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {DrawerNavigationProp} from '@react-navigation/drawer';
-import {SideMenuStackList} from '../../screens/DashBoard';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {MainStackParamList} from '../../../../App';
 
 export interface IAvatar {
   customStyle?: StyleProp<ViewStyle>;
 }
 
 const Avatar = ({customStyle}: IAvatar) => {
-  const navigation = useNavigation<DrawerNavigationProp<SideMenuStackList>>();
+  const navigation = useNavigation<NavigationProp<MainStackParamList>>();
 
   return (
     <TouchableOpacity

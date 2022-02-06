@@ -4,6 +4,7 @@ import {FlatList, StyleSheet} from 'react-native';
 import {getScreenWidth} from '../../utilities/helpers';
 import ItemOrderHistory from '../../components/MyOrders/ItemOrderHistory';
 import ItemOrderUpcoming from '../../components/MyOrders/ItemOrderUpcoming';
+import ListEmptyComponent from '../../components/MyOrders/ListEmptyComponent';
 
 const items: TabControllerItemProps[] = [
   {
@@ -100,9 +101,8 @@ const MyOrders = () => {
               numColumns={1}
               showsVerticalScrollIndicator={false}
               keyExtractor={item => item.id}
-              contentContainerStyle={{
-                paddingHorizontal: 25,
-              }}
+              contentContainerStyle={styles.listContentStyle}
+              ListEmptyComponent={ListEmptyComponent}
             />
           </TabController.TabPage>
 
@@ -113,9 +113,8 @@ const MyOrders = () => {
               numColumns={1}
               showsVerticalScrollIndicator={false}
               keyExtractor={item => item.id}
-              contentContainerStyle={{
-                paddingHorizontal: 25,
-              }}
+              contentContainerStyle={styles.listContentStyle}
+              ListEmptyComponent={ListEmptyComponent}
             />
           </TabController.TabPage>
         </View>
@@ -134,5 +133,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 23.5,
     borderColor: '#474755',
+  },
+  listContentStyle: {
+    paddingHorizontal: 25,
+    flex: data.length === 0 ? 1 : undefined,
   },
 });

@@ -40,6 +40,7 @@ Assets.loadAssetsGroup('icons', {
   wallet: require('./icons/wallet.png'),
   recent: require('./icons/recent.png'),
   home: require('./icons/home.png'),
+  arrowRightNormal: require('./icons/arrow-right-normal.png'),
 });
 
 Assets.loadAssetsGroup('images', {

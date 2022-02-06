@@ -7,6 +7,7 @@ import ItemFood from '../../components/Item/Food/ItemFood';
 import ItemAgency from '../../components/Item/Agency/ItemAgency';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
+import {changeHeaderBackground} from '../../utilities/helpers';
 
 const dataAgency = [
   {
@@ -61,19 +62,7 @@ const Home = () => {
       showsVerticalScrollIndicator={false}
       style={styles.container}
       onScroll={({nativeEvent}) => {
-        if (nativeEvent.contentOffset.y > 0) {
-          navigation.setOptions({
-            headerBackgroundContainerStyle: {
-              backgroundColor: '#474755',
-            },
-          });
-        } else {
-          navigation.setOptions({
-            headerBackgroundContainerStyle: {
-              backgroundColor: 'transparent',
-            },
-          });
-        }
+        changeHeaderBackground(nativeEvent, navigation);
       }}>
       <View paddingT-70>
         <View paddingH-25>
