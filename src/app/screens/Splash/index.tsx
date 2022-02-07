@@ -1,8 +1,8 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 import React from 'react';
-import {Button, Image, Text, View} from 'react-native-ui-lib';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {MainStackParamList} from '../../../../App';
+import { Button, Image, Text, View } from 'react-native-ui-lib';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { MainStackParamList } from '../../../../App';
 
 const Splash = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -12,7 +12,7 @@ const Splash = () => {
       <Image assetName="logo" assetGroup="images" />
       <Button
         onPress={() => {
-          navigation.navigate('DashBoard');
+          navigation.navigate('Reviews');
         }}>
         <Text>Start</Text>
       </Button>

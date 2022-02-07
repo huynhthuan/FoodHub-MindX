@@ -28,6 +28,7 @@ import OrderDetails from './src/app/screens/OrderDetails';
 import MyProfile from './src/app/screens/MyProfile';
 import DeliveryDetails from './src/app/screens/DeliveryDetails';
 import AddDeliveryAddress from './src/app/screens/AddDeliveryAddress';
+import Reviews from './src/app/screens/Reviews';
 
 const MainStack = createNativeStackNavigator();
 
@@ -52,6 +53,7 @@ export type MainStackParamList = {
   MyProfile: undefined;
   DeliveryDetails: undefined;
   AddDeliveryAddress: undefined;
+  Reviews: undefined;
 };
 
 const optionsAuthScreen = {
@@ -221,6 +223,24 @@ const App = () => {
             headerTransparent: true,
             headerShown: true,
             title: 'Add Delivery Address',
+            headerLeft: () => (
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
+            ),
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              color: '#ffffff',
+              fontFamily: 'SofiaPro-Medium',
+              fontSize: 18,
+            },
+          }}
+        />
+        <MainStack.Screen
+          name="Reviews"
+          component={Reviews}
+          options={{
+            headerTransparent: true,
+            headerShown: true,
+            title: 'Reviews',
             headerLeft: () => (
               <HeaderBackButton customStyle={{marginLeft: 9}} />
             ),
