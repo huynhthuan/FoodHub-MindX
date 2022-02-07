@@ -12,7 +12,7 @@ const Splash = () => {
       <Image assetName="logo" assetGroup="images" />
       <Button
         onPress={() => {
-          navigation.navigate('Reviews');
+          navigation.navigate('Reviews', { screenWriteReview: 'ReviewFood' });
         }}>
         <Text>Start</Text>
       </Button>

@@ -41,11 +41,11 @@ Assets.loadAssetsGroup('icons', {
   recent: require('./icons/recent.png'),
   home: require('./icons/home.png'),
   arrowRightNormal: require('./icons/arrow-right-normal.png'),
+  bubbleMessage: require('./icons/bubble-message.png'),
 });
 
 Assets.loadAssetsGroup('images', {
   avatar: require('./img/avatar.png'),
-  bubbleMessage: require('./img/bubble-message.png'),
   cancelOrder: require('./img/cancel-order.png'),
   logo: require('./img/logo.png'),
   myorderEmpty: require('./img/myorder-empty.png'),

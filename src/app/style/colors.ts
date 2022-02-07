@@ -14,4 +14,5 @@ Colors.loadColors({
   gray5: '#B0B0B0',
   yellow: '#FFC529',
   yellow50: 'rgba(255, 197, 41, 0.4)',
+  green: '#4EE476',
 });
