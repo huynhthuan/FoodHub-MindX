@@ -6,8 +6,8 @@
  * @flow strict-local
  */
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Splash from './src/app/screens/Splash';
 import Welcome from './src/app/screens/Welcome';
 import Onboarding from './src/app/screens/Onboarding';
@@ -31,6 +31,10 @@ import AddDeliveryAddress from './src/app/screens/AddDeliveryAddress';
 import Reviews from './src/app/screens/Reviews';
 import ReviewFood from './src/app/screens/ReviewFood';
 import ReviewAgency from './src/app/screens/ReviewAgency';
+import Favorite from './src/app/screens/Favorite';
+import Category from './src/app/screens/Category';
+import Cart from './src/app/screens/Cart';
+import HeaderCartButton from './src/app/components/Buttons/HeaderCartButton';
 
 const MainStack = createNativeStackNavigator();
 
@@ -48,6 +52,7 @@ export type MainStackParamList = {
   AgencyDetails: undefined;
   Search: undefined;
   Filter: undefined;
+  Favorites: undefined;
   Category: undefined;
   Cart: undefined;
   Payment: undefined;
@@ -55,7 +60,7 @@ export type MainStackParamList = {
   MyProfile: undefined;
   DeliveryDetails: undefined;
   AddDeliveryAddress: undefined;
-  Reviews: { screenWriteReview: string };
+  Reviews: {screenWriteReview: string};
   ReviewFood: undefined;
   ReviewAgency: undefined;
 };
@@ -132,9 +137,9 @@ const App = () => {
             headerShown: true,
             headerTransparent: true,
             title: 'Search',
-            headerRight: () => <Avatar customStyle={{ marginRight: 9 }} />,
+            headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
             headerLeft: () => (
-              <HeaderBackButton customStyle={{ marginLeft: 9 }} />
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
             ),
             headerTitleAlign: 'center',
             headerTitleStyle: {
@@ -152,7 +157,7 @@ const App = () => {
             headerTransparent: true,
             title: 'Filter',
             headerLeft: () => (
-              <HeaderBackButton customStyle={{ marginLeft: 9 }} />
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
             ),
             headerTitleAlign: 'center',
             headerTitleStyle: {
@@ -162,8 +167,56 @@ const App = () => {
             },
           }}
         />
-        {/* <MainStack.Screen name="Category" component={Category} /> */}
-        {/* <MainStack.Screen name="Cart" component={Cart} /> */}
+        <MainStack.Screen
+          name="Favorites"
+          component={Favorite}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            title: 'Favorites',
+            headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
+            headerLeft: () => (
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
+            ),
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              color: '#ffffff',
+              fontFamily: 'SofiaPro-Medium',
+              fontSize: 18,
+            },
+          }}
+        />
+        <MainStack.Screen
+          name="Category"
+          component={Category}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            title: '',
+            headerLeft: () => (
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
+            ),
+          }}
+        />
+        <MainStack.Screen
+          name="Cart"
+          component={Cart}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            title: 'Cart',
+            headerLeft: () => (
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
+            ),
+            headerRight: () => <HeaderCartButton />,
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              color: '#ffffff',
+              fontFamily: 'SofiaPro-Medium',
+              fontSize: 18,
+            },
+          }}
+        />
         {/* <MainStack.Screen name="Payment" component={Payment} /> */}
         <MainStack.Screen
           name="MyProfile"
@@ -173,7 +226,7 @@ const App = () => {
             headerTransparent: true,
             title: '',
             headerLeft: () => (
-              <HeaderBackButton customStyle={{ marginLeft: 9 }} />
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
             ),
             headerTitleAlign: 'center',
             headerTitleStyle: {
@@ -190,9 +243,9 @@ const App = () => {
             headerShown: true,
             headerTransparent: true,
             title: 'Order Details',
-            headerRight: () => <Avatar customStyle={{ marginRight: 9 }} />,
+            headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
             headerLeft: () => (
-              <HeaderBackButton customStyle={{ marginLeft: 9 }} />
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
             ),
             headerTitleAlign: 'center',
             headerTitleStyle: {
@@ -210,7 +263,7 @@ const App = () => {
             headerShown: true,
             title: 'Edit Delivery Address',
             headerLeft: () => (
-              <HeaderBackButton customStyle={{ marginLeft: 9 }} />
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
             ),
             headerTitleAlign: 'center',
             headerTitleStyle: {
@@ -228,7 +281,7 @@ const App = () => {
             headerShown: true,
             title: 'Add Delivery Address',
             headerLeft: () => (
-              <HeaderBackButton customStyle={{ marginLeft: 9 }} />
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
             ),
             headerTitleAlign: 'center',
             headerTitleStyle: {
@@ -246,7 +299,7 @@ const App = () => {
             headerShown: true,
             title: 'Reviews',
             headerLeft: () => (
-              <HeaderBackButton customStyle={{ marginLeft: 9 }} />
+              <HeaderBackButton customStyle={{marginLeft: 9}} />
             ),
             headerTitleAlign: 'center',
             headerTitleStyle: {
@@ -264,7 +317,7 @@ const App = () => {
             headerShown: true,
             title: '',
             headerLeft: () => (
-              <HeaderBackButton customStyle={{ marginLeft: 14, marginTop: 14 }} />
+              <HeaderBackButton customStyle={{marginLeft: 14, marginTop: 14}} />
             ),
           }}
         />
@@ -276,7 +329,7 @@ const App = () => {
             headerShown: true,
             title: '',
             headerLeft: () => (
-              <HeaderBackButton customStyle={{ marginLeft: 14, marginTop: 14 }} />
+              <HeaderBackButton customStyle={{marginLeft: 14, marginTop: 14}} />
             ),
           }}
         />

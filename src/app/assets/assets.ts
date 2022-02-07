@@ -56,4 +56,5 @@ Assets.loadAssetsGroup('images', {
   signUpDecorTopRight: require('./img/sign-up-decor-top-right.png'),
   welcomeBg: require('./img/welcom-bg.png'),
   decorProfile: require('./img/decor-profile.png'),
+  categoryDecor: require('./img/category-decor.png'),
 });

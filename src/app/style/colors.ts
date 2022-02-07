@@ -12,6 +12,7 @@ Colors.loadColors({
   gray3: '#A3A3A5',
   gray4: '#9E9E9F',
   gray5: '#B0B0B0',
+  gray6: '#9796A1',
   yellow: '#FFC529',
   yellow50: 'rgba(255, 197, 41, 0.4)',
   green: '#4EE476',
