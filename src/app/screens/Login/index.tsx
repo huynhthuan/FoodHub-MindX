@@ -6,12 +6,20 @@ import {getScreenWidth} from '../../utilities/helpers';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import axios from 'axios';
+import {BASE_URL_JWT_AUTH_GET_TOKEN} from '../../api/constants';
+import Loading from '../../components/Overlay/Loading';
+import {useAppDispatch} from '../../hook';
+import {login} from '../../redux/slices/userSlice';
 
 const Login = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const [showPass, setShowPass] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(false);
+  const [isShowLoading, setIsShowLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+
+  const dispatch = useAppDispatch();
 
   const {
     control,
@@ -24,13 +32,32 @@ const Login = () => {
     },
   });
 
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = (data: {email: string; password: string}) => {
+    setIsShowLoading(true);
+    axios
+      .post(BASE_URL_JWT_AUTH_GET_TOKEN, {
+        username: data.email,
+        password: data.password,
+      })
+      .then(res => {
+        setIsShowLoading(false);
+        dispatch(login(res.data));
+        navigation.navigate('DashBoard');
+      })
+      .catch(function (error) {
+        setIsShowLoading(false);
+        setIsVisible(true);
+        setErrorMessage(
+          `${error.response.data.message.replace(/<[^>]*>?/gm, '')}`,
+        );
+      });
+  };
 
   const onInvalid = (data: any) => {
     setIsVisible(true);
     setErrorMessage(
-      `${data.email ? 'Email: ' + data.email.message + '\n' : ''}${
-        data.password ? 'Password: ' + data.password.message : ''
+      `${data.email ? 'Email: ' + data.email.message : ''}${
+        data.password ? '\n' + 'Password: ' + data.password.message : ''
       }`,
     );
   };
@@ -60,8 +87,9 @@ const Login = () => {
                   message: 'This field is required',
                 },
                 pattern: {
-                  value: /^(?:\d{10}|\w+@\w+\.\w{2,3})$/,
-                  message: 'Incorrect email format or phone format.',
+                  value:
+                    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                  message: 'Incorrect email format.',
                 },
               }}
               render={({
@@ -79,9 +107,9 @@ const Login = () => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  label={'E-mail or phone'}
+                  label={'E-mail'}
                   labelStyle={styles.label}
-                  placeholder={'Enter your email or phone'}
+                  placeholder={'Enter your email'}
                   placeholderTextColor={'#ADADB8'}
                 />
               )}
@@ -188,6 +216,8 @@ const Login = () => {
           fontSize: 16,
         }}
       />
+
+      <Loading isShow={isShowLoading} />
     </>
   );
 };

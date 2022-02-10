@@ -5,9 +5,16 @@ import {getScreenWidth} from '../../utilities/helpers';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {Controller, useForm} from 'react-hook-form';
+import auth from '@react-native-firebase/auth';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import {signUpData} from '../../redux/slices/userSignUpSlice';
 
 const BindPhone = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const signUpState = useAppSelector(state => state.userSignUpSlice);
+  const dispatch = useAppDispatch();
   const {
     control,
     handleSubmit,
@@ -18,14 +25,24 @@ const BindPhone = () => {
     },
   });
 
-  const onSubmit = (data: any) => {
-    navigation.navigate('Verification');
+  async function verifyPhoneNumber(phoneNumber: string) {
+    try {
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      dispatch(signUpData({...signUpState, phone: phoneNumber}));
+      navigation.navigate('Verification', {confirmation});
+    } catch (error) {
+      setIsVisible(true);
+      setErrorMessage(`${error}`);
+    }
+  }
+
+  const onSubmit = async (data: any) => {
+    verifyPhoneNumber(data.phone);
   };
 
   const onInvalid = (data: any) => {
-    Alert.alert('Errors', `${data.phone ? data.phone.message : ''}`, [
-      {text: 'Close'},
-    ]);
+    setIsVisible(true);
+    setErrorMessage(`${data.phone ? 'Phone: ' + data.phone.message : ''}`);
   };
 
   return (
@@ -52,7 +69,8 @@ const BindPhone = () => {
                 message: 'This field is required.',
               },
               pattern: {
-                value: /^[0-9]{10}$/i,
+                value:
+                  /(?:(?:\+?[0-9]\s*(?:[.-]\s*)?)?(?:(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]‌​)\s*)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)([2-9]1[02-9]‌​|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})\s*(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+)\s*)?$/i,
                 message: 'Your phone incorrect format.',
               },
             }}
@@ -81,6 +99,31 @@ const BindPhone = () => {
           </View>
         </View>
       </KeyboardAvoidingView>
+
+      <Incubator.Toast
+        visible={isVisible}
+        position={'bottom'}
+        message={errorMessage}
+        action={{
+          label: 'Close',
+          onPress: () => setIsVisible(false),
+          labelProps: {
+            style: {
+              fontFamily: 'SofiaPro-Medium',
+            },
+          },
+        }}
+        zIndex={99}
+        preset={Incubator.ToastPresets.FAILURE}
+        onDismiss={() => {
+          setIsVisible(false);
+        }}
+        autoDismiss={3500}
+        messageStyle={{
+          fontFamily: 'SofiaPro-Medium',
+          fontSize: 16,
+        }}
+      />
     </View>
   );
 };

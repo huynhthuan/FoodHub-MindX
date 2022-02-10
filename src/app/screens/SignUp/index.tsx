@@ -6,12 +6,16 @@ import {getScreenWidth} from '../../utilities/helpers';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import axios from 'axios';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import {signUpData} from '../../redux/slices/userSignUpSlice';
 
 const SignUp = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const [showPass, setShowPass] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const dispatch = useAppDispatch();
 
   const {
     control,
@@ -19,20 +23,21 @@ const SignUp = () => {
     formState: {errors},
   } = useForm({
     defaultValues: {
-      fullname: '',
+      userName: '',
       email: '',
       password: '',
     },
   });
 
   const onSubmit = (data: any) => {
+    dispatch(signUpData(data));
     navigation.navigate('BindPhone');
   };
 
   const onInvalid = (data: any) => {
     setIsVisible(true);
     setErrorMessage(
-      `${data.fullname ? 'Full name: ' + data.fullname.message + '\n' : ''}${
+      `${data.userName ? 'Full name: ' + data.userName.message + '\n' : ''}${
         data.email ? 'Email: ' + data.email.message + '\n' : ''
       }${data.password ? 'Password: ' + data.password.message : ''}`,
     );
@@ -62,15 +67,11 @@ const SignUp = () => {
                 },
                 minLength: {
                   value: 2,
-                  message: 'Your name must have at least 2 characters.',
+                  message: 'Username must have at least 2 characters.',
                 },
                 maxLength: {
                   value: 32,
-                  message: 'Your name must have a maximum of 32 characters.',
-                },
-                pattern: {
-                  value: /^[A-Za-z\s]+$/,
-                  message: 'Your name must be letters.',
+                  message: 'Username must have a maximum of 32 characters.',
                 },
               }}
               render={({
@@ -88,13 +89,13 @@ const SignUp = () => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  label={'Full name'}
+                  label={'User name'}
                   labelStyle={styles.label}
-                  placeholder={'Enter your full name'}
+                  placeholder={'Enter user name'}
                   placeholderTextColor={'#ADADB8'}
                 />
               )}
-              name="fullname"
+              name="userName"
             />
 
             <Controller

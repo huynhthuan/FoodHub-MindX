@@ -4,7 +4,7 @@ import {
   createDrawerNavigator,
   DrawerContentComponentProps,
   DrawerContentScrollView,
-  DrawerItemList,
+  DrawerItem,
 } from '@react-navigation/drawer';
 import HomeMenu from '../../navigation/HomeMenu';
 import {Button, Image, Text, View} from 'react-native-ui-lib';
@@ -16,6 +16,10 @@ import Settings from '../Settings';
 import HelpsFaqs from '../HelpsFaqs';
 import HeaderBackButton from '../../components/Buttons/HeaderBackButton';
 import Avatar from '../../components/HomeMenu/Avatar';
+import _ from 'lodash';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import {logout} from '../../redux/slices/userSlice';
+import FastImage from 'react-native-fast-image';
 
 export type SideMenuStackList = {
   HomeMenu: undefined;
@@ -30,27 +34,119 @@ export type SideMenuStackList = {
 const SideMenuDrawer = createDrawerNavigator();
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
+  const dispatch = useAppDispatch();
+  const userState = useAppSelector(state => state.userSlice);
+
   return (
     <DrawerContentScrollView {...props} style={styles.drawerContent}>
       <View marginB-33 paddingT-44 paddingL-32>
         <View style={styles.avatarWrap} marginB-23>
-          <Image assetName="avatar" assetGroup="images" style={styles.image} />
+          <FastImage
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+            source={{
+              uri: userState.avatar_url
+                ? userState.avatar_url
+                : 'https://secure.gravatar.com/avatar/c2b06ae950033b392998ada50767b50e?s=96&d=mm&r=g',
+              priority: FastImage.priority.high,
+            }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
         </View>
         <Text white textSemiBold style={styles.name} marginB-8>
-          Eljad Eendaz
+          {userState.user_nicename}
         </Text>
         <Text gray2 style={styles.gmail}>
-          prelookstudio@gmail.com
+          {userState.user_email}
         </Text>
       </View>
-      <DrawerItemList {...props} />
+
+      <DrawerItem
+        label="Home"
+        onPress={() => {
+          props.navigation.navigate('Dashboard');
+        }}
+        icon={() => <Image assetName="home" assetGroup="icons" />}
+        labelStyle={styles.label}
+        style={styles.item}
+      />
+      <DrawerItem
+        label="My Orders"
+        onPress={() => {
+          props.navigation.navigate('MyOrders');
+        }}
+        icon={() => <Image assetName="order" assetGroup="icons" />}
+        labelStyle={styles.label}
+        style={styles.item}
+      />
+      <DrawerItem
+        label="My Profile"
+        onPress={() => {
+          props.navigation.navigate('MyProfile');
+        }}
+        icon={() => <Image assetName="profile" assetGroup="icons" />}
+        labelStyle={styles.label}
+        style={styles.item}
+      />
+      <DrawerItem
+        label="Delivery Address"
+        onPress={() => {
+          props.navigation.navigate('DeliveryAddress');
+        }}
+        icon={() => <Image assetName="deliveryAddress" assetGroup="icons" />}
+        labelStyle={styles.label}
+        style={styles.item}
+      />
+      <DrawerItem
+        label="Payment Methods"
+        onPress={() => {
+          props.navigation.navigate('PaymentMethods');
+        }}
+        icon={() => <Image assetName="wallet" assetGroup="icons" />}
+        labelStyle={styles.label}
+        style={styles.item}
+      />
+      <DrawerItem
+        label="Contact Us"
+        onPress={() => {
+          props.navigation.navigate('ContactUs');
+        }}
+        icon={() => <Image assetName="message" assetGroup="icons" />}
+        labelStyle={styles.label}
+        style={styles.item}
+      />
+      <DrawerItem
+        label="Settings"
+        onPress={() => {
+          props.navigation.navigate('Settings');
+        }}
+        icon={() => <Image assetName="settings" assetGroup="icons" />}
+        labelStyle={styles.label}
+        style={styles.item}
+      />
+      <DrawerItem
+        label="Helps & FAQs"
+        onPress={() => {
+          props.navigation.navigate('HelpsFaqs');
+        }}
+        icon={() => <Image assetName="faq" assetGroup="icons" />}
+        labelStyle={styles.label}
+        style={styles.item}
+      />
+
+      {/* <DrawerItemList {...props} /> */}
 
       <Button
         bg-primary
         marginT-20
         marginL-32
         style={styles.btnLogout}
-        marginB-32>
+        marginB-32
+        onPress={() => {
+          dispatch(logout());
+        }}>
         <Image assetName="logout" marginR-9 assetGroup="icons" />
         <Text white style={styles.textLogout} textRegular>
           Log Out
@@ -83,8 +179,6 @@ const DashBoard = () => {
         drawerLabelStyle: {
           color: '#fff',
         },
-        drawerActiveBackgroundColor: 'transparent',
-        swipeEnabled: false,
       }}>
       <SideMenuDrawer.Screen
         name="Home"
@@ -122,14 +216,14 @@ const DashBoard = () => {
         }}
       />
       <SideMenuDrawer.Screen
-        name="Payment Methods"
+        name="PaymentMethods"
         component={PaymentMethods}
         options={{
           drawerIcon: () => <Image assetName="wallet" assetGroup="icons" />,
         }}
       />
       <SideMenuDrawer.Screen
-        name="Contact Us"
+        name="ContactUs"
         component={ContactUs}
         options={{
           drawerIcon: () => <Image assetName="message" assetGroup="icons" />,
@@ -143,7 +237,7 @@ const DashBoard = () => {
         }}
       />
       <SideMenuDrawer.Screen
-        name="Helps & Faqs"
+        name="Helps&Faqs"
         component={HelpsFaqs}
         options={{
           drawerIcon: () => <Image assetName="faq" assetGroup="icons" />,
@@ -181,5 +275,13 @@ const styles = StyleSheet.create({
   },
   btnLogout: {
     width: 117,
+  },
+  label: {
+    fontSize: 16,
+    color: '#fff',
+    fontFamily: 'SofiaPro',
+  },
+  item: {
+    paddingLeft: 16,
   },
 });

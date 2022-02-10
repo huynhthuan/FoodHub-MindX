@@ -2,7 +2,7 @@ import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import DeliveryAddress from '../../screens/DeliveryAddress';
 import Cart from '../../screens/Cart';
-import Favorite from '../../screens/Favorite';
+import Favorite from '../../screens/Favorites';
 import Notifications from '../../screens/Notifications';
 import Icon from './Icon';
 import Home from '../../screens/Home';
@@ -124,6 +124,17 @@ const HomeMenu = () => {
               focused={focused}
             />
           ),
+          headerShown: true,
+          headerTransparent: true,
+          title: 'Favorites',
+          headerRight: () => <Avatar />,
+          headerLeft: () => <HeaderBackButton />,
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            color: '#ffffff',
+            fontFamily: 'SofiaPro-Medium',
+            fontSize: 18,
+          },
         }}
         name="Favorite"
         component={Favorite}

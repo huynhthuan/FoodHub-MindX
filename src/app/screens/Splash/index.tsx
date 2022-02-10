@@ -6,16 +6,15 @@ import {MainStackParamList} from '../../../../App';
 
 const Splash = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  React.useEffect(() => {
+    setTimeout(() => {
+      navigation.navigate('Onboarding');
+    }, 1000);
+  }, []);
 
   return (
     <View flex centerH centerV bg-primary>
       <Image assetName="logo" assetGroup="images" />
-      <Button
-        onPress={() => {
-          navigation.navigate('Cart');
-        }}>
-        <Text>Start</Text>
-      </Button>
     </View>
   );
 };

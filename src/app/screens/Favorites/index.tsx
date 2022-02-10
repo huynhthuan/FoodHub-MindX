@@ -64,7 +64,7 @@ const data = [
   },
 ];
 
-const Favorite = () => {
+const Favorites = () => {
   const renderItemFood = React.useCallback(
     ({item}) => <ItemFood customStyle={{marginBottom: 20}} data={item} />,
     [],
@@ -128,7 +128,7 @@ const Favorite = () => {
   );
 };
 
-export default Favorite;
+export default Favorites;
 
 const styles = StyleSheet.create({
   tabBar: {

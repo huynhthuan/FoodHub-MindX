@@ -31,10 +31,13 @@ import AddDeliveryAddress from './src/app/screens/AddDeliveryAddress';
 import Reviews from './src/app/screens/Reviews';
 import ReviewFood from './src/app/screens/ReviewFood';
 import ReviewAgency from './src/app/screens/ReviewAgency';
-import Favorite from './src/app/screens/Favorite';
 import Category from './src/app/screens/Category';
 import Cart from './src/app/screens/Cart';
 import HeaderCartButton from './src/app/components/Buttons/HeaderCartButton';
+import {Provider} from 'react-redux';
+import store from './src/app/store';
+import {useAppSelector} from './src/app/hook';
+import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 
 const MainStack = createNativeStackNavigator();
 
@@ -45,19 +48,17 @@ export type MainStackParamList = {
   Login: undefined;
   SignUp: undefined;
   BindPhone: undefined;
-  Verification: undefined;
+  Verification: {confirmation: FirebaseAuthTypes.ConfirmationResult};
   ResetPassword: undefined;
   DashBoard: undefined;
   FoodDetails: undefined;
   AgencyDetails: undefined;
   Search: undefined;
   Filter: undefined;
-  Favorites: undefined;
   Category: undefined;
   Cart: undefined;
   Payment: undefined;
   OrderDetails: undefined;
-  MyProfile: undefined;
   DeliveryDetails: undefined;
   AddDeliveryAddress: undefined;
   Reviews: {screenWriteReview: string};
@@ -72,270 +73,254 @@ const optionsAuthScreen = {
   headerLeft: () => <HeaderBackButton />,
 };
 
-const App = () => {
+const AppWrapper = () => {
   return (
-    <NavigationContainer>
-      <MainStack.Navigator
-        screenOptions={{
-          headerShown: false,
-          animation: 'slide_from_right',
-        }}>
-        <MainStack.Screen name="Splash" component={Splash} />
-        <MainStack.Screen name="Onboarding" component={Onboarding} />
-        <MainStack.Screen name="Welcome" component={Welcome} />
-        <MainStack.Screen
-          options={optionsAuthScreen}
-          name="Login"
-          component={Login}
-        />
-        <MainStack.Screen
-          options={optionsAuthScreen}
-          name="SignUp"
-          component={SignUp}
-        />
-        <MainStack.Screen
-          options={optionsAuthScreen}
-          name="BindPhone"
-          component={BindPhone}
-        />
-        <MainStack.Screen
-          options={optionsAuthScreen}
-          name="Verification"
-          component={Verification}
-        />
-        <MainStack.Screen
-          options={optionsAuthScreen}
-          name="ResetPassword"
-          component={ResetPassword}
-        />
-        <MainStack.Screen name="DashBoard" component={DashBoard} />
-        <MainStack.Screen
-          name="FoodDetails"
-          component={FoodDetails}
-          options={{
-            headerShown: true,
-            headerTransparent: true,
-            title: '',
-            headerLeft: () => <HeaderBackButtonDetails />,
-          }}
-        />
-        <MainStack.Screen
-          name="AgencyDetails"
-          component={AgencyDetails}
-          options={{
-            headerShown: true,
-            headerTransparent: true,
-            title: '',
-            headerLeft: () => <HeaderBackButtonDetails />,
-          }}
-        />
-        <MainStack.Screen
-          name="Search"
-          component={Search}
-          options={{
-            animation: 'fade_from_bottom',
-            headerShown: true,
-            headerTransparent: true,
-            title: 'Search',
-            headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              color: '#ffffff',
-              fontFamily: 'SofiaPro-Medium',
-              fontSize: 18,
-            },
-          }}
-        />
-        <MainStack.Screen
-          name="Filter"
-          component={Filter}
-          options={{
-            headerShown: true,
-            headerTransparent: true,
-            title: 'Filter',
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              color: '#ffffff',
-              fontFamily: 'SofiaPro-Medium',
-              fontSize: 18,
-            },
-          }}
-        />
-        <MainStack.Screen
-          name="Favorites"
-          component={Favorite}
-          options={{
-            headerShown: true,
-            headerTransparent: true,
-            title: 'Favorites',
-            headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              color: '#ffffff',
-              fontFamily: 'SofiaPro-Medium',
-              fontSize: 18,
-            },
-          }}
-        />
-        <MainStack.Screen
-          name="Category"
-          component={Category}
-          options={{
-            headerShown: true,
-            headerTransparent: true,
-            title: '',
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-          }}
-        />
-        <MainStack.Screen
-          name="Cart"
-          component={Cart}
-          options={{
-            headerShown: true,
-            headerTransparent: true,
-            title: 'Cart',
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-            headerRight: () => <HeaderCartButton />,
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              color: '#ffffff',
-              fontFamily: 'SofiaPro-Medium',
-              fontSize: 18,
-            },
-          }}
-        />
-        {/* <MainStack.Screen name="Payment" component={Payment} /> */}
-        <MainStack.Screen
-          name="MyProfile"
-          component={MyProfile}
-          options={{
-            headerShown: true,
-            headerTransparent: true,
-            title: '',
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              color: '#ffffff',
-              fontFamily: 'SofiaPro-Medium',
-              fontSize: 18,
-            },
-          }}
-        />
-        <MainStack.Screen
-          name="OrderDetails"
-          component={OrderDetails}
-          options={{
-            headerShown: true,
-            headerTransparent: true,
-            title: 'Order Details',
-            headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              color: '#ffffff',
-              fontFamily: 'SofiaPro-Medium',
-              fontSize: 18,
-            },
-          }}
-        />
-        <MainStack.Screen
-          name="DeliveryDetails"
-          component={DeliveryDetails}
-          options={{
-            headerTransparent: true,
-            headerShown: true,
-            title: 'Edit Delivery Address',
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              color: '#ffffff',
-              fontFamily: 'SofiaPro-Medium',
-              fontSize: 18,
-            },
-          }}
-        />
-        <MainStack.Screen
-          name="AddDeliveryAddress"
-          component={AddDeliveryAddress}
-          options={{
-            headerTransparent: true,
-            headerShown: true,
-            title: 'Add Delivery Address',
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              color: '#ffffff',
-              fontFamily: 'SofiaPro-Medium',
-              fontSize: 18,
-            },
-          }}
-        />
-        <MainStack.Screen
-          name="Reviews"
-          component={Reviews}
-          options={{
-            headerTransparent: true,
-            headerShown: true,
-            title: 'Reviews',
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 9}} />
-            ),
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              color: '#ffffff',
-              fontFamily: 'SofiaPro-Medium',
-              fontSize: 18,
-            },
-          }}
-        />
-        <MainStack.Screen
-          name="ReviewFood"
-          component={ReviewFood}
-          options={{
-            headerTransparent: true,
-            headerShown: true,
-            title: '',
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 14, marginTop: 14}} />
-            ),
-          }}
-        />
-        <MainStack.Screen
-          name="ReviewAgency"
-          component={ReviewAgency}
-          options={{
-            headerTransparent: true,
-            headerShown: true,
-            title: '',
-            headerLeft: () => (
-              <HeaderBackButton customStyle={{marginLeft: 14, marginTop: 14}} />
-            ),
-          }}
-        />
-      </MainStack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <App />
+    </Provider>
   );
 };
 
-export default App;
+const App = () => {
+  const userState = useAppSelector(state => state.userSlice);
+
+  return (
+    <Provider store={store}>
+      <NavigationContainer>
+        <MainStack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}>
+          {userState.token === null ? (
+            <>
+              <MainStack.Screen name="Splash" component={Splash} />
+              <MainStack.Screen name="Onboarding" component={Onboarding} />
+              <MainStack.Screen name="Welcome" component={Welcome} />
+              <MainStack.Screen
+                options={optionsAuthScreen}
+                name="Login"
+                component={Login}
+              />
+              <MainStack.Screen
+                options={optionsAuthScreen}
+                name="SignUp"
+                component={SignUp}
+              />
+              <MainStack.Screen
+                options={optionsAuthScreen}
+                name="BindPhone"
+                component={BindPhone}
+              />
+              <MainStack.Screen
+                options={optionsAuthScreen}
+                name="Verification"
+                component={Verification}
+              />
+              <MainStack.Screen
+                options={optionsAuthScreen}
+                name="ResetPassword"
+                component={ResetPassword}
+              />
+            </>
+          ) : (
+            <>
+              <MainStack.Screen name="DashBoard" component={DashBoard} />
+              <MainStack.Screen
+                name="FoodDetails"
+                component={FoodDetails}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: '',
+                  headerLeft: () => <HeaderBackButtonDetails />,
+                }}
+              />
+              <MainStack.Screen
+                name="AgencyDetails"
+                component={AgencyDetails}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: '',
+                  headerLeft: () => <HeaderBackButtonDetails />,
+                }}
+              />
+              <MainStack.Screen
+                name="Search"
+                component={Search}
+                options={{
+                  animation: 'fade_from_bottom',
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: 'Search',
+                  headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="Filter"
+                component={Filter}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: 'Filter',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="Category"
+                component={Category}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: '',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                }}
+              />
+              <MainStack.Screen
+                name="Cart"
+                component={Cart}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: 'Cart',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerRight: () => <HeaderCartButton />,
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="OrderDetails"
+                component={OrderDetails}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: 'Order Details',
+                  headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="DeliveryDetails"
+                component={DeliveryDetails}
+                options={{
+                  headerTransparent: true,
+                  headerShown: true,
+                  title: 'Edit Delivery Address',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="AddDeliveryAddress"
+                component={AddDeliveryAddress}
+                options={{
+                  headerTransparent: true,
+                  headerShown: true,
+                  title: 'Add Delivery Address',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="Reviews"
+                component={Reviews}
+                options={{
+                  headerTransparent: true,
+                  headerShown: true,
+                  title: 'Reviews',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="ReviewFood"
+                component={ReviewFood}
+                options={{
+                  headerTransparent: true,
+                  headerShown: true,
+                  title: '',
+                  headerLeft: () => (
+                    <HeaderBackButton
+                      customStyle={{marginLeft: 14, marginTop: 14}}
+                    />
+                  ),
+                }}
+              />
+              <MainStack.Screen
+                name="ReviewAgency"
+                component={ReviewAgency}
+                options={{
+                  headerTransparent: true,
+                  headerShown: true,
+                  title: '',
+                  headerLeft: () => (
+                    <HeaderBackButton
+                      customStyle={{marginLeft: 14, marginTop: 14}}
+                    />
+                  ),
+                }}
+              />
+            </>
+          )}
+        </MainStack.Navigator>
+      </NavigationContainer>
+    </Provider>
+  );
+};
+
+export default AppWrapper;

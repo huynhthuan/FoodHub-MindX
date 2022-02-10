@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "@ptomasroos/react-native-multi-slider": "^2.2.2",
+    "@react-native-firebase/app": "^14.3.1",
+    "@react-native-firebase/auth": "^14.3.1",
     "@react-navigation/bottom-tabs": "^6.1.0",
     "@react-navigation/drawer": "^6.2.0",
     "@react-navigation/native": "^6.0.7",
     "@react-navigation/native-stack": "^6.3.0",
+    "@reduxjs/toolkit": "^1.7.2",
     "@types/lodash": "^4.14.178",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "axios": "^0.25.0",
@@ -24,6 +27,7 @@
     "react": "17.0.2",
     "react-hook-form": "^7.25.3",
     "react-native": "0.67.2",
+    "react-native-fast-image": "^8.5.11",
     "react-native-gesture-handler": "2.1.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-reanimated": "^2.3.1",
@@ -32,6 +36,7 @@
     "react-native-swiper": "^1.6.0",
     "react-native-ui-lib": "^6.8.1",
     "react-native-woocommerce-api": "^1.8.8",
+    "react-redux": "^7.2.6",
     "stream": "^0.0.2"
   },
   "devDependencies": {

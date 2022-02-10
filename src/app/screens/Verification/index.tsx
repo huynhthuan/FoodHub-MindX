@@ -1,17 +1,102 @@
 import _ from 'lodash';
-import {Button, Image, MaskedInput, Text, View} from 'react-native-ui-lib';
+import {
+  Button,
+  Image,
+  Incubator,
+  MaskedInput,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native-ui-lib';
 import React from 'react';
-import {Alert, KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
+import {KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
 import {getScreenWidth} from '../../utilities/helpers';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
+import axios from 'axios';
+import auth from '@react-native-firebase/auth';
+import {useAppSelector} from '../../hook';
+import {signUpState} from '../../redux/slices/userSignUpSlice';
+import {
+  BASE_URL_ACF_USER,
+  BASE_URL_WP_JSON_GET_NONCE,
+  BASE_URL_WP_JSON_SIGN_UP,
+} from '../../api/constants';
 
 const Verification = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const [code, setCode] = React.useState('');
+  const route = useRoute<RouteProp<MainStackParamList, 'Verification'>>();
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const signUpState = useAppSelector(state => state.userSignUpSlice);
 
-  const renderTimeText = (value: any) => {
-    const paddedValue = _.padStart(value, 6, '*');
+  async function verifyPhoneNumber(phoneNumber: string) {
+    let confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+    navigation.navigate('Verification', {confirmation});
+  }
+
+  const confirmCode = React.useCallback(
+    async (signUpState: signUpState) => {
+      if (route.params.confirmation) {
+        const res = await route.params.confirmation.confirm(code);
+        if (res) {
+          axios
+            .get(BASE_URL_WP_JSON_GET_NONCE, {
+              params: {
+                controller: 'user',
+                method: 'register',
+              },
+            })
+            .then(res => {
+              axios
+                .post(BASE_URL_WP_JSON_SIGN_UP, {
+                  params: {
+                    username: signUpState.userName,
+                    user_pass: signUpState.password,
+                    email: signUpState.email,
+                    nonce: res.data.nonce,
+                  },
+                })
+                .then(res => {
+                  axios.post(BASE_URL_ACF_USER + '/phone', {
+                    params: {
+                      phone: signUpState.phone,
+                    },
+                    // headers: {Authorization: `Bearer ${}`},
+                  });
+                  console.log(res.data);
+                })
+                .catch(error => {
+                  console.log(error.response.data);
+                });
+            })
+            .catch(error => {
+              console.log(error.response);
+            });
+        } else {
+          setIsVisible(true);
+          setErrorMessage(`Invalid code. Please try again or resend OTP`);
+        }
+      }
+    },
+    [code],
+  );
+
+  const resendCode = React.useCallback(async () => {
+    setCode('');
+    if (signUpState.phone) {
+      verifyPhoneNumber(signUpState.phone);
+    }
+  }, [code]);
+
+  const renderCodeText = () => {
+    const paddedValue = _.padStart(code, 6, '*');
     const one = paddedValue.substring(0, 1);
     const two = paddedValue.substring(1, 2);
     const three = paddedValue.substring(2, 3);
@@ -44,21 +129,39 @@ const Verification = () => {
           Vefification Code
         </Text>
         <Text gray2 marginB-32 style={styles.desc}>
-          Please type the verification code sent to 0932512365
+          Please type the verification code sent to {signUpState.phone}
         </Text>
         <View>
           <MaskedInput
-            onChangeText={value => setCode(value)}
+            onChangeText={value => {
+              setCode(value);
+            }}
             value={code}
             keyboardType={'numeric'}
-            renderMaskedText={renderTimeText}
+            renderMaskedText={renderCodeText}
             maxLength={6}
           />
-          <Text gray4 marginB-32 style={styles.textResend}>
-            I don’t recevie a code!<Text primary> Please resend</Text>
-          </Text>
+          <View marginB-32 row centerV>
+            <Text gray4 style={styles.textResend} marginR-2>
+              I don’t recevie a code!
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                resendCode();
+              }}>
+              <Text primary textBold style={styles.textResend}>
+                Please resend
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <View center>
-            <Button bg-primary style={styles.btnLogin} onPress={() => {}}>
+            <Button
+              bg-primary
+              style={styles.btnLogin}
+              onPress={() => {
+                confirmCode(signUpState);
+              }}>
               <Text white style={styles.btnLoginText}>
                 Submit
               </Text>
@@ -66,6 +169,31 @@ const Verification = () => {
           </View>
         </View>
       </KeyboardAvoidingView>
+
+      <Incubator.Toast
+        visible={isVisible}
+        position={'bottom'}
+        message={errorMessage}
+        action={{
+          label: 'Close',
+          onPress: () => setIsVisible(false),
+          labelProps: {
+            style: {
+              fontFamily: 'SofiaPro-Medium',
+            },
+          },
+        }}
+        zIndex={99}
+        preset={Incubator.ToastPresets.FAILURE}
+        onDismiss={() => {
+          setIsVisible(false);
+        }}
+        autoDismiss={3500}
+        messageStyle={{
+          fontFamily: 'SofiaPro-Medium',
+          fontSize: 16,
+        }}
+      />
     </View>
   );
 };

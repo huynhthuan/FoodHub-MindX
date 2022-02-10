@@ -3,6 +3,7 @@ import {Colors} from 'react-native-ui-lib';
 Colors.loadColors({
   primary: '#FE724C',
   primaryDark: '#2D2D3A',
+  primaryDark50: 'rgba(45, 45, 58, 0.5)',
   dark: '#393948',
   dark2: '#9797A3',
   dark3: '#30384F',
