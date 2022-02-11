@@ -1,16 +1,16 @@
-import {Button, Image, Incubator, Text, View} from 'react-native-ui-lib';
+import { Button, Image, Incubator, Text, View } from 'react-native-ui-lib';
 import React from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
-import {getScreenWidth} from '../../utilities/helpers';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {MainStackParamList} from '../../../../App';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { getScreenWidth } from '../../utilities/helpers';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { MainStackParamList } from '../../../../App';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import axios from 'axios';
-import {BASE_URL_JWT_AUTH_GET_TOKEN} from '../../api/constants';
+import { BASE_URL_JWT_AUTH_GET_TOKEN } from '../../api/constants';
 import Loading from '../../components/Overlay/Loading';
-import {useAppDispatch} from '../../hook';
-import {login} from '../../redux/slices/userSlice';
+import { useAppDispatch } from '../../hook';
+import { login } from '../../redux/slices/userSlice';
 
 const Login = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -24,7 +24,7 @@ const Login = () => {
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm({
     defaultValues: {
       email: '',
@@ -32,7 +32,8 @@ const Login = () => {
     },
   });
 
-  const onSubmit = (data: {email: string; password: string}) => {
+
+  const onSubmit = (data: { email: string; password: string }) => {
     setIsShowLoading(true);
     axios
       .post(BASE_URL_JWT_AUTH_GET_TOKEN, {
@@ -56,8 +57,7 @@ const Login = () => {
   const onInvalid = (data: any) => {
     setIsVisible(true);
     setErrorMessage(
-      `${data.email ? 'Email: ' + data.email.message : ''}${
-        data.password ? '\n' + 'Password: ' + data.password.message : ''
+      `${data.email ? 'Email: ' + data.email.message : ''}${data.password ? '\n' + 'Password: ' + data.password.message : ''
       }`,
     );
   };
@@ -93,7 +93,7 @@ const Login = () => {
                 },
               }}
               render={({
-                field: {onChange, onBlur, value},
+                field: { onChange, onBlur, value },
               }: {
                 field: {
                   onChange: any;
@@ -125,7 +125,7 @@ const Login = () => {
                 },
               }}
               render={({
-                field: {onChange, onBlur, value},
+                field: { onChange, onBlur, value },
               }: {
                 field: {
                   onChange: any;

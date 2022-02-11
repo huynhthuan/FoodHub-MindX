@@ -7,26 +7,34 @@ import {
   Text,
   TouchableOpacity,
   View,
+
 } from 'react-native-ui-lib';
 import React from 'react';
-import {KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
-import {getScreenWidth} from '../../utilities/helpers';
+import { KeyboardAvoidingView, LogBox, Platform, StyleSheet } from 'react-native';
+import { getScreenWidth } from '../../utilities/helpers';
 import {
   NavigationProp,
   RouteProp,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import {MainStackParamList} from '../../../../App';
+import { MainStackParamList } from '../../../../App';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
-import {useAppSelector} from '../../hook';
-import {signUpState} from '../../redux/slices/userSignUpSlice';
+import { useAppDispatch, useAppSelector } from '../../hook';
+import { signUpState } from '../../redux/slices/userSignUpSlice';
 import {
   BASE_URL_ACF_USER,
+  BASE_URL_JWT_AUTH_GET_TOKEN,
   BASE_URL_WP_JSON_GET_NONCE,
   BASE_URL_WP_JSON_SIGN_UP,
 } from '../../api/constants';
+import { login } from '../../redux/slices/userSlice';
+import Loading from '../../components/Overlay/Loading';
+
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
 
 const Verification = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -35,55 +43,75 @@ const Verification = () => {
   const [isVisible, setIsVisible] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
   const signUpState = useAppSelector(state => state.userSignUpSlice);
+  const userState = useAppSelector(state => state.userSlice);
+  const dispatch = useAppDispatch();
+  const [isShowLoading, setIsShowLoading] = React.useState(false);
 
   async function verifyPhoneNumber(phoneNumber: string) {
     let confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-    navigation.navigate('Verification', {confirmation});
+    navigation.navigate('Verification', { confirmation });
   }
 
   const confirmCode = React.useCallback(
     async (signUpState: signUpState) => {
-      if (route.params.confirmation) {
-        const res = await route.params.confirmation.confirm(code);
-        if (res) {
+      console.log(signUpState);
+
+      axios
+        .get(BASE_URL_WP_JSON_GET_NONCE, {
+          params: {
+            controller: 'user',
+            method: 'register',
+          },
+        })
+        .then(res => {
+          console.log(res.data);
+
           axios
-            .get(BASE_URL_WP_JSON_GET_NONCE, {
+            .get(BASE_URL_WP_JSON_SIGN_UP, {
               params: {
-                controller: 'user',
-                method: 'register',
-              },
+                username: signUpState.userName,
+                user_pass: signUpState.password,
+                email: signUpState.email,
+                nonce: res.data.nonce,
+              }
             })
             .then(res => {
-              axios
-                .post(BASE_URL_WP_JSON_SIGN_UP, {
-                  params: {
-                    username: signUpState.userName,
-                    user_pass: signUpState.password,
-                    email: signUpState.email,
-                    nonce: res.data.nonce,
-                  },
-                })
-                .then(res => {
-                  axios.post(BASE_URL_ACF_USER + '/phone', {
-                    params: {
-                      phone: signUpState.phone,
-                    },
-                    // headers: {Authorization: `Bearer ${}`},
+              if (res.data.status === 'ok') {
+                axios
+                  .post(BASE_URL_JWT_AUTH_GET_TOKEN, {
+                    username: signUpState.email,
+                    password: signUpState.password,
+                  })
+                  .then(res => {
+                    setIsShowLoading(false);
+                    dispatch(login(res.data));
+                    navigation.navigate('DashBoard');
+                  })
+                  .catch(function (error) {
+                    setIsShowLoading(false);
+                    setIsVisible(true);
+                    setErrorMessage(
+                      `${error.response.data.message.replace(/<[^>]*>?/gm, '')}`,
+                    );
                   });
-                  console.log(res.data);
-                })
-                .catch(error => {
-                  console.log(error.response.data);
-                });
+              }
+              console.log(res.data);
+            }).catch(error => {
+              console.log('SIGUP', error);
             })
-            .catch(error => {
-              console.log(error.response);
-            });
-        } else {
-          setIsVisible(true);
-          setErrorMessage(`Invalid code. Please try again or resend OTP`);
-        }
-      }
+        }).catch(error => {
+          console.log('GET NONCE', error);
+        })
+
+      // if (route.params.confirmation) {
+      //   route.params.confirmation.confirm(code).then((res) => {
+
+      //   }).catch(error => {
+      //     console.log('VERIFY CODE', error);
+      //     setIsVisible(true);
+      //     setErrorMessage(`An error occurred, please try again or resend OTP.`);
+      //   })
+      // }
     },
     [code],
   );
@@ -194,6 +222,8 @@ const Verification = () => {
           fontSize: 16,
         }}
       />
+
+      <Loading isShow={isShowLoading} />
     </View>
   );
 };

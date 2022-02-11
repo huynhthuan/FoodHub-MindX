@@ -1,13 +1,13 @@
-import {Button, Image, Incubator, Text, View} from 'react-native-ui-lib';
+import { Button, Image, Incubator, Text, View } from 'react-native-ui-lib';
 import React from 'react';
-import {Alert, KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
-import {getScreenWidth} from '../../utilities/helpers';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {MainStackParamList} from '../../../../App';
-import {Controller, useForm} from 'react-hook-form';
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { getScreenWidth } from '../../utilities/helpers';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { MainStackParamList } from '../../../../App';
+import { Controller, useForm } from 'react-hook-form';
 import auth from '@react-native-firebase/auth';
-import {useAppDispatch, useAppSelector} from '../../hook';
-import {signUpData} from '../../redux/slices/userSignUpSlice';
+import { useAppDispatch, useAppSelector } from '../../hook';
+import { signUpData } from '../../redux/slices/userSignUpSlice';
 
 const BindPhone = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -18,7 +18,7 @@ const BindPhone = () => {
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm({
     defaultValues: {
       phone: '',
@@ -28,8 +28,8 @@ const BindPhone = () => {
   async function verifyPhoneNumber(phoneNumber: string) {
     try {
       const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-      dispatch(signUpData({...signUpState, phone: phoneNumber}));
-      navigation.navigate('Verification', {confirmation});
+      dispatch(signUpData({ ...signUpState, phone: phoneNumber }));
+      navigation.navigate('Verification', { confirmation });
     } catch (error) {
       setIsVisible(true);
       setErrorMessage(`${error}`);
@@ -69,12 +69,11 @@ const BindPhone = () => {
                 message: 'This field is required.',
               },
               pattern: {
-                value:
-                  /(?:(?:\+?[0-9]\s*(?:[.-]\s*)?)?(?:(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]‌​)\s*)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)([2-9]1[02-9]‌​|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})\s*(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+)\s*)?$/i,
+                value: /(\+84|0[3|5|7|8|9])+([0-9]{9})\b/i,
                 message: 'Your phone incorrect format.',
               },
             }}
-            render={({field: {onChange, onBlur, value}}) => (
+            render={({ field: { onChange, onBlur, value } }) => (
               <Incubator.TextField
                 style={styles.input}
                 onBlur={onBlur}

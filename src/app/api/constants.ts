@@ -12,7 +12,8 @@ const BASE_URL_JWT_AUTH_GET_TOKEN = BASE_URL_JWT_AUTH + 'v1/token';
 const BASE_URL_ACF_API = BASE_URL + 'wp-json/acf/';
 const BASE_URL_ACF_USER = BASE_URL_ACF_API + 'users/';
 
-const BASE_URL_WP_JSON_SIGN_UP = BASE_URL_JSON + 'register/';
+const BASE_URL_WP_JSON_USER = BASE_URL_JSON + 'user/';
+const BASE_URL_WP_JSON_SIGN_UP = BASE_URL_WP_JSON_USER + 'register/';
 const BASE_URL_WP_JSON_GET_NONCE = BASE_URL_JSON + 'get_nonce/';
 
 export {
@@ -23,5 +24,5 @@ export {
   BASE_URL_JWT_AUTH_GET_TOKEN,
   BASE_URL_ACF_USER,
   BASE_URL_WP_JSON_SIGN_UP,
-  BASE_URL_WP_JSON_GET_NONCE
+  BASE_URL_WP_JSON_GET_NONCE,
 };
