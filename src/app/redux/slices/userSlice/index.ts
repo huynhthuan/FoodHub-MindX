@@ -8,6 +8,7 @@ export interface userState {
   user_display_name: string | null;
   avatar_url: string | null;
   id: number | null;
+  phone: string | null;
 }
 
 // Define the initial state using that type
@@ -18,6 +19,7 @@ const initialState: userState = {
   user_display_name: null,
   avatar_url: null,
   id: null,
+  phone: null,
 };
 
 export const userSlice = createSlice({
@@ -32,11 +34,15 @@ export const userSlice = createSlice({
       state.user_display_name = action.payload.user_display_name;
       state.avatar_url = action.payload.avatar_url;
       state.id = action.payload.id;
+      state.phone = action.payload.phone;
+    },
+    updateUserAvatar: (state, action: PayloadAction<string>) => {
+      state.avatar_url = action.payload;
     },
     logout: state => Object.assign({}, state, initialState),
   },
 });
 
-export const {login, logout} = userSlice.actions;
+export const {login, logout, updateUserAvatar} = userSlice.actions;
 
 export default userSlice.reducer;

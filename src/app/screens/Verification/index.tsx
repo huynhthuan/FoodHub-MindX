@@ -7,30 +7,23 @@ import {
   Text,
   TouchableOpacity,
   View,
-
 } from 'react-native-ui-lib';
 import React from 'react';
-import { KeyboardAvoidingView, LogBox, Platform, StyleSheet } from 'react-native';
-import { getScreenWidth } from '../../utilities/helpers';
+import {KeyboardAvoidingView, LogBox, Platform, StyleSheet} from 'react-native';
+import {getScreenWidth} from '../../utilities/helpers';
 import {
   NavigationProp,
   RouteProp,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import { MainStackParamList } from '../../../../App';
+import {MainStackParamList} from '../../../../App';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
-import { useAppDispatch, useAppSelector } from '../../hook';
-import { signUpState } from '../../redux/slices/userSignUpSlice';
-import {
-  BASE_URL_ACF_USER,
-  BASE_URL_JWT_AUTH_GET_TOKEN,
-  BASE_URL_WP_JSON_GET_NONCE,
-  BASE_URL_WP_JSON_SIGN_UP,
-} from '../../api/constants';
-import { login } from '../../redux/slices/userSlice';
-import Loading from '../../components/Overlay/Loading';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import {showToast} from '../../redux/slices/toastSlice';
+import {BASE_URL_WP_API_USER} from '../../api/constants';
+import {setLoading} from '../../redux/slices/loadingSlice';
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -40,86 +33,104 @@ const Verification = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const [code, setCode] = React.useState('');
   const route = useRoute<RouteProp<MainStackParamList, 'Verification'>>();
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
-  const signUpState = useAppSelector(state => state.userSignUpSlice);
-  const userState = useAppSelector(state => state.userSlice);
   const dispatch = useAppDispatch();
-  const [isShowLoading, setIsShowLoading] = React.useState(false);
+  const userState = useAppSelector(state => state.userSlice);
 
   async function verifyPhoneNumber(phoneNumber: string) {
     let confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-    navigation.navigate('Verification', { confirmation });
+    navigation.navigate('Verification', {confirmation, phoneNumber});
   }
 
-  const confirmCode = React.useCallback(
-    async (signUpState: signUpState) => {
-      console.log(signUpState);
-
-      axios
-        .get(BASE_URL_WP_JSON_GET_NONCE, {
-          params: {
-            controller: 'user',
-            method: 'register',
-          },
-        })
+  const confirmCode = React.useCallback(async () => {
+    if (route.params.confirmation) {
+      route.params.confirmation
+        .confirm(code)
         .then(res => {
-          console.log(res.data);
+          console.log(res);
 
-          axios
-            .get(BASE_URL_WP_JSON_SIGN_UP, {
-              params: {
-                username: signUpState.userName,
-                user_pass: signUpState.password,
-                email: signUpState.email,
-                nonce: res.data.nonce,
-              }
-            })
-            .then(res => {
-              if (res.data.status === 'ok') {
-                axios
-                  .post(BASE_URL_JWT_AUTH_GET_TOKEN, {
-                    username: signUpState.email,
-                    password: signUpState.password,
-                  })
-                  .then(res => {
-                    setIsShowLoading(false);
-                    dispatch(login(res.data));
-                    navigation.navigate('DashBoard');
-                  })
-                  .catch(function (error) {
-                    setIsShowLoading(false);
-                    setIsVisible(true);
-                    setErrorMessage(
-                      `${error.response.data.message.replace(/<[^>]*>?/gm, '')}`,
-                    );
-                  });
-              }
-              console.log(res.data);
-            }).catch(error => {
-              console.log('SIGUP', error);
-            })
-        }).catch(error => {
-          console.log('GET NONCE', error);
+          if (res) {
+            dispatch(
+              setLoading({
+                isShown: true,
+              }),
+            );
+
+            axios
+              .post(
+                BASE_URL_WP_API_USER + userState.id,
+                {
+                  acf: {
+                    phone: route.params.phoneNumber,
+                  },
+                },
+                {
+                  headers: {
+                    Authorization: 'Bearer ' + userState.token,
+                  },
+                },
+              )
+              .then(res => {
+                console.log('DOne');
+                dispatch(
+                  setLoading({
+                    isShown: false,
+                  }),
+                );
+                dispatch(
+                  showToast({
+                    isShown: true,
+                    msg: `Bind number phone successfully!`,
+                    preset: Incubator.ToastPresets.SUCCESS,
+                  }),
+                );
+                navigation.navigate('DashBoard');
+              })
+              .catch(error => {
+                console.log(error);
+                dispatch(
+                  setLoading({
+                    isShown: false,
+                  }),
+                );
+                dispatch(
+                  showToast({
+                    isShown: true,
+                    msg: `${error.data}`,
+                    preset: Incubator.ToastPresets.FAILURE,
+                  }),
+                );
+              });
+          } else {
+            dispatch(
+              setLoading({
+                isShown: false,
+              }),
+            );
+            dispatch(
+              showToast({
+                isShown: true,
+                msg: `An error occurred, please try again or resend OTP.`,
+                preset: Incubator.ToastPresets.FAILURE,
+              }),
+            );
+          }
         })
-
-      // if (route.params.confirmation) {
-      //   route.params.confirmation.confirm(code).then((res) => {
-
-      //   }).catch(error => {
-      //     console.log('VERIFY CODE', error);
-      //     setIsVisible(true);
-      //     setErrorMessage(`An error occurred, please try again or resend OTP.`);
-      //   })
-      // }
-    },
-    [code],
-  );
+        .catch(error => {
+          dispatch(
+            showToast({
+              isShown: true,
+              msg: `An error occurred, please try again or resend OTP.`,
+              preset: Incubator.ToastPresets.FAILURE,
+            }),
+          );
+        });
+    }
+  }, [code]);
 
   const resendCode = React.useCallback(async () => {
     setCode('');
-    if (signUpState.phone) {
-      verifyPhoneNumber(signUpState.phone);
+    if (route.params.phoneNumber) {
+      verifyPhoneNumber(route.params.phoneNumber);
     }
   }, [code]);
 
@@ -157,7 +168,7 @@ const Verification = () => {
           Vefification Code
         </Text>
         <Text gray2 marginB-32 style={styles.desc}>
-          Please type the verification code sent to {signUpState.phone}
+          Please type the verification code sent to {route.params.phoneNumber}
         </Text>
         <View>
           <MaskedInput
@@ -188,7 +199,7 @@ const Verification = () => {
               bg-primary
               style={styles.btnLogin}
               onPress={() => {
-                confirmCode(signUpState);
+                confirmCode();
               }}>
               <Text white style={styles.btnLoginText}>
                 Submit
@@ -197,33 +208,6 @@ const Verification = () => {
           </View>
         </View>
       </KeyboardAvoidingView>
-
-      <Incubator.Toast
-        visible={isVisible}
-        position={'bottom'}
-        message={errorMessage}
-        action={{
-          label: 'Close',
-          onPress: () => setIsVisible(false),
-          labelProps: {
-            style: {
-              fontFamily: 'SofiaPro-Medium',
-            },
-          },
-        }}
-        zIndex={99}
-        preset={Incubator.ToastPresets.FAILURE}
-        onDismiss={() => {
-          setIsVisible(false);
-        }}
-        autoDismiss={3500}
-        messageStyle={{
-          fontFamily: 'SofiaPro-Medium',
-          fontSize: 16,
-        }}
-      />
-
-      <Loading isShow={isShowLoading} />
     </View>
   );
 };

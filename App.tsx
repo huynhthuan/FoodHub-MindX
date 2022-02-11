@@ -38,6 +38,9 @@ import {Provider} from 'react-redux';
 import store from './src/app/store';
 import {useAppSelector} from './src/app/hook';
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import Loading from './src/app/components/Overlay/Loading';
+import ToastCustom from './src/app/components/Overlay/ToastCustom';
+import {Text} from 'react-native-ui-lib';
 
 const MainStack = createNativeStackNavigator();
 
@@ -48,7 +51,10 @@ export type MainStackParamList = {
   Login: undefined;
   SignUp: undefined;
   BindPhone: undefined;
-  Verification: {confirmation: FirebaseAuthTypes.ConfirmationResult};
+  Verification: {
+    confirmation: FirebaseAuthTypes.ConfirmationResult;
+    phoneNumber: string;
+  };
   ResetPassword: undefined;
   DashBoard: undefined;
   FoodDetails: undefined;
@@ -83,9 +89,11 @@ const AppWrapper = () => {
 
 const App = () => {
   const userState = useAppSelector(state => state.userSlice);
+  const loading = useAppSelector(state => state.loadingSlice);
+  const toasCustom = useAppSelector(state => state.toastSlice);
 
   return (
-    <Provider store={store}>
+    <>
       <NavigationContainer>
         <MainStack.Navigator
           screenOptions={{
@@ -125,6 +133,16 @@ const App = () => {
           ) : (
             <>
               <MainStack.Screen name="DashBoard" component={DashBoard} />
+              <MainStack.Screen
+                options={optionsAuthScreen}
+                name="BindPhone"
+                component={BindPhone}
+              />
+              <MainStack.Screen
+                options={optionsAuthScreen}
+                name="Verification"
+                component={Verification}
+              />
               <MainStack.Screen
                 name="FoodDetails"
                 component={FoodDetails}
@@ -319,7 +337,14 @@ const App = () => {
           )}
         </MainStack.Navigator>
       </NavigationContainer>
-    </Provider>
+
+      <Loading isShow={loading.isShown} />
+      <ToastCustom
+        isVisible={toasCustom.isShown}
+        msg={toasCustom.msg}
+        preset={toasCustom.preset}
+      />
+    </>
   );
 };
 

@@ -7,8 +7,15 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import axios from 'axios';
-import {useAppDispatch, useAppSelector} from '../../hook';
-import {signUpData} from '../../redux/slices/userSignUpSlice';
+import {useAppDispatch} from '../../hook';
+import {
+  BASE_URL_JWT_AUTH_GET_TOKEN,
+  BASE_URL_WP_JSON_GET_NONCE,
+  BASE_URL_WP_JSON_SIGN_UP,
+} from '../../api/constants';
+import {setLoading} from '../../redux/slices/loadingSlice';
+import {showToast} from '../../redux/slices/toastSlice';
+import {login} from '../../redux/slices/userSlice';
 
 const SignUp = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -28,10 +35,77 @@ const SignUp = () => {
       password: '',
     },
   });
-
   const onSubmit = (data: any) => {
-    dispatch(signUpData(data));
-    navigation.navigate('BindPhone');
+    dispatch(setLoading({isShown: true}));
+
+    axios
+      .get(BASE_URL_WP_JSON_GET_NONCE, {
+        params: {
+          controller: 'user',
+          method: 'register',
+        },
+      })
+      .then(res => {
+        axios
+          .get(BASE_URL_WP_JSON_SIGN_UP, {
+            params: {
+              username: data.userName,
+              user_pass: data.password,
+              email: data.email,
+              nonce: res.data.nonce,
+            },
+          })
+          .then(res => {
+            if (res.data.status === 'ok') {
+              axios
+                .post(BASE_URL_JWT_AUTH_GET_TOKEN, {
+                  username: data.email,
+                  password: data.password,
+                })
+                .then(res => {
+                  dispatch(setLoading({isShown: false}));
+                  dispatch(login(res.data));
+                  dispatch(
+                    showToast({
+                      isShown: true,
+                      msg: 'Sign up successfully!!!\nWelcome to FoodHub',
+                      preset: Incubator.ToastPresets.SUCCESS,
+                    }),
+                  );
+                  navigation.navigate('BindPhone');
+                });
+            } else {
+              dispatch(setLoading({isShown: false}));
+              dispatch(
+                showToast({
+                  isShown: true,
+                  msg: res.data.error,
+                  preset: Incubator.ToastPresets.FAILURE,
+                }),
+              );
+            }
+          })
+          .catch(error => {
+            dispatch(setLoading({isShown: false}));
+            dispatch(
+              showToast({
+                isShown: true,
+                msg: error,
+                preset: Incubator.ToastPresets.FAILURE,
+              }),
+            );
+          });
+      })
+      .catch(error => {
+        dispatch(setLoading({isShown: false}));
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: error,
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
   };
 
   const onInvalid = (data: any) => {
@@ -39,7 +113,7 @@ const SignUp = () => {
     setErrorMessage(
       `${data.userName ? 'Full name: ' + data.userName.message + '\n' : ''}${
         data.email ? 'Email: ' + data.email.message + '\n' : ''
-      }${data.password ? 'Password: ' + data.password.message : ''}`,
+      }${data.password ? 'Password: ' + data.password.message + '\n' : ''}`,
     );
   };
 
@@ -106,7 +180,8 @@ const SignUp = () => {
                   message: 'This field is required',
                 },
                 pattern: {
-                  value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                  value:
+                    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                   message: 'Incorrect email format.',
                 },
               }}

@@ -1,30 +1,27 @@
-import { Button, Image, Incubator, Text, View } from 'react-native-ui-lib';
+import {Button, Image, Incubator, Text, View} from 'react-native-ui-lib';
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { getScreenWidth } from '../../utilities/helpers';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { MainStackParamList } from '../../../../App';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import {StyleSheet, TouchableOpacity} from 'react-native';
+import {useForm, Controller} from 'react-hook-form';
+import {getScreenWidth} from '../../utilities/helpers';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {MainStackParamList} from '../../../../App';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import axios from 'axios';
-import { BASE_URL_JWT_AUTH_GET_TOKEN } from '../../api/constants';
-import Loading from '../../components/Overlay/Loading';
-import { useAppDispatch } from '../../hook';
-import { login } from '../../redux/slices/userSlice';
+import {BASE_URL_JWT_AUTH_GET_TOKEN} from '../../api/constants';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import {login} from '../../redux/slices/userSlice';
+import {setLoading} from '../../redux/slices/loadingSlice';
+import {showToast} from '../../redux/slices/toastSlice';
 
 const Login = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const [showPass, setShowPass] = React.useState(false);
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [isShowLoading, setIsShowLoading] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
-
   const dispatch = useAppDispatch();
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
   } = useForm({
     defaultValues: {
       email: '',
@@ -32,33 +29,40 @@ const Login = () => {
     },
   });
 
+  const onSubmit = (data: {email: string; password: string}) => {
+    dispatch(setLoading({isShown: true}));
 
-  const onSubmit = (data: { email: string; password: string }) => {
-    setIsShowLoading(true);
     axios
       .post(BASE_URL_JWT_AUTH_GET_TOKEN, {
         username: data.email,
         password: data.password,
       })
       .then(res => {
-        setIsShowLoading(false);
+        dispatch(setLoading({isShown: false}));
         dispatch(login(res.data));
         navigation.navigate('DashBoard');
       })
       .catch(function (error) {
-        setIsShowLoading(false);
-        setIsVisible(true);
-        setErrorMessage(
-          `${error.response.data.message.replace(/<[^>]*>?/gm, '')}`,
+        dispatch(setLoading({isShown: false}));
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: `${error.response.data.message.replace(/<[^>]*>?/gm, '')}`,
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
         );
       });
   };
 
   const onInvalid = (data: any) => {
-    setIsVisible(true);
-    setErrorMessage(
-      `${data.email ? 'Email: ' + data.email.message : ''}${data.password ? '\n' + 'Password: ' + data.password.message : ''
-      }`,
+    dispatch(
+      showToast({
+        isShown: true,
+        msg: `${data.email ? 'Email: ' + data.email.message : ''}${
+          data.password ? '\n' + 'Password: ' + data.password.message : ''
+        }`,
+        preset: Incubator.ToastPresets.FAILURE,
+      }),
     );
   };
 
@@ -93,7 +97,7 @@ const Login = () => {
                 },
               }}
               render={({
-                field: { onChange, onBlur, value },
+                field: {onChange, onBlur, value},
               }: {
                 field: {
                   onChange: any;
@@ -125,7 +129,7 @@ const Login = () => {
                 },
               }}
               render={({
-                field: { onChange, onBlur, value },
+                field: {onChange, onBlur, value},
               }: {
                 field: {
                   onChange: any;
@@ -191,33 +195,6 @@ const Login = () => {
           </Text>
         </View>
       </KeyboardAwareScrollView>
-
-      <Incubator.Toast
-        visible={isVisible}
-        position={'bottom'}
-        message={errorMessage}
-        action={{
-          label: 'Close',
-          onPress: () => setIsVisible(false),
-          labelProps: {
-            style: {
-              fontFamily: 'SofiaPro-Medium',
-            },
-          },
-        }}
-        zIndex={99}
-        preset={Incubator.ToastPresets.FAILURE}
-        onDismiss={() => {
-          setIsVisible(false);
-        }}
-        autoDismiss={3500}
-        messageStyle={{
-          fontFamily: 'SofiaPro-Medium',
-          fontSize: 16,
-        }}
-      />
-
-      <Loading isShow={isShowLoading} />
     </>
   );
 };

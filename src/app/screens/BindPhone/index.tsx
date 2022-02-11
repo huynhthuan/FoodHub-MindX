@@ -1,48 +1,113 @@
-import { Button, Image, Incubator, Text, View } from 'react-native-ui-lib';
+import {
+  Button,
+  Image,
+  Incubator,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native-ui-lib';
 import React from 'react';
-import { Alert, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
-import { getScreenWidth } from '../../utilities/helpers';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { MainStackParamList } from '../../../../App';
-import { Controller, useForm } from 'react-hook-form';
+import {KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
+import {getScreenWidth} from '../../utilities/helpers';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {MainStackParamList} from '../../../../App';
+import {Controller, useForm} from 'react-hook-form';
 import auth from '@react-native-firebase/auth';
-import { useAppDispatch, useAppSelector } from '../../hook';
-import { signUpData } from '../../redux/slices/userSignUpSlice';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import {showToast} from '../../redux/slices/toastSlice';
+import axios from 'axios';
+import {BASE_URL} from '../../api/constants';
+import {setLoading} from '../../redux/slices/loadingSlice';
 
 const BindPhone = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
-  const signUpState = useAppSelector(state => state.userSignUpSlice);
   const dispatch = useAppDispatch();
+
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
   } = useForm({
     defaultValues: {
       phone: '',
     },
   });
-
   async function verifyPhoneNumber(phoneNumber: string) {
     try {
       const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-      dispatch(signUpData({ ...signUpState, phone: phoneNumber }));
-      navigation.navigate('Verification', { confirmation });
+      dispatch(
+        setLoading({
+          isShown: false,
+        }),
+      );
+      navigation.navigate('Verification', {confirmation, phoneNumber});
     } catch (error) {
-      setIsVisible(true);
-      setErrorMessage(`${error}`);
+      dispatch(
+        setLoading({
+          isShown: false,
+        }),
+      );
+      dispatch(
+        showToast({
+          isShown: true,
+          msg: `${error}`,
+          preset: Incubator.ToastPresets.FAILURE,
+        }),
+      );
     }
   }
 
   const onSubmit = async (data: any) => {
-    verifyPhoneNumber(data.phone);
+    dispatch(
+      setLoading({
+        isShown: true,
+      }),
+    );
+    axios
+      .get(BASE_URL + 'helper/checkExistPhone', {
+        params: {
+          phone: data.phone,
+        },
+      })
+      .then(res => {
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+        if (res.data.length) {
+          dispatch(
+            showToast({
+              isShown: true,
+              msg: `Phone number is exist. Please try other phone number!`,
+              preset: Incubator.ToastPresets.FAILURE,
+            }),
+          );
+        } else {
+          verifyPhoneNumber(data.phone);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: `${error.data}`,
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
   };
 
   const onInvalid = (data: any) => {
-    setIsVisible(true);
-    setErrorMessage(`${data.phone ? 'Phone: ' + data.phone.message : ''}`);
+    dispatch(
+      showToast({
+        isShown: true,
+        msg: `${data.phone ? 'Phone: ' + data.phone.message : ''}`,
+        preset: Incubator.ToastPresets.FAILURE,
+      }),
+    );
   };
 
   return (
@@ -58,7 +123,7 @@ const BindPhone = () => {
           Bind Phone Number
         </Text>
         <Text gray2 marginB-32 style={styles.desc}>
-          Enter your phone number to verify your account
+          Enter your phone number to link with your account.
         </Text>
         <View>
           <Controller
@@ -73,7 +138,7 @@ const BindPhone = () => {
                 message: 'Your phone incorrect format.',
               },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({field: {onChange, onBlur, value}}) => (
               <Incubator.TextField
                 style={styles.input}
                 onBlur={onBlur}
@@ -96,33 +161,19 @@ const BindPhone = () => {
               </Text>
             </Button>
           </View>
+
+          <TouchableOpacity center marginT-10>
+            <Text
+              textBold
+              gray2
+              onPress={() => {
+                navigation.navigate('DashBoard');
+              }}>
+              Skip
+            </Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-
-      <Incubator.Toast
-        visible={isVisible}
-        position={'bottom'}
-        message={errorMessage}
-        action={{
-          label: 'Close',
-          onPress: () => setIsVisible(false),
-          labelProps: {
-            style: {
-              fontFamily: 'SofiaPro-Medium',
-            },
-          },
-        }}
-        zIndex={99}
-        preset={Incubator.ToastPresets.FAILURE}
-        onDismiss={() => {
-          setIsVisible(false);
-        }}
-        autoDismiss={3500}
-        messageStyle={{
-          fontFamily: 'SofiaPro-Medium',
-          fontSize: 16,
-        }}
-      />
     </View>
   );
 };
