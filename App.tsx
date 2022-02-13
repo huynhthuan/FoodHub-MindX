@@ -6,6 +6,7 @@
  * @flow strict-local
  */
 import React from 'react';
+import * as Sentry from '@sentry/react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Splash from './src/app/screens/Splash';
@@ -25,7 +26,6 @@ import Avatar from './src/app/components/HomeMenu/Avatar';
 import Filter from './src/app/screens/Filter';
 import DashBoard from './src/app/screens/DashBoard';
 import OrderDetails from './src/app/screens/OrderDetails';
-import MyProfile from './src/app/screens/MyProfile';
 import DeliveryDetails from './src/app/screens/DeliveryDetails';
 import AddDeliveryAddress from './src/app/screens/AddDeliveryAddress';
 import Reviews from './src/app/screens/Reviews';
@@ -40,7 +40,14 @@ import {useAppSelector} from './src/app/hook';
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import Loading from './src/app/components/Overlay/Loading';
 import ToastCustom from './src/app/components/Overlay/ToastCustom';
-import {Text} from 'react-native-ui-lib';
+import {deliveryAddressData} from './src/app/redux/slices/deliveryAddressSlice';
+
+Sentry.init({
+  dsn: 'https://2e7732ba44794b38913cb3829622ac0f@o1121885.ingest.sentry.io/6158966',
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+  // We recommend adjusting this value in production.
+  tracesSampleRate: 1.0,
+});
 
 const MainStack = createNativeStackNavigator();
 
@@ -65,7 +72,7 @@ export type MainStackParamList = {
   Cart: undefined;
   Payment: undefined;
   OrderDetails: undefined;
-  DeliveryDetails: undefined;
+  DeliveryDetails: {addressDetail: deliveryAddressData};
   AddDeliveryAddress: undefined;
   Reviews: {screenWriteReview: string};
   ReviewFood: undefined;
@@ -99,7 +106,7 @@ const App = () => {
           screenOptions={{
             headerShown: false,
           }}>
-          {userState.token === null ? (
+          {userState.token === undefined ? (
             <>
               <MainStack.Screen name="Splash" component={Splash} />
               <MainStack.Screen name="Onboarding" component={Onboarding} />
@@ -348,4 +355,4 @@ const App = () => {
   );
 };
 
-export default AppWrapper;
+export default Sentry.wrap(AppWrapper);

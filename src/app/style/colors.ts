@@ -17,4 +17,5 @@ Colors.loadColors({
   yellow: '#FFC529',
   yellow50: 'rgba(255, 197, 41, 0.4)',
   green: '#4EE476',
+  red: '#EA001B',
 });

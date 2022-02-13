@@ -24,6 +24,7 @@ import {useAppDispatch, useAppSelector} from '../../hook';
 import {showToast} from '../../redux/slices/toastSlice';
 import {BASE_URL_WP_API_USER} from '../../api/constants';
 import {setLoading} from '../../redux/slices/loadingSlice';
+import {logout, updateUserPhone} from '../../redux/slices/userSlice';
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -70,28 +71,40 @@ const Verification = () => {
                 },
               )
               .then(res => {
-                console.log('DOne');
                 dispatch(
                   setLoading({
                     isShown: false,
                   }),
                 );
+                dispatch(updateUserPhone(route.params.phoneNumber));
                 dispatch(
                   showToast({
                     isShown: true,
-                    msg: `Bind number phone successfully!`,
+                    msg: `Liên kết số điện thoại thành công!`,
                     preset: Incubator.ToastPresets.SUCCESS,
                   }),
                 );
                 navigation.navigate('DashBoard');
               })
               .catch(error => {
-                console.log(error);
                 dispatch(
                   setLoading({
                     isShown: false,
                   }),
                 );
+
+                if (error.response.data.data.status === 403) {
+                  dispatch(
+                    showToast({
+                      isShown: true,
+                      msg: 'Phiên đăng nhập của bạn đã hết hạn. Vui Lòng đăng nhập lại!',
+                      preset: Incubator.ToastPresets.OFFLINE,
+                    }),
+                  );
+                  dispatch(logout());
+                  return;
+                }
+
                 dispatch(
                   showToast({
                     isShown: true,
@@ -109,7 +122,7 @@ const Verification = () => {
             dispatch(
               showToast({
                 isShown: true,
-                msg: `An error occurred, please try again or resend OTP.`,
+                msg: `Đã có lỗi xảy ra, vui lòng thử lại hoặc ấn gửi lại mã OTP.`,
                 preset: Incubator.ToastPresets.FAILURE,
               }),
             );
@@ -119,7 +132,7 @@ const Verification = () => {
           dispatch(
             showToast({
               isShown: true,
-              msg: `An error occurred, please try again or resend OTP.`,
+              msg: `Đã có lỗi xảy ra, vui lòng thử lại hoặc ấn gửi lại mã OTP.`,
               preset: Incubator.ToastPresets.FAILURE,
             }),
           );

@@ -1,16 +1,72 @@
-import {Button, Image, Text, View} from 'react-native-ui-lib';
-import React from 'react';
+import {Button, Image, Incubator, Text, View} from 'react-native-ui-lib';
+import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
-import {getScreenWidth} from '../../utilities/helpers';
+import {getScreenWidth, getStatusOrder} from '../../utilities/helpers';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import WooApi from '../../api/wooApi';
+import {setLoading} from '../../redux/slices/loadingSlice';
+import axios from 'axios';
+import {
+  BASE_URL_WOOCOMMERCE_ORDER,
+  WOO_KEY,
+  WOO_SECRET,
+} from '../../api/constants';
+import {showToast} from '../../redux/slices/toastSlice';
 
 export interface IItemOrderUpcoming {
-  data: any;
+  id: number;
+  getOrdersCompleted: () => void;
 }
 
-const ItemOrderUpcoming = ({data}: IItemOrderUpcoming) => {
+const ItemOrderUpcoming = ({id, getOrdersCompleted}: IItemOrderUpcoming) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  const entitieOrders = useAppSelector(state => state.orderSlice.entities);
+  const order: any = entitieOrders[id];
+  const [isVisible, setIsVisible] = React.useState(false);
+  const dispatch = useAppDispatch();
+
+  if (!order) return null;
+
+  const cancelOrder = React.useCallback(() => {
+    setIsVisible(false);
+    dispatch(
+      setLoading({
+        isShown: true,
+      }),
+    );
+
+    WooApi.post('order/' + order.id, {
+      order: {
+        status: 'cancelled',
+      },
+    })
+      .then((data: any) => {
+        console.log(data);
+
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+        getOrdersCompleted();
+      })
+      .catch((error: any) => {
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Đã có lỗi xảy ra. Vui lòng thử lại !',
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
+  }, []);
 
   return (
     <View bg-dark padding-18 marginB-20 style={styles.container}>
@@ -26,7 +82,7 @@ const ItemOrderUpcoming = ({data}: IItemOrderUpcoming) => {
           <View>
             <View row spread marginB-9>
               <Text gray2 textRegular style={styles.text}>
-                3 Items
+                {order.line_items.length} đồ ăn
               </Text>
             </View>
 
@@ -38,7 +94,7 @@ const ItemOrderUpcoming = ({data}: IItemOrderUpcoming) => {
               onPress={() => {
                 navigation.navigate('AgencyDetails');
               }}>
-              McDonald’s{' '}
+              Food Hub{' '}
               <Image
                 assetName="verify"
                 width={8}
@@ -50,47 +106,79 @@ const ItemOrderUpcoming = ({data}: IItemOrderUpcoming) => {
         </View>
 
         <Text yellow textRegular style={styles.price}>
-          #2641000
+          #{order.id}
         </Text>
       </View>
 
       <View row spread marginB-21>
         <View>
           <Text gray2 textBold marginB-11>
-            Estimated Arrival
+            Dự kiến thời gian giao
           </Text>
           <View row bottom>
             <Text white textRegular style={styles.time}>
               25
             </Text>
             <Text white textRegular style={styles.timeUnit}>
-              min
+              phút
             </Text>
           </View>
         </View>
 
         <View right>
           <Text gray2 marginB-5>
-            Now
+            Tình trạng
           </Text>
           <Text textBold style={styles.textStatus}>
-            Food on the way
+            {getStatusOrder(order.status)}
           </Text>
         </View>
       </View>
 
       <View row spread>
-        <Button bg-dark4 style={styles.btn}>
+        <Button
+          bg-dark4
+          style={styles.btn}
+          onPress={() => {
+            setIsVisible(true);
+          }}>
           <Text white textMedium style={styles.btnText}>
-            Cancel
+            Hủy đơn
           </Text>
         </Button>
         <Button bg-primary style={styles.btn}>
           <Text white textMedium style={styles.btnText}>
-            Track Order
+            Kiểm tra
           </Text>
         </Button>
       </View>
+
+      <Incubator.Toast
+        visible={isVisible}
+        position={'bottom'}
+        message={'Bạn có chắc chắn muốn hủy đơn hàng?'}
+        action={{
+          label: 'Đồng ý',
+          onPress: () => {
+            cancelOrder();
+          },
+          labelProps: {
+            style: {
+              fontFamily: 'SofiaPro-Medium',
+            },
+          },
+        }}
+        zIndex={99}
+        preset={Incubator.ToastPresets.GENERAL}
+        onDismiss={() => {
+          setIsVisible(false);
+        }}
+        autoDismiss={5000}
+        messageStyle={{
+          fontFamily: 'SofiaPro-Medium',
+          fontSize: 16,
+        }}
+      />
     </View>
   );
 };

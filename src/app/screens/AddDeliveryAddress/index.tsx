@@ -1,9 +1,8 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
-import {View} from 'react-native-ui-lib';
 import {MainStackParamList} from '../../../../App';
-import FormDeliveryAddress from '../../components/Delivery/FormDeliveryAddress';
+import FormAddDeliveryAddress from '../../components/Delivery/FormAddDeliveryAddress';
 import {changeHeaderBackground} from '../../utilities/helpers';
 
 const AddDeliveryAddress = () => {
@@ -15,7 +14,7 @@ const AddDeliveryAddress = () => {
       onScroll={({nativeEvent}) => {
         changeHeaderBackground(nativeEvent, navigation);
       }}>
-      <FormDeliveryAddress />
+      <FormAddDeliveryAddress />
     </ScrollView>
   );
 };

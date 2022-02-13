@@ -42,6 +42,7 @@ Assets.loadAssetsGroup('icons', {
   home: require('./icons/home.png'),
   arrowRightNormal: require('./icons/arrow-right-normal.png'),
   bubbleMessage: require('./icons/bubble-message.png'),
+  addressShipping: require('./icons/addressShipping.png'),
 });
 
 Assets.loadAssetsGroup('images', {

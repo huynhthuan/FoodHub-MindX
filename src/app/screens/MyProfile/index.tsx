@@ -21,7 +21,12 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import axios from 'axios';
 import {BASE_URL_WP_API_USER} from '../../api/constants';
-import {updateUserAvatar} from '../../redux/slices/userSlice';
+import {
+  updateFirstName,
+  updateLastName,
+  updateUserAvatar,
+} from '../../redux/slices/userSlice';
+import {setLoading} from '../../redux/slices/loadingSlice';
 
 const MyProfile = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -35,13 +40,66 @@ const MyProfile = () => {
     formState: {errors},
   } = useForm({
     defaultValues: {
-      firstname: '',
-      lastname: '',
-      phone: '',
+      firstname: userState.first_name,
+      lastname: userState.last_name,
+      phone: userState.phone,
+      email: userState.user_email,
     },
   });
 
-  const onSubmit = (data: any) => {};
+  const onSubmit = (data: any) => {
+    dispatch(
+      setLoading({
+        isShown: true,
+      }),
+    );
+    axios
+      .post(
+        BASE_URL_WP_API_USER + userState.id,
+        {
+          first_name: data.firstname,
+          last_name: data.lastname,
+        },
+        {
+          headers: {
+            Authorization: 'Bearer ' + userState.token,
+          },
+        },
+      )
+      .then(res => {
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+        dispatch(updateFirstName(data.firstname));
+        dispatch(updateLastName(data.lastname));
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: `Change information sucessfully.`,
+            preset: Incubator.ToastPresets.SUCCESS,
+          }),
+        );
+      })
+      .catch(error => {
+        console.log(error);
+
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: error.data,
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
+  };
 
   const onInvalid = (data: any) => {
     dispatch(
@@ -194,15 +252,16 @@ const MyProfile = () => {
               },
               minLength: {
                 value: 2,
-                message: 'Your name must have at least 2 characters.',
+                message: 'Your first name must have at least 2 characters.',
               },
               maxLength: {
                 value: 32,
-                message: 'Your name must have a maximum of 32 characters.',
+                message:
+                  'Your first name must have a maximum of 32 characters.',
               },
               pattern: {
                 value: /^[A-Za-z\s]+$/,
-                message: 'Your name must be letters.',
+                message: 'Your first name must be letters.',
               },
             }}
             render={({
@@ -238,15 +297,15 @@ const MyProfile = () => {
               },
               minLength: {
                 value: 2,
-                message: 'Your name must have at least 2 characters.',
+                message: 'Your last name must have at least 2 characters.',
               },
               maxLength: {
                 value: 32,
-                message: 'Your name must have a maximum of 32 characters.',
+                message: 'Your last name must have a maximum of 32 characters.',
               },
               pattern: {
                 value: /^[A-Za-z\s]+$/,
-                message: 'Your name must be letters.',
+                message: 'Your last name must be letters.',
               },
             }}
             render={({
@@ -275,16 +334,6 @@ const MyProfile = () => {
 
           <Controller
             control={control}
-            rules={{
-              required: {
-                value: true,
-                message: 'This field is required',
-              },
-              pattern: {
-                value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-                message: 'Incorrect email format.',
-              },
-            }}
             render={({
               field: {onChange, onBlur, value},
             }: {
@@ -299,7 +348,7 @@ const MyProfile = () => {
                 style={styles.input}
                 onBlur={onBlur}
                 onChangeText={onChange}
-                value={userState.user_email}
+                value={value}
                 label={'E-mail'}
                 labelStyle={styles.label}
                 placeholder={'Enter your email'}
@@ -308,9 +357,10 @@ const MyProfile = () => {
                 selectTextOnFocus={false}
               />
             )}
+            name="email"
           />
 
-          {userState.phone !== null ? (
+          {userState.phone === undefined ? (
             <>
               <Text style={styles.label}>Phone number</Text>
               <Button
@@ -325,26 +375,18 @@ const MyProfile = () => {
           ) : (
             <Controller
               control={control}
-              rules={{
-                required: {
-                  value: true,
-                  message: 'This field is required.',
-                },
-                pattern: {
-                  value: /(\+84|0[3|5|7|8|9])+([0-9]{9})\b/i,
-                  message: 'Your phone incorrect format.',
-                },
-              }}
               render={({field: {onChange, onBlur, value}}) => (
                 <Incubator.TextField
                   style={styles.input}
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  value={userState.phone}
+                  value={value}
                   label={'Phone Number'}
                   labelStyle={styles.label}
                   placeholderTextColor={'#ADADB8'}
                   keyboardType="phone-pad"
+                  editable={false}
+                  selectTextOnFocus={false}
                 />
               )}
               name="phone"

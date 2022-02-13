@@ -1,14 +1,25 @@
-import {TabController, TabControllerItemProps, View} from 'react-native-ui-lib';
+import {
+  Incubator,
+  TabController,
+  TabControllerItemProps,
+  View,
+} from 'react-native-ui-lib';
 import React from 'react';
 import {FlatList, StyleSheet} from 'react-native';
 import {getScreenWidth} from '../../utilities/helpers';
 import ItemOrderHistory from '../../components/MyOrders/ItemOrderHistory';
 import ItemOrderUpcoming from '../../components/MyOrders/ItemOrderUpcoming';
 import ListEmptyComponent from '../../components/MyOrders/ListEmptyComponent';
+import WooApi from '../../api/wooApi';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import {ordersReceived} from '../../redux/slices/orderSlice';
+import {showToast} from '../../redux/slices/toastSlice';
+import {ordersCompletedReceived} from '../../redux/slices/orderCompletedSlice';
+import ListEmptyComponentCompleted from '../../components/MyOrders/ListEmptyComponentCompleted';
 
 const items: TabControllerItemProps[] = [
   {
-    label: 'Upcoming',
+    label: 'Đơn đang xử lý',
     style: {
       height: 47,
       borderBottomWidth: 0,
@@ -16,7 +27,7 @@ const items: TabControllerItemProps[] = [
     width: (getScreenWidth() - 50) / 2,
   },
   {
-    label: 'History',
+    label: 'Đơn hoàn thành',
     style: {
       height: 47,
     },
@@ -24,55 +35,111 @@ const items: TabControllerItemProps[] = [
   },
 ];
 
-const data = [
-  {
-    name: 'Burger',
-    id: '1',
-  },
-  {
-    name: 'Chicken',
-    id: '2',
-  },
-  {
-    name: 'Fast Food',
-    id: '3',
-  },
-  {
-    name: 'Fast Food Hub',
-    id: '4',
-  },
-  {
-    name: 'Burger',
-    id: '5',
-  },
-  {
-    name: 'Chicken',
-    id: '6',
-  },
-  {
-    name: 'Fast Food',
-    id: '7',
-  },
-  {
-    name: 'Fast Food Hub',
-    id: '8',
-  },
-];
-
 const MyOrders = () => {
+  const userState = useAppSelector(state => state.userSlice);
+  const [loadingOrder, setLoadingOrder] = React.useState(false);
+  const dispatch = useAppDispatch();
+  const orderList = useAppSelector(state => state.orderSlice);
+  const orderCompletedList = useAppSelector(state => state.orderCompletedSlice);
+  const [pageOrder, setPageOrder] = React.useState(4);
+
+  const [pageOrderCompleted, setPageOrderCompleted] = React.useState(3);
+
+  const renderItemOrderUpcoming = React.useCallback(
+    ({item}) => (
+      <ItemOrderUpcoming id={item} getOrdersCompleted={getOrdersCompleted} />
+    ),
+    [],
+  );
+
   const renderItemOrderHistory = React.useCallback(
     ({item}) => <ItemOrderHistory data={item} />,
     [],
   );
 
-  const renderItemOrderUpcoming = React.useCallback(
-    ({item}) => <ItemOrderUpcoming data={item} />,
-    [],
-  );
+  const getOrdersUpcomming = React.useCallback(() => {
+    setLoadingOrder(true);
+    console.log('page in get()', pageOrder);
+
+    WooApi.get('orders', {
+      customer: userState.id,
+      per_page: pageOrder,
+      status: ['on-hold', 'arrival-shipment'],
+    })
+      .then((data: any) => {
+        dispatch(
+          ordersReceived({
+            orderList: JSON.stringify(data),
+          }),
+        );
+        setLoadingOrder(false);
+      })
+      .catch((error: any) => {
+        dispatch(
+          ordersReceived({
+            orderList: JSON.stringify([]),
+          }),
+        );
+        setLoadingOrder(false);
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Đã có lỗi xảy ra, vui lòng thử lại!',
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
+  }, [pageOrder]);
+
+  const getOrdersCompleted = React.useCallback(() => {
+    setLoadingOrder(true);
+    WooApi.get('orders', {
+      customer: userState.id,
+      per_page: pageOrderCompleted,
+      status: ['completed', 'cancelled'],
+    })
+      .then((data: any) => {
+        dispatch(
+          ordersCompletedReceived({
+            orderList: JSON.stringify(data),
+          }),
+        );
+        setLoadingOrder(false);
+      })
+      .catch((error: any) => {
+        dispatch(
+          ordersCompletedReceived({
+            orderList: JSON.stringify([]),
+          }),
+        );
+        setLoadingOrder(false);
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Đã có lỗi xảy ra, vui lòng thử lại!',
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
+  }, [pageOrderCompleted]);
+
+  React.useEffect(() => {
+    getOrdersUpcomming();
+  }, []);
 
   return (
     <View flex-1 bg-primaryDark paddingT-70>
-      <TabController items={items} initialIndex={0} asCarousel={false}>
+      <TabController
+        items={items}
+        initialIndex={0}
+        asCarousel={false}
+        onChangeIndex={index => {
+          if (index === 0) {
+            getOrdersUpcomming();
+          } else {
+            getOrdersCompleted();
+          }
+        }}>
         <View paddingH-25>
           <View style={styles.tabBar}>
             <TabController.TabBar
@@ -96,25 +163,50 @@ const MyOrders = () => {
         <View marginT-30 flex>
           <TabController.TabPage index={0}>
             <FlatList
-              data={data}
+              data={orderList.ids}
               renderItem={renderItemOrderUpcoming}
               numColumns={1}
               showsVerticalScrollIndicator={false}
-              keyExtractor={item => item.id}
+              keyExtractor={(item, index) => index.toString()}
               contentContainerStyle={styles.listContentStyle}
+              refreshing={loadingOrder}
+              onRefresh={() => {
+                setPageOrder(prev => {
+                  return 4;
+                });
+                getOrdersUpcomming();
+              }}
               ListEmptyComponent={ListEmptyComponent}
+              onEndReachedThreshold={0.5}
+              onEndReached={() => {
+                console.log('end');
+                setPageOrder(prev => prev + 4);
+                setTimeout(() => {
+                
+                  // getOrdersUpcomming();
+                }, 1000);
+              }}
             />
           </TabController.TabPage>
 
           <TabController.TabPage index={1}>
             <FlatList
-              data={data}
+              data={orderCompletedList.ids}
               renderItem={renderItemOrderHistory}
               numColumns={1}
               showsVerticalScrollIndicator={false}
-              keyExtractor={item => item.id}
+              keyExtractor={(item, index) => index.toString()}
               contentContainerStyle={styles.listContentStyle}
-              ListEmptyComponent={ListEmptyComponent}
+              refreshing={loadingOrder}
+              onRefresh={() => {
+                getOrdersCompleted();
+              }}
+              ListEmptyComponent={ListEmptyComponentCompleted}
+              onEndReachedThreshold={10}
+              onEndReached={() => {
+                setPageOrderCompleted(pageOrderCompleted + 1);
+                getOrdersCompleted();
+              }}
             />
           </TabController.TabPage>
         </View>
@@ -136,6 +228,5 @@ const styles = StyleSheet.create({
   },
   listContentStyle: {
     paddingHorizontal: 25,
-    flex: data.length === 0 ? 1 : undefined,
   },
 });

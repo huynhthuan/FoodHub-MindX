@@ -1,21 +1,25 @@
-import {Text, View} from 'react-native-ui-lib';
 import React from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
-import FormDeliveryAddress from '../../components/Delivery/FormDeliveryAddress';
-import {useNavigation, NavigationProp} from '@react-navigation/native';
+import FormEditDeliveryAddress from '../../components/Delivery/FormEditDeliveryAddress';
+import {
+  useNavigation,
+  NavigationProp,
+  useRoute,
+  RouteProp,
+} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
-import {changeHeaderBackground} from '../../utilities/helpers';
+import {changeHeaderBackground, getScreenHeight} from '../../utilities/helpers';
 
 const DeliveryDetails = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
-
+  const route = useRoute<RouteProp<MainStackParamList, 'DeliveryDetails'>>();
   return (
     <ScrollView
       contentContainerStyle={styles.content}
       onScroll={({nativeEvent}) => {
         changeHeaderBackground(nativeEvent, navigation);
       }}>
-      <FormDeliveryAddress />
+      <FormEditDeliveryAddress data={route.params.addressDetail} />
     </ScrollView>
   );
 };
@@ -28,5 +32,6 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     paddingHorizontal: 25,
     backgroundColor: '#2D2D3A',
+    minHeight: getScreenHeight(),
   },
 });

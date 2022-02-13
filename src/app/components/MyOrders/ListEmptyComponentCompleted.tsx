@@ -1,16 +1,15 @@
 import {Button, Image, Text, View} from 'react-native-ui-lib';
 import React from 'react';
 import {StyleSheet} from 'react-native';
-import {getScreenHeight, getScreenWidth} from '../../utilities/helpers';
 
-const ListEmptyComponent = () => {
+const ListEmptyComponentCompleted = () => {
   return (
     <View flex-1 paddingT-119>
       <View center>
         <Image assetName="myorderEmpty" assetGroup="images" marginB-44 />
       </View>
       <Text textSemiBold white style={styles.title} marginB-12 center>
-        Không có đơn hàng nào đang được giao đến bạn.
+        Bạn chưa đặt đơn hàng nào.
       </Text>
       <Text gray2 textRegular style={styles.desc} center>
         Hãy ăn thêm nhiều nhaaa!!!
@@ -27,7 +26,7 @@ const ListEmptyComponent = () => {
   );
 };
 
-export default ListEmptyComponent;
+export default ListEmptyComponentCompleted;
 
 const styles = StyleSheet.create({
   title: {

@@ -33,4 +33,25 @@ const changeHeaderBackground = (
   }
 };
 
-export {getScreenHeight, getScreenWidth, changeHeaderBackground};
+const getStatusOrder = (statusCode: string) => {
+  let statusName = '';
+  switch (statusCode) {
+    case 'on-hold':
+      statusName = 'Đang chuẩn bị';
+      break;
+    case 'arrival-shipment':
+      statusName = 'Đang giao đồ';
+      break;
+    default:
+      break;
+  }
+
+  return statusName;
+};
+
+export {
+  getScreenHeight,
+  getScreenWidth,
+  changeHeaderBackground,
+  getStatusOrder,
+};

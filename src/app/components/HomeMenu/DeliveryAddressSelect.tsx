@@ -3,9 +3,9 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 
 const address = [
-  {label: 'ABAP1', value: 'ABAP1'},
-  {label: 'ABAP2', value: 'ABAP2'},
-  {label: 'ABAP3', value: 'ABAP3'},
+  {label: 'ABAP1222', value: 'ABAP1'},
+  {label: 'ABAP2222', value: 'ABAP2'},
+  {label: 'ABAP3222', value: 'ABAP3'},
 ];
 
 const DeliveryAddressSelect = () => {

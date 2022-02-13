@@ -3,16 +3,29 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
+import {useAppSelector} from '../../hook';
 
 export interface IItemDelivery {
-  data: any;
+  id: number;
 }
 
-const ItemDeliveryAddress = ({data}: IItemDelivery) => {
+const ItemDeliveryAddress = ({id}: IItemDelivery) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  const entitieAddress = useAppSelector(
+    state => state.deliveryAddressSlice.entities,
+  );
+  const address = entitieAddress[id];
+
+  if (!address) return null;
 
   return (
-    <View paddingH-25>
+    <TouchableOpacity
+      paddingH-25
+      onPress={() => {
+        navigation.navigate('DeliveryDetails', {
+          addressDetail: address,
+        });
+      }}>
       <View
         bg-dark
         style={styles.container}
@@ -24,35 +37,39 @@ const ItemDeliveryAddress = ({data}: IItemDelivery) => {
         row
         spread>
         <View row marginR-7>
-          <View style={styles.imageWrap} marginR-20>
+          <View style={styles.imageWrap} center marginR-20>
             <Image
-              assetName="avatar"
-              assetGroup="images"
+              assetName="addressShipping"
+              assetGroup="icons"
               style={styles.image}
             />
           </View>
 
           <View>
             <Text white textSemiBold marginB-12 style={styles.name}>
-              Home
+              {address.name}
             </Text>
             <Text textSemiBold gray2 style={styles.desc} marginB-9>
-              542-154-5184
+              {address.phone}
             </Text>
             <Text textSemiBold gray2 style={styles.desc}>
-              4261 Kembery Drive, Chicago, LSAdddddddd
+              {`${address.address}, ${JSON.parse(address.wards).label}, ${
+                JSON.parse(address.state).label
+              }, ${JSON.parse(address.city).label}`}
             </Text>
           </View>
         </View>
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('DeliveryDetails');
+            navigation.navigate('DeliveryDetails', {
+              addressDetail: address,
+            });
           }}>
           <Image assetName="addressOption" assetGroup="icons" />
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -67,10 +84,11 @@ const styles = StyleSheet.create({
     height: 65,
     borderRadius: 14,
     overflow: 'hidden',
+    backgroundColor: '#fff',
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: 45.19,
+    height: 45.19,
   },
   name: {
     fontSize: 16,

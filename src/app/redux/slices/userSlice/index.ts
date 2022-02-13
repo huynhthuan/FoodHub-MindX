@@ -2,24 +2,28 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 // Define a type for the slice state
 export interface userState {
-  token: string | null;
-  user_email: string | null;
-  user_nicename: string | null;
-  user_display_name: string | null;
-  avatar_url: string | null;
-  id: number | null;
-  phone: string | null;
+  token: string | undefined;
+  user_email: string | undefined;
+  user_nicename: string | undefined;
+  user_display_name: string | undefined;
+  avatar_url: string | undefined;
+  id: number | undefined;
+  phone: string | undefined;
+  first_name: string | undefined;
+  last_name: string | undefined;
 }
 
 // Define the initial state using that type
 const initialState: userState = {
-  token: null,
-  user_email: null,
-  user_nicename: null,
-  user_display_name: null,
-  avatar_url: null,
-  id: null,
-  phone: null,
+  token: undefined,
+  user_email: undefined,
+  user_nicename: undefined,
+  user_display_name: undefined,
+  avatar_url: undefined,
+  id: undefined,
+  phone: undefined,
+  first_name: undefined,
+  last_name: undefined,
 };
 
 export const userSlice = createSlice({
@@ -35,14 +39,32 @@ export const userSlice = createSlice({
       state.avatar_url = action.payload.avatar_url;
       state.id = action.payload.id;
       state.phone = action.payload.phone;
+      state.first_name = action.payload.first_name;
+      state.last_name = action.payload.last_name;
     },
     updateUserAvatar: (state, action: PayloadAction<string>) => {
       state.avatar_url = action.payload;
+    },
+    updateUserPhone: (state, action: PayloadAction<string>) => {
+      state.phone = action.payload;
+    },
+    updateFirstName: (state, action: PayloadAction<string>) => {
+      state.first_name = action.payload;
+    },
+    updateLastName: (state, action: PayloadAction<string>) => {
+      state.last_name = action.payload;
     },
     logout: state => Object.assign({}, state, initialState),
   },
 });
 
-export const {login, logout, updateUserAvatar} = userSlice.actions;
+export const {
+  login,
+  logout,
+  updateUserAvatar,
+  updateUserPhone,
+  updateFirstName,
+  updateLastName,
+} = userSlice.actions;
 
 export default userSlice.reducer;
