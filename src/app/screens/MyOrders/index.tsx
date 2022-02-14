@@ -41,9 +41,6 @@ const MyOrders = () => {
   const dispatch = useAppDispatch();
   const orderList = useAppSelector(state => state.orderSlice);
   const orderCompletedList = useAppSelector(state => state.orderCompletedSlice);
-  const [pageOrder, setPageOrder] = React.useState(4);
-
-  const [pageOrderCompleted, setPageOrderCompleted] = React.useState(3);
 
   const renderItemOrderUpcoming = React.useCallback(
     ({item}) => (
@@ -59,11 +56,9 @@ const MyOrders = () => {
 
   const getOrdersUpcomming = React.useCallback(() => {
     setLoadingOrder(true);
-    console.log('page in get()', pageOrder);
-
     WooApi.get('orders', {
       customer: userState.id,
-      per_page: pageOrder,
+      per_page: 100,
       status: ['on-hold', 'arrival-shipment'],
     })
       .then((data: any) => {
@@ -89,13 +84,13 @@ const MyOrders = () => {
           }),
         );
       });
-  }, [pageOrder]);
+  }, []);
 
   const getOrdersCompleted = React.useCallback(() => {
     setLoadingOrder(true);
     WooApi.get('orders', {
       customer: userState.id,
-      per_page: pageOrderCompleted,
+      per_page: 100,
       status: ['completed', 'cancelled'],
     })
       .then((data: any) => {
@@ -121,7 +116,7 @@ const MyOrders = () => {
           }),
         );
       });
-  }, [pageOrderCompleted]);
+  }, []);
 
   React.useEffect(() => {
     getOrdersUpcomming();
@@ -171,21 +166,9 @@ const MyOrders = () => {
               contentContainerStyle={styles.listContentStyle}
               refreshing={loadingOrder}
               onRefresh={() => {
-                setPageOrder(prev => {
-                  return 4;
-                });
                 getOrdersUpcomming();
               }}
               ListEmptyComponent={ListEmptyComponent}
-              onEndReachedThreshold={0.5}
-              onEndReached={() => {
-                console.log('end');
-                setPageOrder(prev => prev + 4);
-                setTimeout(() => {
-                
-                  // getOrdersUpcomming();
-                }, 1000);
-              }}
             />
           </TabController.TabPage>
 
@@ -202,11 +185,6 @@ const MyOrders = () => {
                 getOrdersCompleted();
               }}
               ListEmptyComponent={ListEmptyComponentCompleted}
-              onEndReachedThreshold={10}
-              onEndReached={() => {
-                setPageOrderCompleted(pageOrderCompleted + 1);
-                getOrdersCompleted();
-              }}
             />
           </TabController.TabPage>
         </View>

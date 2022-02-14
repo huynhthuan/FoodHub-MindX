@@ -82,7 +82,7 @@ const ItemOrderUpcoming = ({id, getOrdersCompleted}: IItemOrderUpcoming) => {
           <View>
             <View row spread marginB-9>
               <Text gray2 textRegular style={styles.text}>
-                {order.line_items.length} đồ ăn
+                {/* {order.line_items.length} đồ ăn */}
               </Text>
             </View>
 
