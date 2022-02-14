@@ -21,9 +21,16 @@ export const orderCompletedSlice = createSlice({
         JSON.parse(action.payload.orderList),
       );
     },
+    ordersCompletedAddMany(state, action: PayloadAction<{orderList: string}>) {
+      ordersCompletedAdapter.addMany(
+        state,
+        JSON.parse(action.payload.orderList),
+      );
+    },
   },
 });
 
-export const {ordersCompletedReceived} = orderCompletedSlice.actions;
+export const {ordersCompletedReceived, ordersCompletedAddMany} =
+  orderCompletedSlice.actions;
 
 export default orderCompletedSlice.reducer;

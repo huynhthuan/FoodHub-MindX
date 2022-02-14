@@ -18,9 +18,12 @@ export const orderSlice = createSlice({
       // Or, call them as "mutating" helpers in a case reducer
       ordersAdapter.setAll(state, JSON.parse(action.payload.orderList));
     },
+    ordersAddMany(state, action: PayloadAction<{orderList: string}>) {
+      ordersAdapter.addMany(state, JSON.parse(action.payload.orderList));
+    },
   },
 });
 
-export const {ordersReceived} = orderSlice.actions;
+export const {ordersReceived, ordersAddMany} = orderSlice.actions;
 
 export default orderSlice.reducer;

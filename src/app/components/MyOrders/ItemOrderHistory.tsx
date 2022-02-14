@@ -4,13 +4,20 @@ import {StyleSheet} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {getScreenWidth} from '../../utilities/helpers';
+import {useAppSelector} from '../../hook';
 
 export interface IItemOrderHistory {
-  data: any;
+  id: number;
 }
 
-const ItemOrderHistory = ({data}: IItemOrderHistory) => {
+const ItemOrderHistory = ({id}: IItemOrderHistory) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  const entitieOrders = useAppSelector(
+    state => state.orderCompletedSlice.entities,
+  );
+  const order: any = entitieOrders[id];
+  
+  if (!order) return null;
 
   return (
     <TouchableOpacity
@@ -68,7 +75,7 @@ const ItemOrderHistory = ({data}: IItemOrderHistory) => {
         </View>
 
         <Text yellow textRegular style={styles.price}>
-          $15.30
+          $15.30 {order.id}
         </Text>
       </View>
       <View row spread>

@@ -37,35 +37,51 @@ const ItemOrderUpcoming = ({id, getOrdersCompleted}: IItemOrderUpcoming) => {
       }),
     );
 
-    WooApi.post('order/' + order.id, {
-      order: {
-        status: 'cancelled',
-      },
+    fetch('https://jsonplaceholder.typicode.com/posts/1', {
+      method: 'PUT',
+      body: JSON.stringify({title: '1231'}),
     })
-      .then((data: any) => {
-        console.log(data);
-
+      .then(response => response.json())
+      .then(json => {
         dispatch(
           setLoading({
             isShown: false,
           }),
         );
-        getOrdersCompleted();
-      })
-      .catch((error: any) => {
-        dispatch(
-          setLoading({
-            isShown: false,
-          }),
-        );
-        dispatch(
-          showToast({
-            isShown: true,
-            msg: 'Đã có lỗi xảy ra. Vui lòng thử lại !',
-            preset: Incubator.ToastPresets.FAILURE,
-          }),
-        );
+        console.log(json);
       });
+
+    // WooApi.put('order/' + order.id, {
+    //   order: {
+    //     status: 'cancelled',
+    //   },
+    // })
+    //   .then((data: any) => {
+    //     console.log(data);
+
+    //     dispatch(
+    //       setLoading({
+    //         isShown: false,
+    //       }),
+    //     );
+    //     getOrdersCompleted();
+    //   })
+    //   .catch((error: any) => {
+    //     console.log(error);
+
+    //     dispatch(
+    //       setLoading({
+    //         isShown: false,
+    //       }),
+    //     );
+    //     dispatch(
+    //       showToast({
+    //         isShown: true,
+    //         msg: 'Đã có lỗi xảy ra. Vui lòng thử lại !',
+    //         preset: Incubator.ToastPresets.FAILURE,
+    //       }),
+    //     );
+    //   });
   }, []);
 
   return (
@@ -82,7 +98,7 @@ const ItemOrderUpcoming = ({id, getOrdersCompleted}: IItemOrderUpcoming) => {
           <View>
             <View row spread marginB-9>
               <Text gray2 textRegular style={styles.text}>
-                {/* {order.line_items.length} đồ ăn */}
+                {order.line_items.length} đồ ăn
               </Text>
             </View>
 
