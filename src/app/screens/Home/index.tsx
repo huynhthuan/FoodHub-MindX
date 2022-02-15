@@ -67,7 +67,7 @@ const Home = () => {
       <View paddingT-70>
         <View paddingH-25>
           <Text marginB-29 white style={styles.title}>
-            What would you like to order
+            Bạn muốn đặt món gì ?
           </Text>
         </View>
 
@@ -81,7 +81,7 @@ const Home = () => {
           />
         </View>
 
-        <View paddingL-25>
+        <View>
           <CategorySwiper />
         </View>
 
@@ -104,7 +104,7 @@ const Home = () => {
 
         <View paddingH-25>
           <Text marginB-15 white style={styles.sectionTitle}>
-            Popular dishes
+            Món ăn bình dân
           </Text>
         </View>
 

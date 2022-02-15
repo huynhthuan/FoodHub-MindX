@@ -69,7 +69,7 @@ export type MainStackParamList = {
   AgencyDetails: undefined;
   Search: undefined;
   Filter: undefined;
-  Category: undefined;
+  Category: {CategoryDetail: any};
   Cart: undefined;
   Payment: undefined;
   OrderDetails: undefined;

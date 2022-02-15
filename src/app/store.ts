@@ -1,4 +1,5 @@
 import orderSlice from './redux/slices/orderSlice/';
+import categoriesSlice from './redux/slices/categoriesSlice/';
 import provincesSlice from './redux/slices/provincesSlice/';
 import {configureStore} from '@reduxjs/toolkit';
 import userSlice from './redux/slices/userSlice';
@@ -8,6 +9,8 @@ import toastSlice from './redux/slices/toastSlice';
 import deliveryAddressSlice from './redux/slices/deliveryAddressSlice';
 import deliveryAddressLoadingSlice from './redux/slices/deliveryAddressLoadingSlice';
 import orderCompletedSlice from './redux/slices/orderCompletedSlice';
+import orderCompletedLoading from './redux/slices/orderCompletedLoading';
+import orderUpcommingLoading from './redux/slices/orderUpcommingLoading';
 
 const store = configureStore({
   reducer: {
@@ -19,7 +22,10 @@ const store = configureStore({
     provincesSlice,
     deliveryAddressLoadingSlice,
     orderSlice,
+    categoriesSlice,
     orderCompletedSlice,
+    orderCompletedLoading,
+    orderUpcommingLoading,
   },
 });
 

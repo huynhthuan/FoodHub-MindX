@@ -1,6 +1,6 @@
 import {Assets, Button, Text, View, Image} from 'react-native-ui-lib';
 import React from 'react';
-import {Dimensions, ImageBackground, StyleSheet} from 'react-native';
+import {ImageBackground, StyleSheet} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {getScreenWidth} from '../../utilities/helpers';
@@ -15,12 +15,12 @@ const Welcome = () => {
       style={styles.backgroundImg}>
       <View paddingB-54 style={styles.container}>
         <View marginB-187>
-          <Text style={styles.title1}>Welcome to</Text>
+          <Text style={styles.title1}>Chào mừng đến</Text>
           <Text marginB-19 style={styles.title2}>
             FoodHub
           </Text>
           <Text dark3 style={styles.welcomeDesc}>
-            Your favourite foods delivered fast at your door.
+            Thực phẩm yêu thích của bạn được giao nhanh chóng tại cửa của bạn.
           </Text>
         </View>
 
@@ -31,20 +31,20 @@ const Welcome = () => {
             navigation.navigate('SignUp');
           }}>
           <Text white style={styles.startButtonText}>
-            Start with your email
+            Bắt đầu với email của bạn
           </Text>
         </Button>
 
         <View center>
           <Text white style={styles.signInDescText}>
-            Already have an account?{' '}
+            Bạn có săn san để tạo một tài khoản?{' '}
             <Text
               underline={true}
               style={styles.signInDescText}
               onPress={() => {
                 navigation.navigate('Login');
               }}>
-              Sign In
+              Đăng nhập
             </Text>
           </Text>
         </View>

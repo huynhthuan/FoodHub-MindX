@@ -1,26 +1,20 @@
 import {Button, Image, Incubator, Text, View} from 'react-native-ui-lib';
-import React, {useState} from 'react';
+import React from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {getScreenWidth, getStatusOrder} from '../../utilities/helpers';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import WooApi from '../../api/wooApi';
-import {setLoading} from '../../redux/slices/loadingSlice';
-import axios from 'axios';
-import {
-  BASE_URL_WOOCOMMERCE_ORDER,
-  WOO_KEY,
-  WOO_SECRET,
-} from '../../api/constants';
 import {showToast} from '../../redux/slices/toastSlice';
+import {setOrderUpcommingLoading} from '../../redux/slices/orderUpcommingLoading';
 
 export interface IItemOrderUpcoming {
   id: number;
-  getOrdersCompleted: () => void;
+  getOrdersUpcomming: () => void;
 }
 
-const ItemOrderUpcoming = ({id, getOrdersCompleted}: IItemOrderUpcoming) => {
+const ItemOrderUpcoming = ({id, getOrdersUpcomming}: IItemOrderUpcoming) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const entitieOrders = useAppSelector(state => state.orderSlice.entities);
   const order: any = entitieOrders[id];
@@ -32,64 +26,39 @@ const ItemOrderUpcoming = ({id, getOrdersCompleted}: IItemOrderUpcoming) => {
   const cancelOrder = React.useCallback(() => {
     setIsVisible(false);
     dispatch(
-      setLoading({
-        isShown: true,
+      setOrderUpcommingLoading({
+        isLoading: true,
       }),
     );
 
-    axios
-      .get(
-        'http://127.0.0.1:80/food/wp-json/wc/v3/orders?consumer_key=ck_2ad8ff7bd9ef3dd81417fedbc64d826d33094247&consumer_secret=cs_a2008a11433314b1a1d38ed655fce4e094bf78f9',
-      )
-      .then(res => {
+    console.log('ID order cancel', id);
+
+    WooApi.put('orders/' + order.id, {
+      status: 'cancelled',
+    })
+      .then((data: any) => {
+        getOrdersUpcomming();
         dispatch(
-          setLoading({
-            isShown: false,
+          setOrderUpcommingLoading({
+            isLoading: false,
           }),
         );
-        console.log(res.data);
       })
-      .catch(error => {
+      .catch((error: any) => {
         dispatch(
-          setLoading({
-            isShown: false,
+          setOrderUpcommingLoading({
+            isLoading: false,
           }),
         );
-        console.log(error);
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Đã có lỗi xảy ra. Vui lòng thử lại !',
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
       });
-
-    // WooApi.put('order/' + order.id, {
-    //   order: {
-    //     status: 'cancelled',
-    //   },
-    // })
-    //   .then((data: any) => {
-    //     console.log(data);
-
-    //     dispatch(
-    //       setLoading({
-    //         isShown: false,
-    //       }),
-    //     );
-    //     getOrdersCompleted();
-    //   })
-    //   .catch((error: any) => {
-    //     console.log(error);
-
-    //     dispatch(
-    //       setLoading({
-    //         isShown: false,
-    //       }),
-    //     );
-    //     dispatch(
-    //       showToast({
-    //         isShown: true,
-    //         msg: 'Đã có lỗi xảy ra. Vui lòng thử lại !',
-    //         preset: Incubator.ToastPresets.FAILURE,
-    //       }),
-    //     );
-    //   });
-  }, []);
+  }, [id]);
 
   return (
     <View bg-dark padding-18 marginB-20 style={styles.container}>

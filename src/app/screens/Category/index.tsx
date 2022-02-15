@@ -1,8 +1,23 @@
-import {Button, Image, Text, View} from 'react-native-ui-lib';
-import React from 'react';
+import {
+  Button,
+  Image,
+  Incubator,
+  Picker,
+  PickerItemValue,
+  Text,
+  View,
+  WheelPicker,
+} from 'react-native-ui-lib';
+import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet} from 'react-native';
 import ItemFood from '../../components/Item/Food/ItemFood';
 import {getScreenWidth} from '../../utilities/helpers';
+import {RouteProp, useFocusEffect, useRoute} from '@react-navigation/native';
+import {MainStackParamList} from '../../../../App';
+import FastImage from 'react-native-fast-image';
+import axios from 'axios';
+import {BASE_URL_WP_MEDIA, BASE_URL_WP_PRODUCT_CAT} from '../../api/constants';
+import _ from 'lodash';
 
 const data = [
   {
@@ -45,31 +60,103 @@ const Category = () => {
     [],
   );
 
+  const [sort, setSort] = useState('');
+
+  const route = useRoute<RouteProp<MainStackParamList, 'Category'>>();
+
+  const [imageDecor, setImageDecor] = React.useState('');
+
+  React.useEffect(() => {
+    console.log('Category ID', route.params.CategoryDetail.id);
+    setImageDecor('');
+    axios
+      .get(BASE_URL_WP_PRODUCT_CAT + route.params.CategoryDetail.id)
+      .then(res => {
+        console.log(imageDecor);
+        if (res.data.acf.category_image_decore_top) {
+          axios
+            .get(BASE_URL_WP_MEDIA + res.data.acf.category_image_decore_top)
+            .then(res => {
+              console.log(res.data.guid.rendered);
+              setImageDecor(res.data.guid.rendered);
+            });
+        }
+      });
+  }, []);
+
   return (
     <View flex-1 bg-primaryDark paddingT-96>
       <View style={styles.imageWrap}>
-        <Image
-          assetName="categoryDecor"
-          assetGroup="images"
-          style={styles.image}
-        />
+        {imageDecor === '' ? (
+          <Image
+            assetName="categoryDecor"
+            assetGroup="images"
+            style={styles.image}
+          />
+        ) : (
+          <FastImage
+            source={{
+              uri: imageDecor,
+              priority: FastImage.priority.high,
+            }}
+            style={{
+              width: 271,
+              height: 333,
+            }}
+          />
+        )}
       </View>
       <View paddingH-25>
         <Text white textBold style={styles.title} marginB-25>
-          Fast Food
+          {route.params.CategoryDetail.name}
         </Text>
         <Text gray2 textRegular style={styles.desc} marginB-30>
-          80 type of pizza
+          {route.params.CategoryDetail.count} type of{' '}
+          {route.params.CategoryDetail.name}
         </Text>
       </View>
       <View row spread marginB-20 paddingH-25 centerV>
         <View row>
           <Text white textRegular marginR-5>
-            Sort by:
+            Sắp xếp theo:
           </Text>
-          <Text textMedium primary>
-            Popular
-          </Text>
+
+          <Picker
+            value={sort}
+            placeholder={'Placeholder'}
+            onChange={(item: string) => {
+              setSort(item);
+            }}
+            renderPicker={(value: PickerItemValue, label: string) => (
+              <Text textMedium primary>
+                {label}
+              </Text>
+            )}>
+            <Picker.Item
+              key={'asc-price'}
+              label="Giá thấp đến cao"
+              value={'asc-price'}></Picker.Item>
+            <Picker.Item
+              key={'desc-price'}
+              label="Giá cao đến thấp"
+              value={'desc-price'}></Picker.Item>
+            <Picker.Item
+              key={'asc-title'}
+              label="A-Z"
+              value={'asc-title'}></Picker.Item>
+            <Picker.Item
+              key={'desc-title'}
+              label="Z-A"
+              value={'desc-title'}></Picker.Item>
+            <Picker.Item
+              key={'desc-rating'}
+              label="Đánh giá"
+              value={'desc-rating'}></Picker.Item>
+            <Picker.Item
+              key={'desc-popularity'}
+              label="Phổ biến"
+              value={'desc-popularity '}></Picker.Item>
+          </Picker>
         </View>
 
         <View>
@@ -114,6 +201,7 @@ const styles = StyleSheet.create({
   desc: {
     fontSize: 19,
     lineHeight: 22.8,
+    textTransform: 'lowercase',
   },
   btn: {
     backgroundColor: 'transparent',

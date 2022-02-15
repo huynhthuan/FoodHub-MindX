@@ -27,10 +27,22 @@ export const orderCompletedSlice = createSlice({
         JSON.parse(action.payload.orderList),
       );
     },
+    ordersCompletedUpsertOne(
+      state,
+      action: PayloadAction<{orderList: string}>,
+    ) {
+      ordersCompletedAdapter.upsertOne(
+        state,
+        JSON.parse(action.payload.orderList),
+      );
+    },
   },
 });
 
-export const {ordersCompletedReceived, ordersCompletedAddMany} =
-  orderCompletedSlice.actions;
+export const {
+  ordersCompletedReceived,
+  ordersCompletedAddMany,
+  ordersCompletedUpsertOne,
+} = orderCompletedSlice.actions;
 
 export default orderCompletedSlice.reducer;

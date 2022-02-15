@@ -2,7 +2,6 @@ import {
   Incubator,
   TabController,
   TabControllerItemProps,
-  Text,
   View,
 } from 'react-native-ui-lib';
 import React from 'react';
@@ -21,7 +20,8 @@ import {
 } from '../../redux/slices/orderCompletedSlice';
 import ListEmptyComponentCompleted from '../../components/MyOrders/ListEmptyComponentCompleted';
 import _ from 'lodash';
-import {setLoading} from '../../redux/slices/loadingSlice';
+import {setOrderCompletedLoading} from '../../redux/slices/orderCompletedLoading';
+import {setOrderUpcommingLoading} from '../../redux/slices/orderUpcommingLoading';
 
 const items: TabControllerItemProps[] = [
   {
@@ -43,10 +43,14 @@ const items: TabControllerItemProps[] = [
 
 const MyOrders = () => {
   const userState = useAppSelector(state => state.userSlice);
-  const [loadingUpcommingOrder, setLoadingUpcommingOrder] =
-    React.useState(false);
-  const [loadingOrderCompleted, setLoadingOrderCompleted] =
-    React.useState(false);
+
+  const loadingUpcommingOrder = useAppSelector(
+    state => state.orderUpcommingLoading,
+  );
+  const loadingOrderCompleted = useAppSelector(
+    state => state.orderCompletedLoading,
+  );
+
   const [indexTab, setIndexTab] = React.useState(0);
   const [orderUpcommingOffset, setOrderUpcommingOffset] = React.useState(0);
   const [orderCompletedOffset, setOrderCompletedOffset] = React.useState(0);
@@ -57,7 +61,7 @@ const MyOrders = () => {
 
   const renderItemOrderUpcoming = React.useCallback(
     ({item}) => (
-      <ItemOrderUpcoming id={item} getOrdersCompleted={getOrdersCompleted} />
+      <ItemOrderUpcoming getOrdersUpcomming={getOrdersUpcomming} id={item} />
     ),
     [],
   );
@@ -69,7 +73,11 @@ const MyOrders = () => {
 
   const getOrdersUpcomming = React.useCallback(() => {
     setOrderUpcommingOffset(0);
-    setLoadingUpcommingOrder(true);
+    dispatch(
+      setOrderUpcommingLoading({
+        isLoading: true,
+      }),
+    );
     WooApi.get('orders', {
       customer: userState.id,
       per_page: 4,
@@ -81,7 +89,11 @@ const MyOrders = () => {
             orderList: JSON.stringify(data),
           }),
         );
-        setLoadingUpcommingOrder(false);
+        dispatch(
+          setOrderUpcommingLoading({
+            isLoading: false,
+          }),
+        );
       })
       .catch((error: any) => {
         dispatch(
@@ -89,7 +101,11 @@ const MyOrders = () => {
             orderList: JSON.stringify([]),
           }),
         );
-        setLoadingUpcommingOrder(false);
+        dispatch(
+          setOrderUpcommingLoading({
+            isLoading: false,
+          }),
+        );
         dispatch(
           showToast({
             isShown: true,
@@ -101,7 +117,11 @@ const MyOrders = () => {
   }, []);
 
   const orderUpcommingLoadmore = () => {
-    setLoadingUpcommingOrder(true);
+    dispatch(
+      setOrderUpcommingLoading({
+        isLoading: true,
+      }),
+    );
     WooApi.get('orders', {
       customer: userState.id,
       per_page: 4,
@@ -114,10 +134,18 @@ const MyOrders = () => {
             orderList: JSON.stringify(data),
           }),
         );
-        setLoadingUpcommingOrder(false);
+        dispatch(
+          setOrderUpcommingLoading({
+            isLoading: false,
+          }),
+        );
       })
       .catch((error: any) => {
-        setLoadingUpcommingOrder(false);
+        dispatch(
+          setOrderUpcommingLoading({
+            isLoading: false,
+          }),
+        );
         dispatch(
           showToast({
             isShown: true,
@@ -130,7 +158,11 @@ const MyOrders = () => {
 
   const getOrdersCompleted = React.useCallback(() => {
     setOrderCompletedOffset(0);
-    setLoadingOrderCompleted(true);
+    dispatch(
+      setOrderCompletedLoading({
+        isLoading: true,
+      }),
+    );
     WooApi.get('orders', {
       customer: userState.id,
       per_page: 4,
@@ -143,7 +175,11 @@ const MyOrders = () => {
           }),
         );
 
-        setLoadingOrderCompleted(false);
+        dispatch(
+          setOrderCompletedLoading({
+            isLoading: false,
+          }),
+        );
       })
       .catch((error: any) => {
         dispatch(
@@ -151,7 +187,11 @@ const MyOrders = () => {
             orderList: JSON.stringify([]),
           }),
         );
-        setLoadingOrderCompleted(false);
+        dispatch(
+          setOrderCompletedLoading({
+            isLoading: false,
+          }),
+        );
         dispatch(
           showToast({
             isShown: true,
@@ -163,7 +203,11 @@ const MyOrders = () => {
   }, []);
 
   const ordersCompletedLoadmore = () => {
-    setLoadingOrderCompleted(true);
+    dispatch(
+      setOrderCompletedLoading({
+        isLoading: true,
+      }),
+    );
     WooApi.get('orders', {
       customer: userState.id,
       per_page: 4,
@@ -176,10 +220,18 @@ const MyOrders = () => {
             orderList: JSON.stringify(data),
           }),
         );
-        setLoadingOrderCompleted(false);
+        dispatch(
+          setOrderCompletedLoading({
+            isLoading: false,
+          }),
+        );
       })
       .catch((error: any) => {
-        setLoadingOrderCompleted(false);
+        dispatch(
+          setOrderCompletedLoading({
+            isLoading: false,
+          }),
+        );
         dispatch(
           showToast({
             isShown: true,
@@ -244,7 +296,7 @@ const MyOrders = () => {
               showsVerticalScrollIndicator={false}
               keyExtractor={(item, index) => index.toString()}
               contentContainerStyle={styles.listContentStyle}
-              refreshing={loadingUpcommingOrder}
+              refreshing={loadingUpcommingOrder.isLoading}
               onRefresh={() => {
                 getOrdersUpcomming();
               }}
@@ -264,7 +316,7 @@ const MyOrders = () => {
               showsVerticalScrollIndicator={false}
               keyExtractor={(item, index) => index.toString()}
               contentContainerStyle={styles.listContentStyle}
-              refreshing={loadingOrderCompleted}
+              refreshing={loadingOrderCompleted.isLoading}
               onRefresh={() => {
                 getOrdersCompleted();
               }}

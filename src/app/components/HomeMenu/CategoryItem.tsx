@@ -1,17 +1,44 @@
-import {Image, Text, View} from 'react-native-ui-lib';
+import {Text, TouchableOpacity, View} from 'react-native-ui-lib';
 import React from 'react';
 import {StyleSheet} from 'react-native';
+import {useAppSelector} from '../../hook';
+import FastImage from 'react-native-fast-image';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {MainStackParamList} from '../../../../App';
 
-const CategoryItem = () => {
+const CategoryItem = ({id}: {id: number}) => {
+  const entitieOrders = useAppSelector(state => state.categoriesSlice.entities);
+  const category: any = entitieOrders[id];
+  const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+
+  if (!category) return null;
+
   return (
-    <View bg-dark centerH style={styles.container}>
+    <TouchableOpacity
+      bg-dark
+      centerH
+      style={styles.container}
+      onPress={() => {
+        navigation.navigate('Category', {
+          CategoryDetail: category,
+        });
+      }}>
       <View bg-white marginB-15 center style={styles.imagesWrap}>
-        <Image assetName="avatar" assetGroup="images" />
+        <FastImage
+          source={{
+            uri: category.image.src,
+            priority: FastImage.priority.high,
+          }}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
       </View>
       <Text white center style={styles.name}>
-        Burger
+        {category.name}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -22,7 +49,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     paddingTop: 7,
     paddingBottom: 17.61,
-    width: 58.57,
+    width: 58,
     marginRight: 12,
   },
   imagesWrap: {
@@ -35,5 +62,6 @@ const styles = StyleSheet.create({
     fontFamily: 'SofiaPro',
     fontSize: 11,
     lineHeight: 11,
+    paddingHorizontal: 5,
   },
 });
