@@ -37,18 +37,25 @@ const ItemOrderUpcoming = ({id, getOrdersCompleted}: IItemOrderUpcoming) => {
       }),
     );
 
-    fetch('https://jsonplaceholder.typicode.com/posts/1', {
-      method: 'PUT',
-      body: JSON.stringify({title: '1231'}),
-    })
-      .then(response => response.json())
-      .then(json => {
+    axios
+      .get(
+        'http://127.0.0.1:80/food/wp-json/wc/v3/orders?consumer_key=ck_2ad8ff7bd9ef3dd81417fedbc64d826d33094247&consumer_secret=cs_a2008a11433314b1a1d38ed655fce4e094bf78f9',
+      )
+      .then(res => {
         dispatch(
           setLoading({
             isShown: false,
           }),
         );
-        console.log(json);
+        console.log(res.data);
+      })
+      .catch(error => {
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+        console.log(error);
       });
 
     // WooApi.put('order/' + order.id, {
