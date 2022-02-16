@@ -11,6 +11,7 @@ export interface userState {
   phone: string | undefined;
   first_name: string | undefined;
   last_name: string | undefined;
+  product_like: string | undefined;
 }
 
 // Define the initial state using that type
@@ -24,6 +25,7 @@ const initialState: userState = {
   phone: undefined,
   first_name: undefined,
   last_name: undefined,
+  product_like: undefined,
 };
 
 export const userSlice = createSlice({
@@ -41,6 +43,7 @@ export const userSlice = createSlice({
       state.phone = action.payload.phone;
       state.first_name = action.payload.first_name;
       state.last_name = action.payload.last_name;
+      state.product_like = action.payload.product_like;
     },
     updateUserAvatar: (state, action: PayloadAction<string>) => {
       state.avatar_url = action.payload;
@@ -54,6 +57,9 @@ export const userSlice = createSlice({
     updateLastName: (state, action: PayloadAction<string>) => {
       state.last_name = action.payload;
     },
+    updateProductLike: (state, action: PayloadAction<string>) => {
+      state.product_like = action.payload;
+    },
     logout: state => Object.assign({}, state, initialState),
   },
 });
@@ -65,6 +71,7 @@ export const {
   updateUserPhone,
   updateFirstName,
   updateLastName,
+  updateProductLike
 } = userSlice.actions;
 
 export default userSlice.reducer;

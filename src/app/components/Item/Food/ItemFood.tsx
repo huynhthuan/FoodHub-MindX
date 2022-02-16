@@ -1,23 +1,140 @@
-import {Image, Text, View} from 'react-native-ui-lib';
-import React from 'react';
+import {
+  Image,
+  Incubator,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native-ui-lib';
+import React, {useState} from 'react';
 import {Animated, StyleProp, StyleSheet, ViewStyle} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../../App';
+import {useAppDispatch, useAppSelector} from '../../../hook';
+import FastImage from 'react-native-fast-image';
+import axios from 'axios';
+import {BASE_URL_WP_API_USER} from '../../../api/constants';
+import {setLoading} from '../../../redux/slices/loadingSlice';
+import {logout, updateProductLike} from '../../../redux/slices/userSlice';
+import {showToast} from '../../../redux/slices/toastSlice';
+import _ from 'lodash';
 
 export interface IItemFoodLarger {
-  data?: any;
+  id: number;
   customStyle?: StyleProp<ViewStyle | Animated.AnimatedProps<ViewStyle>>;
 }
 
-const ItemFood = ({data, customStyle}: IItemFoodLarger) => {
+const ItemFood = ({id, customStyle}: IItemFoodLarger) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  const entitieProduct = useAppSelector(state => state.productSlice.entities);
+  const product: any = entitieProduct[id];
+  const dispatch = useAppDispatch();
+  const userState = useAppSelector(state => state.userSlice);
+  const [isLike, setIsLike] = React.useState(false);
+
+  if (!product) return null;
+
+  React.useEffect(() => {
+    if (userState.product_like?.split(',')) {
+      if (userState.product_like?.split(',').includes(id.toString())) {
+        setIsLike(true);
+      }
+    }
+  }, [id]);
+
+  const updateProductLikeUser = React.useCallback((productLike: string) => {
+    axios
+      .post(
+        BASE_URL_WP_API_USER + userState.id,
+        {
+          acf: {
+            product_like: productLike,
+          },
+        },
+        {
+          headers: {
+            Authorization: 'Bearer ' + userState.token,
+          },
+        },
+      )
+      .then(res => {
+        console.log('done', res.data.acf.product_like);
+        dispatch(updateProductLike(productLike));
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+      })
+      .catch(error => {
+        console.log(error);
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+
+        if (error.response?.data?.data.status === 403) {
+          dispatch(
+            showToast({
+              isShown: true,
+              msg: 'Phiên đăng nhập của bạn đã hết hạn. Vui Lòng đăng nhập lại!',
+              preset: Incubator.ToastPresets.OFFLINE,
+            }),
+          );
+          dispatch(logout());
+          return;
+        }
+
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Đã có lỗi xảy ra. Vui lòng thử lại !',
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
+  }, []);
+
+  const likeProduct = React.useCallback(() => {
+    let newProductLine = [];
+    let productLike = userState.product_like?.split(',');
+
+    dispatch(
+      setLoading({
+        isShown: true,
+      }),
+    );
+
+    if (userState.product_like?.split(',')) {
+      if (isLike) {
+        if (productLike) {
+          let index = productLike.indexOf(id.toString());
+          productLike.splice(index, 1);
+          setIsLike(false);
+          updateProductLikeUser(productLike.join(','));
+        }
+      } else {
+        if (productLike) {
+          productLike.push(id.toString());
+          setIsLike(true);
+          updateProductLikeUser(productLike.join(','));
+        }
+      }
+    } else {
+      newProductLine.push(id.toString());
+      setIsLike(true);
+      updateProductLikeUser(newProductLine.join(','));
+    }
+  }, [isLike, userState.product_like]);
 
   return (
     <View style={[styles.container, customStyle]}>
       <View center bg-dark4 row style={styles.reviewWrap}>
+        <Text white> {userState.product_like}</Text>
         <Text white style={styles.rate}>
-          4.5
+          {product.average_rating}
         </Text>
+
         <Image
           assetName="star"
           assetGroup="icons"
@@ -25,28 +142,41 @@ const ItemFood = ({data, customStyle}: IItemFoodLarger) => {
           height={9.45}
           marginR-3
         />
-        <Text style={styles.count}>(25+)</Text>
+        <Text style={styles.count}>({product.rating_count}+)</Text>
       </View>
-      <View style={styles.favorite}>
-        <Image assetName="like" assetGroup="icons" />
-      </View>
+      <TouchableOpacity
+        style={styles.favorite}
+        onPress={() => {
+          likeProduct();
+        }}>
+        {isLike ? (
+          <Image assetName="like" tintColor="red" assetGroup="icons" />
+        ) : (
+          <Image assetName="like" assetGroup="icons" />
+        )}
+      </TouchableOpacity>
       <View bg-white row style={styles.priceWrap}>
         <Text primaryDark style={styles.priceText}>
-          10.35
+          {product.price} VNĐ - {product.id}
         </Text>
       </View>
       <View marginB-22 style={styles.imagesWrap}>
-        <Image assetName="avatar" assetGroup="images" style={styles.images} />
+        <FastImage
+          source={{
+            uri: product.images[0]?.src,
+            priority: 'high',
+          }}
+          style={styles.images}
+        />
       </View>
-      <Text
-        white
-        marginB-8
-        style={styles.name}
+      <TouchableOpacity
         onPress={() => {
           navigation.navigate('FoodDetails');
         }}>
-        Chicken Hawaiian
-      </Text>
+        <Text white marginB-8 style={styles.name}>
+          {product.name}
+        </Text>
+      </TouchableOpacity>
       <Text style={styles.desc}>Chicken, Cheese and pineapple</Text>
     </View>
   );

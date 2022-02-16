@@ -2,23 +2,23 @@ import {Button, Image, Text, View} from 'react-native-ui-lib';
 import React from 'react';
 import {StyleSheet} from 'react-native';
 
-const ListEmptyComponent = () => {
+const ListEmptyItem = () => {
   return (
     <View flex-1 paddingT-119>
       <View center>
         <Image assetName="myorderEmpty" assetGroup="images" marginB-44 />
       </View>
       <Text textSemiBold white style={styles.title} marginB-12 center>
-        Không có đơn hàng nào đang được giao đến bạn.
+        Chuyên mục này chưa có sản phẩm.
       </Text>
       <Text gray2 textRegular style={styles.desc} center>
-        Hãy ăn thêm nhiều nhaaa!!!
+        Chúng tôi sẽ cập nhật trong thời gian tới.
       </Text>
 
       <View center>
         <Button bg-primary marginT-30 style={styles.btn}>
           <Text white textSemiBold style={styles.textBtn}>
-            Đặt đồ ngay
+            Khám phá danh mục khác
           </Text>
         </Button>
       </View>
@@ -26,7 +26,7 @@ const ListEmptyComponent = () => {
   );
 };
 
-export default ListEmptyComponent;
+export default ListEmptyItem;
 
 const styles = StyleSheet.create({
   title: {

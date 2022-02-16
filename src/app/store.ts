@@ -1,3 +1,4 @@
+import productSlice from './redux/slices/productSlice/';
 import orderSlice from './redux/slices/orderSlice/';
 import categoriesSlice from './redux/slices/categoriesSlice/';
 import provincesSlice from './redux/slices/provincesSlice/';
@@ -26,6 +27,7 @@ const store = configureStore({
     orderCompletedSlice,
     orderCompletedLoading,
     orderUpcommingLoading,
+    productSlice,
   },
 });
 
