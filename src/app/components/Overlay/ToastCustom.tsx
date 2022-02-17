@@ -20,7 +20,7 @@ const ToastCustom = ({
       position={'bottom'}
       message={msg}
       action={{
-        label: 'Close',
+        label: 'Đóng',
         onPress: () => {
           dispatch(
             showToast({

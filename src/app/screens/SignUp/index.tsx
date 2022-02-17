@@ -68,7 +68,7 @@ const SignUp = () => {
                   dispatch(
                     showToast({
                       isShown: true,
-                      msg: 'Sign up successfully!!!\nWelcome to FoodHub',
+                      msg: 'Đăng kí thành công!!!\nChào mừng đến với FoodHub',
                       preset: Incubator.ToastPresets.SUCCESS,
                     }),
                   );
@@ -109,11 +109,16 @@ const SignUp = () => {
   };
 
   const onInvalid = (data: any) => {
-    setIsVisible(true);
-    setErrorMessage(
-      `${data.userName ? 'Full name: ' + data.userName.message + '\n' : ''}${
-        data.email ? 'Email: ' + data.email.message + '\n' : ''
-      }${data.password ? 'Password: ' + data.password.message + '\n' : ''}`,
+    dispatch(
+      showToast({
+        isShown: true,
+        msg: `${
+          data.userName ? 'Họ và tên: ' + data.userName.message + '\n' : ''
+        }${data.email ? 'Email: ' + data.email.message + '\n' : ''}${
+          data.password ? 'Mật khẩu: ' + data.password.message + '\n' : ''
+        }`,
+        preset: Incubator.ToastPresets.FAILURE,
+      }),
     );
   };
 
@@ -129,7 +134,7 @@ const SignUp = () => {
         </View>
         <View paddingH-25 paddingT-100>
           <Text white marginB-31 style={styles.title}>
-            Sign Up
+            Đăng kí
           </Text>
           <View>
             <Controller
@@ -137,15 +142,15 @@ const SignUp = () => {
               rules={{
                 required: {
                   value: true,
-                  message: 'This field is required.',
+                  message: 'Trường này không được để trống.',
                 },
                 minLength: {
                   value: 2,
-                  message: 'Username must have at least 2 characters.',
+                  message: 'Tên tài khoản phải ít nhất có 2 kí tự.',
                 },
                 maxLength: {
                   value: 32,
-                  message: 'Username must have a maximum of 32 characters.',
+                  message: 'Tên tài khoản tối đa 32 kí tự.',
                 },
               }}
               render={({
@@ -163,9 +168,9 @@ const SignUp = () => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  label={'User name'}
+                  label={'Tên tài khoản'}
                   labelStyle={styles.label}
-                  placeholder={'Enter user name'}
+                  placeholder={'Nhập tên tài khoản'}
                   placeholderTextColor={'#ADADB8'}
                 />
               )}
@@ -177,12 +182,12 @@ const SignUp = () => {
               rules={{
                 required: {
                   value: true,
-                  message: 'This field is required',
+                  message: 'Trường này không được để trống',
                 },
                 pattern: {
                   value:
                     /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                  message: 'Incorrect email format.',
+                  message: 'Định dạng email không đúng.',
                 },
               }}
               render={({
@@ -202,7 +207,7 @@ const SignUp = () => {
                   value={value}
                   label={'E-mail'}
                   labelStyle={styles.label}
-                  placeholder={'Enter your email'}
+                  placeholder={'Nhập email của bạn'}
                   placeholderTextColor={'#ADADB8'}
                 />
               )}
@@ -214,12 +219,12 @@ const SignUp = () => {
               rules={{
                 required: {
                   value: true,
-                  message: 'This field is required.',
+                  message: 'Trường này không được để trống.',
                 },
                 pattern: {
                   value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
                   message:
-                    'Password must be at least 8 characters, including 1 uppercase letter, 1 number and 1 special character.',
+                    'Mật khẩu phải có ít nhất 8 ký tự, bao gồm 1 ký tự viết hoa, 1 số và 1 ký tự đặc biệt.',
                 },
               }}
               render={({
@@ -237,9 +242,9 @@ const SignUp = () => {
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
-                    label={'Password'}
+                    label={'Mật khẩu'}
                     labelStyle={styles.label}
-                    placeholder={'Enter your password'}
+                    placeholder={'Nhập mật khẩu của bạn'}
                     placeholderTextColor={'#ADADB8'}
                     secureTextEntry={!showPass}
                   />
@@ -264,46 +269,22 @@ const SignUp = () => {
               style={styles.btnLogin}
               onPress={handleSubmit(onSubmit, onInvalid)}>
               <Text white style={styles.btnLoginText}>
-                SIGN UP
+                Đăng kí
               </Text>
             </Button>
           </View>
           <Text gray3 center marginB-30>
-            Already have an account?{' '}
+            Bạn đã có tài khoản?{' '}
             <Text
               primary
               onPress={() => {
                 navigation.navigate('Login');
               }}>
-              Sign In
+              Đăng nhập
             </Text>
           </Text>
         </View>
       </KeyboardAwareScrollView>
-      <Incubator.Toast
-        visible={isVisible}
-        position={'bottom'}
-        message={errorMessage}
-        action={{
-          label: 'Close',
-          onPress: () => setIsVisible(false),
-          labelProps: {
-            style: {
-              fontFamily: 'SofiaPro-Medium',
-            },
-          },
-        }}
-        zIndex={99}
-        preset={Incubator.ToastPresets.FAILURE}
-        onDismiss={() => {
-          setIsVisible(false);
-        }}
-        autoDismiss={3500}
-        messageStyle={{
-          fontFamily: 'SofiaPro-Medium',
-          fontSize: 16,
-        }}
-      />
     </>
   );
 };

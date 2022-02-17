@@ -37,7 +37,7 @@ const Welcome = () => {
 
         <View center>
           <Text white style={styles.signInDescText}>
-            Bạn có săn san để tạo một tài khoản?{' '}
+            Bạn có sẵn sàng để tạo một tài khoản?{' '}
             <Text
               underline={true}
               style={styles.signInDescText}

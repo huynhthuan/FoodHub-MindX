@@ -28,7 +28,7 @@ const SearchBar = ({
           }}
           onPressIn={onPressInCustom}
           value={keyWordValue}
-          placeholder={'Find for food or restaurant...'}
+          placeholder={'Tìm đồ ăn cho bạn...'}
           placeholderTextColor={'#ADADB8'}
           style={styles.input}
           showSoftInputOnFocus={showSoftInputOnFocus}

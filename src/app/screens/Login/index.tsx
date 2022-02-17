@@ -59,7 +59,7 @@ const Login = () => {
       showToast({
         isShown: true,
         msg: `${data.email ? 'Email: ' + data.email.message : ''}${
-          data.password ? '\n' + 'Password: ' + data.password.message : ''
+          data.password ? '\n' + 'Mật khẩu: ' + data.password.message : ''
         }`,
         preset: Incubator.ToastPresets.FAILURE,
       }),
@@ -80,7 +80,7 @@ const Login = () => {
         </View>
         <View paddingH-25 paddingT-100>
           <Text white marginB-31 style={styles.title}>
-            Login
+            Đăng nhập
           </Text>
           <View>
             <Controller
@@ -88,12 +88,12 @@ const Login = () => {
               rules={{
                 required: {
                   value: true,
-                  message: 'This field is required',
+                  message: 'Trường này không được để trống.',
                 },
                 pattern: {
                   value:
                     /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                  message: 'Incorrect email format.',
+                  message: 'Định dạng email không đúng.',
                 },
               }}
               render={({
@@ -113,7 +113,7 @@ const Login = () => {
                   value={value}
                   label={'E-mail'}
                   labelStyle={styles.label}
-                  placeholder={'Enter your email'}
+                  placeholder={'Nhập email của bạn'}
                   placeholderTextColor={'#ADADB8'}
                 />
               )}
@@ -125,7 +125,7 @@ const Login = () => {
               rules={{
                 required: {
                   value: true,
-                  message: 'This field is required',
+                  message: 'Trường này không được để trống',
                 },
               }}
               render={({
@@ -143,9 +143,9 @@ const Login = () => {
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
-                    label={'Password'}
+                    label={'Mật khẩu'}
                     labelStyle={styles.label}
-                    placeholder={'Password'}
+                    placeholder={'Mật khẩu'}
                     placeholderTextColor={'#ADADB8'}
                     secureTextEntry={!showPass}
                   />
@@ -171,7 +171,7 @@ const Login = () => {
             onPress={() => {
               navigation.navigate('ResetPassword');
             }}>
-            Forgot password?
+            Quên mật khẩu?
           </Text>
           <View center marginB-32>
             <Button
@@ -179,18 +179,18 @@ const Login = () => {
               style={styles.btnLogin}
               onPress={handleSubmit(onSubmit, onInvalid)}>
               <Text white style={styles.btnLoginText}>
-                Login
+                Đăng nhập
               </Text>
             </Button>
           </View>
           <Text gray3 center>
-            Don’t have an account?{' '}
+            Bạn chưa có tài khoản?{' '}
             <Text
               primary
               onPress={() => {
                 navigation.navigate('SignUp');
               }}>
-              Sign Up
+              Đăng kí
             </Text>
           </Text>
         </View>

@@ -178,7 +178,7 @@ const App = () => {
                   animation: 'fade_from_bottom',
                   headerShown: true,
                   headerTransparent: true,
-                  title: 'Search',
+                  title: 'Tìm kiếm',
                   headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
                   headerLeft: () => (
                     <HeaderBackButton customStyle={{marginLeft: 9}} />
@@ -197,7 +197,7 @@ const App = () => {
                 options={{
                   headerShown: true,
                   headerTransparent: true,
-                  title: 'Filter',
+                  title: 'Lọc sản phẩm',
                   headerLeft: () => (
                     <HeaderBackButton customStyle={{marginLeft: 9}} />
                   ),
@@ -227,7 +227,7 @@ const App = () => {
                 options={{
                   headerShown: true,
                   headerTransparent: true,
-                  title: 'Cart',
+                  title: 'Giỏ hàng',
                   headerLeft: () => (
                     <HeaderBackButton customStyle={{marginLeft: 9}} />
                   ),
@@ -246,7 +246,7 @@ const App = () => {
                 options={{
                   headerShown: true,
                   headerTransparent: true,
-                  title: 'Order Details',
+                  title: 'Chi tiết đơn hàng',
                   headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
                   headerLeft: () => (
                     <HeaderBackButton customStyle={{marginLeft: 9}} />
@@ -265,7 +265,7 @@ const App = () => {
                 options={{
                   headerTransparent: true,
                   headerShown: true,
-                  title: 'Edit Delivery Address',
+                  title: 'Chỉnh sửa địa chỉ giao hàng',
                   headerLeft: () => (
                     <HeaderBackButton customStyle={{marginLeft: 9}} />
                   ),
@@ -283,7 +283,7 @@ const App = () => {
                 options={{
                   headerTransparent: true,
                   headerShown: true,
-                  title: 'Add Delivery Address',
+                  title: 'Thêm địa chỉ giao hàng',
                   headerLeft: () => (
                     <HeaderBackButton customStyle={{marginLeft: 9}} />
                   ),
@@ -301,7 +301,7 @@ const App = () => {
                 options={{
                   headerTransparent: true,
                   headerShown: true,
-                  title: 'Reviews',
+                  title: 'Đánh giá',
                   headerLeft: () => (
                     <HeaderBackButton customStyle={{marginLeft: 9}} />
                   ),

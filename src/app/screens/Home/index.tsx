@@ -51,7 +51,7 @@ const Home = () => {
           width: 154,
           marginRight: 15,
         }}
-        data={item}
+        id={item}
       />
     ),
     [],
@@ -87,7 +87,7 @@ const Home = () => {
 
         <View paddingH-25>
           <Text marginB-15 white style={styles.sectionTitle}>
-            Featured agency
+            Món ăn nổi bật
           </Text>
         </View>
 
@@ -104,7 +104,7 @@ const Home = () => {
 
         <View paddingH-25>
           <Text marginB-15 white style={styles.sectionTitle}>
-            Món ăn bình dân
+            Món ăn phổ biến
           </Text>
         </View>
 

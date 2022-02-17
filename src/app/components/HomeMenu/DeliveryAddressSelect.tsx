@@ -17,14 +17,14 @@ const DeliveryAddressSelect = () => {
       value={addressDelivery}
       enableModalBlur={false}
       onChange={(item: string) => setAddressDelivery(item)}
-      topBarProps={{title: 'Select Delivery Address'}}
+      topBarProps={{title: 'Chọn địa chỉ giao hàng'}}
       style={styles.boxAddress}
       showSearch
-      searchPlaceholder={'Search your delivery address'}
+      searchPlaceholder={'Tìm địa chỉ giao hàng'}
       renderPicker={(value: PickerItemValue, label: string) => (
         <View center>
           <Text white style={styles.title}>
-            Deliver to{' '}
+            Giao tới{' '}
             <Image
               assetName="arrowDownNormal"
               width={8.64}
@@ -33,7 +33,7 @@ const DeliveryAddressSelect = () => {
             />
           </Text>
           <Text primary style={styles.address}>
-            {label ? label : 'Select Delivery Address'}
+            {label ? label : 'Chọn địa chỉ'}
           </Text>
         </View>
       )}>

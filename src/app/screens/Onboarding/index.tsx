@@ -1,13 +1,29 @@
-import {Button, Image, Text, View} from 'react-native-ui-lib';
+import {Button, Image, View} from 'react-native-ui-lib';
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import Swiper from 'react-native-swiper';
 import BoardingItem from '../../components/Onboarding/BoardingItem';
-import {getScreenHeight, getScreenWidth} from '../../utilities/helpers';
+import {getScreenWidth} from '../../utilities/helpers';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 
-const dataOnboarding = new Array(3).fill(null);
+const data = [
+  {
+    title: 'Khám phá menu',
+    desc: 'App của chúng tôi có thể gửi bạn đi mọi nơi, ngoại trừ vũ trụ. Mức giá rất rẻ và nhiều khuyến mãi',
+    image: 'onboarding1',
+  },
+  {
+    title: 'Nhiều ưu đãi lớn',
+    desc: 'Ứng dụng của chúng tôi có thể đưa bạn đến mọi nơi, thậm chí cả không gian. Chỉ với $ 2,99 mỗi tháng',
+    image: 'onboarding2',
+  },
+  {
+    title: 'Nhận hàng tận nơi',
+    desc: 'Ứng dụng của chúng tôi có thể đưa bạn đến mọi nơi, thậm chí cả không gian. Chỉ với $ 2,99 mỗi tháng',
+    image: 'onboarding3',
+  },
+];
 
 const Onboarding = () => {
   const swiperRef = React.useRef(null);
@@ -35,8 +51,13 @@ const Onboarding = () => {
         onIndexChanged={index => {
           setSwiperIndex(index);
         }}>
-        {dataOnboarding.map((item, index) => (
-          <BoardingItem key={index} />
+        {data.map((item, index) => (
+          <BoardingItem
+            key={index}
+            titleSlice={item.title}
+            desc={item.desc}
+            image={item.image}
+          />
         ))}
       </Swiper>
       <Button

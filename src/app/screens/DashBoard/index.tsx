@@ -64,7 +64,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       </View>
 
       <DrawerItem
-        label="Home"
+        label="Trang chủ"
         onPress={() => {
           props.navigation.navigate('Dashboard');
         }}
@@ -73,7 +73,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         style={styles.item}
       />
       <DrawerItem
-        label="My Orders"
+        label="Đơn hàng của bạn"
         onPress={() => {
           props.navigation.navigate('MyOrders');
         }}
@@ -82,7 +82,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         style={styles.item}
       />
       <DrawerItem
-        label="My Profile"
+        label="Thông tin tài khoản"
         onPress={() => {
           props.navigation.navigate('MyProfile');
         }}
@@ -91,7 +91,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         style={styles.item}
       />
       <DrawerItem
-        label="Delivery Address"
+        label="Địa chỉ giao hàng"
         onPress={() => {
           props.navigation.navigate('DeliveryAddress');
         }}
@@ -100,7 +100,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         style={styles.item}
       />
       <DrawerItem
-        label="Payment Methods"
+        label="Thanh toán"
         onPress={() => {
           props.navigation.navigate('PaymentMethods');
         }}
@@ -109,7 +109,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         style={styles.item}
       />
       <DrawerItem
-        label="Contact Us"
+        label="Liên hệ"
         onPress={() => {
           props.navigation.navigate('ContactUs');
         }}
@@ -118,7 +118,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         style={styles.item}
       />
       <DrawerItem
-        label="Settings"
+        label="Cài đặt"
         onPress={() => {
           props.navigation.navigate('Settings');
         }}
@@ -127,7 +127,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         style={styles.item}
       />
       <DrawerItem
-        label="Helps & FAQs"
+        label="Giúp đỡ & Hỏi đáp"
         onPress={() => {
           props.navigation.navigate('HelpsFaqs');
         }}
@@ -149,7 +149,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         }}>
         <Image assetName="logout" marginR-9 assetGroup="icons" />
         <Text white style={styles.textLogout} textRegular>
-          Log Out
+          Đăng xuất
         </Text>
       </Button>
     </DrawerContentScrollView>
@@ -196,7 +196,7 @@ const DashBoard = () => {
           headerTransparent: true,
           headerLeft: () => <HeaderBackButton />,
           headerRight: () => <Avatar />,
-          headerTitle: 'My Orders',
+          headerTitle: 'Đơn hàng của bạn',
           headerTitleStyle: {
             color: '#fff',
             fontFamily: 'SofiaPro-Medium',

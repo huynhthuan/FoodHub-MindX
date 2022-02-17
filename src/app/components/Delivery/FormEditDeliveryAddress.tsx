@@ -312,15 +312,15 @@ const FormEditDeliveryAddress = ({
         rules={{
           required: {
             value: true,
-            message: 'This field is required.',
+            message: 'Trường này không được để trống.',
           },
           minLength: {
             value: 2,
-            message: 'Your name must have at least 2 characters.',
+            message: 'Tên địa chỉ tối thiểu 2 kí tự.',
           },
           maxLength: {
             value: 32,
-            message: 'Your name must have a maximum of 32 characters.',
+            message: 'Tên địa chỉ tối đa 32 kí tự.',
           },
         }}
         render={({field: {onChange, onBlur, value}}) => (
@@ -332,7 +332,7 @@ const FormEditDeliveryAddress = ({
             value={value}
             label={'Tên địa chỉ'}
             labelStyle={styles.label}
-            placeholder={'Enter your name address'}
+            placeholder={'Nhập tên địa chỉ của bạn'}
             placeholderTextColor={'#ADADB8'}
           />
         )}
@@ -344,11 +344,11 @@ const FormEditDeliveryAddress = ({
         rules={{
           required: {
             value: true,
-            message: 'This field is required.',
+            message: 'Trường này không được để trống.',
           },
           pattern: {
             value: /(\+84|0[3|5|7|8|9])+([0-9]{9})\b/i,
-            message: 'Your phone incorrect format.',
+            message: 'Số điện thoại của bạn chưa đúng định dạng.',
           },
         }}
         render={({field: {onChange, onBlur, value}}) => (
@@ -361,7 +361,7 @@ const FormEditDeliveryAddress = ({
             keyboardType="phone-pad"
             label="Số điện thoại"
             labelStyle={styles.label}
-            placeholder={'Enter your mobile number'}
+            placeholder={'Nhập số điện thoại của bạn'}
           />
         )}
         name="phone"
@@ -372,11 +372,11 @@ const FormEditDeliveryAddress = ({
         rules={{
           required: {
             value: true,
-            message: 'This field is required.',
+            message: 'Trường này không được để trống.',
           },
           minLength: {
             value: 2,
-            message: 'Your street must have at least 2 characters.',
+            message: 'Địa chỉ cụ thể tối thiểu phải 2 kí tự.',
           },
         }}
         render={({field: {onChange, onBlur, value}}) => (
@@ -388,7 +388,7 @@ const FormEditDeliveryAddress = ({
             placeholderTextColor={'#ADADB8'}
             label="Địa chỉ cụ thể (bao gồm số nhà, ngõ, hẻm)"
             labelStyle={styles.label}
-            placeholder={'Enter your street'}
+            placeholder={'Nhập địa chỉ cụ thể'}
           />
         )}
         name="address_primary"
@@ -401,7 +401,7 @@ const FormEditDeliveryAddress = ({
             rules={{
               required: {
                 value: true,
-                message: 'This field is required.',
+                message: 'Trường này không được để trống.',
               },
             }}
             render={({field: {onChange, onBlur, value}}) => (
@@ -464,7 +464,7 @@ const FormEditDeliveryAddress = ({
               rules={{
                 required: {
                   value: true,
-                  message: 'This field is required.',
+                  message: 'Trường này không được để trống.',
                 },
               }}
               render={({field: {onChange, onBlur, value}}) => (
@@ -530,7 +530,7 @@ const FormEditDeliveryAddress = ({
               rules={{
                 required: {
                   value: true,
-                  message: 'This field is required.',
+                  message: 'Trường này không được để trống.',
                 },
               }}
               render={({field: {onChange, onBlur, value}}) => (
@@ -628,7 +628,7 @@ const FormEditDeliveryAddress = ({
           style={styles.btn}
           onPress={handleSubmit(onSubmit, onInvalid)}>
           <Text white textSemiBold style={styles.btnText}>
-            Save
+            Lưu
           </Text>
         </Button>
 

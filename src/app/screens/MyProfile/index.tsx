@@ -77,7 +77,7 @@ const MyProfile = () => {
         dispatch(
           showToast({
             isShown: true,
-            msg: `Change information sucessfully.`,
+            msg: `Thay đổi thong tin thành công.`,
             preset: Incubator.ToastPresets.SUCCESS,
           }),
         );
@@ -105,11 +105,9 @@ const MyProfile = () => {
     dispatch(
       showToast({
         isShown: true,
-        msg: `${
-          data.firstname ? 'First name: ' + data.firstname.message + '\n' : ''
-        }${data.lastname ? 'Last name: ' + data.lastname.message + '\n' : ''}${
-          data.phone ? 'Email: ' + data.phone.message : ''
-        }`,
+        msg: `${data.firstname ? 'Họ: ' + data.firstname.message + '\n' : ''}${
+          data.lastname ? 'Tên: ' + data.lastname.message + '\n' : ''
+        }${data.phone ? 'Email: ' + data.phone.message : ''}`,
         preset: Incubator.ToastPresets.FAILURE,
       }),
     );
@@ -208,7 +206,7 @@ const MyProfile = () => {
                           dispatch(
                             showToast({
                               isShown: true,
-                              msg: `Upload avatar successfully!`,
+                              msg: `Tải ảnh đại diện thành công!`,
                               preset: Incubator.ToastPresets.SUCCESS,
                             }),
                           );
@@ -248,20 +246,19 @@ const MyProfile = () => {
             rules={{
               required: {
                 value: true,
-                message: 'This field is required.',
+                message: 'Trường này không được bỏ trống.',
               },
               minLength: {
                 value: 2,
-                message: 'Your first name must have at least 2 characters.',
+                message: 'Họ của bạn ít nhất phải có 2 kí tự.',
               },
               maxLength: {
                 value: 32,
-                message:
-                  'Your first name must have a maximum of 32 characters.',
+                message: 'Họ của bạn tối đa 32 kí tự.',
               },
               pattern: {
                 value: /^[A-Za-z\s]+$/,
-                message: 'Your first name must be letters.',
+                message: 'Họ của bạn phải là chữ cái.',
               },
             }}
             render={({
@@ -279,9 +276,9 @@ const MyProfile = () => {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                label={'First name'}
+                label={'Họ'}
                 labelStyle={styles.label}
-                placeholder={'Enter your first name'}
+                placeholder={'Nhập họ của bạn'}
                 placeholderTextColor={'#ADADB8'}
               />
             )}
@@ -293,19 +290,19 @@ const MyProfile = () => {
             rules={{
               required: {
                 value: true,
-                message: 'This field is required.',
+                message: 'Trường này không được bỏ trống.',
               },
               minLength: {
                 value: 2,
-                message: 'Your last name must have at least 2 characters.',
+                message: 'Tên của bạn ít nhất phải có 2 kí tự.',
               },
               maxLength: {
                 value: 32,
-                message: 'Your last name must have a maximum of 32 characters.',
+                message: 'Tên của bạn tối đa 32 kí tự.',
               },
               pattern: {
                 value: /^[A-Za-z\s]+$/,
-                message: 'Your last name must be letters.',
+                message: 'Tên của bạn phải là chữ cái.',
               },
             }}
             render={({
@@ -323,9 +320,9 @@ const MyProfile = () => {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                label={'Last name'}
+                label={'Tên'}
                 labelStyle={styles.label}
-                placeholder={'Enter your last name'}
+                placeholder={'Nhập tên của bạn'}
                 placeholderTextColor={'#ADADB8'}
               />
             )}
@@ -351,7 +348,7 @@ const MyProfile = () => {
                 value={value}
                 label={'E-mail'}
                 labelStyle={styles.label}
-                placeholder={'Enter your email'}
+                placeholder={'Nhập email của bạn'}
                 placeholderTextColor={'#ADADB8'}
                 editable={false}
                 selectTextOnFocus={false}
@@ -362,14 +359,14 @@ const MyProfile = () => {
 
           {userState.phone === undefined ? (
             <>
-              <Text style={styles.label}>Phone number</Text>
+              <Text style={styles.label}>Số điện thoại</Text>
               <Button
                 marginB-20
                 bg-gray2
                 onPress={() => {
                   navigation.navigate('BindPhone');
                 }}>
-                <Text white>Bind phone number</Text>
+                <Text white>Liên kết số điện thoại</Text>
               </Button>
             </>
           ) : (
@@ -381,7 +378,7 @@ const MyProfile = () => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  label={'Phone Number'}
+                  label={'Số điện thoại'}
                   labelStyle={styles.label}
                   placeholderTextColor={'#ADADB8'}
                   keyboardType="phone-pad"
@@ -399,7 +396,7 @@ const MyProfile = () => {
               style={styles.btnSave}
               onPress={handleSubmit(onSubmit, onInvalid)}>
               <Text white textSemiBold style={styles.btnSaveText}>
-                Save
+                Lưu
               </Text>
             </Button>
           </View>

@@ -73,7 +73,7 @@ const HomeMenu = () => {
             />
           ),
           headerLeft: () => <HeaderBackButton />,
-          title: 'Delivery Address',
+          title: 'Địa chỉ giao hàng',
           headerTitleStyle: {
             color: '#fff',
             fontFamily: 'SofiaPro-Medium',
@@ -126,7 +126,7 @@ const HomeMenu = () => {
           ),
           headerShown: true,
           headerTransparent: true,
-          title: 'Favorites',
+          title: 'Yêu thích',
           headerRight: () => <Avatar />,
           headerLeft: () => <HeaderBackButton />,
           headerTitleAlign: 'center',
