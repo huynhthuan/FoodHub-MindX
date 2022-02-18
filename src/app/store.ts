@@ -12,6 +12,7 @@ import deliveryAddressLoadingSlice from './redux/slices/deliveryAddressLoadingSl
 import orderCompletedSlice from './redux/slices/orderCompletedSlice';
 import orderCompletedLoading from './redux/slices/orderCompletedLoading';
 import orderUpcommingLoading from './redux/slices/orderUpcommingLoading';
+import noticesSlice from './redux/slices/noticesSlice';
 
 const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ const store = configureStore({
     orderCompletedLoading,
     orderUpcommingLoading,
     productSlice,
+    noticesSlice,
   },
 });
 

@@ -151,18 +151,15 @@ const HomeMenu = () => {
               focused={focused}
             />
           ),
-          tabBarBadge: '3',
-          tabBarBadgeStyle: {
-            backgroundColor: '#FE724C',
+          headerShown: true,
+          headerTransparent: true,
+          title: 'Thông báo',
+          headerRight: () => <Avatar />,
+          headerLeft: () => <HeaderBackButton />,
+          headerTitleStyle: {
             color: '#ffffff',
-            fontSize: 10,
-            fontFamily: 'SofiaPro',
-            lineHeight: 14.53,
-            padding: 0,
-            top: 15,
-            left: 10,
-            width: 14.56,
-            borderRadius: 6,
+            fontFamily: 'SofiaPro-Medium',
+            fontSize: 18,
           },
         }}
         name="Notifications"
