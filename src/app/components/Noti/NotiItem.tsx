@@ -4,6 +4,10 @@ import FastImage from 'react-native-fast-image';
 import {StyleSheet} from 'react-native';
 import {useAppSelector} from '../../hook';
 import moment from 'moment'; // require
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {MainStackParamList} from '../../../../App';
+import axios from 'axios';
+import {BASE_URL_WP_MEDIA} from '../../api/constants';
 moment.updateLocale('en', {
   relativeTime: {
     future: 'in %s',
@@ -28,15 +32,30 @@ moment.updateLocale('en', {
 const NotiItem = ({id}: {id: number}) => {
   const entitieNotices = useAppSelector(state => state.noticesSlice.entities);
   const notice: any = entitieNotices[id];
-
+  const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   if (!notice) return null;
+  const [image, setImage] = React.useState(
+    'https://secure.gravatar.com/avatar/c2b06ae950033b392998ada50767b50e?s=96&d=mm&r=g',
+  );
+
+  React.useEffect(() => {
+    axios.get(BASE_URL_WP_MEDIA + notice.featured_media).then(res => {
+      setImage(res.data.source_url);
+    });
+  }, []);
 
   return (
-    <TouchableOpacity paddingH-25 row marginB-20>
+    <TouchableOpacity
+      paddingH-25
+      row
+      marginB-20
+      onPress={() => {
+        navigation.navigate('NotificationsDetails', {notiId: id});
+      }}>
       <View style={styles.imageWrap} bg-white marginR-12>
         <FastImage
           source={{
-            uri: 'https://secure.gravatar.com/avatar/c2b06ae950033b392998ada50767b50e?s=96&d=mm&r=g',
+            uri: image,
             priority: 'high',
           }}
           style={styles.image}

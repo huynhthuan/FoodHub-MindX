@@ -92,9 +92,9 @@ const Notifications = () => {
   return (
     <>
       <FlatList
-        // onScroll={({nativeEvent}) => {
-        //   changeHeaderBackground(nativeEvent, navigation);
-        // }}
+        onScroll={({nativeEvent}) => {
+          changeHeaderBackground(nativeEvent, navigation);
+        }}
         data={noticeData}
         renderItem={renderNotiItem}
         numColumns={1}

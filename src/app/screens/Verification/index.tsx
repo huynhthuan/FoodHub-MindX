@@ -9,8 +9,14 @@ import {
   View,
 } from 'react-native-ui-lib';
 import React from 'react';
-import {KeyboardAvoidingView, LogBox, Platform, StyleSheet} from 'react-native';
-import {getScreenWidth} from '../../utilities/helpers';
+import {
+  KeyboardAvoidingView,
+  LogBox,
+  Platform,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
+import {getScreenHeight, getScreenWidth} from '../../utilities/helpers';
 import {
   NavigationProp,
   RouteProp,
@@ -169,19 +175,19 @@ const Verification = () => {
   };
 
   return (
-    <View flex bg-primaryDark padding-20>
+    <View flex bg-primaryDark>
       <View row spread style={styles.decorTop}>
         <Image assetName="signUpDecorTopLeft" assetGroup="images" />
         <Image assetName="signUpDecorTopRight" assetGroup="images" />
       </View>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}>
         <Text white marginB-20 style={styles.title}>
-          Vefification Code
+          Mã xác minh
         </Text>
         <Text gray2 marginB-32 style={styles.desc}>
-          Please type the verification code sent to {route.params.phoneNumber}
+          Vui lòng nhập mã xác minh được gửi đến {route.params.phoneNumber}
         </Text>
         <View>
           <MaskedInput
@@ -195,14 +201,14 @@ const Verification = () => {
           />
           <View marginB-32 row centerV>
             <Text gray4 style={styles.textResend} marginR-2>
-              I don’t recevie a code!
+              Tôi không nhận được mã!
             </Text>
             <TouchableOpacity
               onPress={() => {
                 resendCode();
               }}>
               <Text primary textBold style={styles.textResend}>
-                Please resend
+                Gửi lại
               </Text>
             </TouchableOpacity>
           </View>
@@ -215,12 +221,12 @@ const Verification = () => {
                 confirmCode();
               }}>
               <Text white style={styles.btnLoginText}>
-                Submit
+                Xác minh
               </Text>
             </Button>
           </View>
         </View>
-      </KeyboardAvoidingView>
+      </ScrollView>
     </View>
   );
 };
@@ -229,8 +235,9 @@ export default Verification;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
+    minHeight: getScreenHeight(),
+    paddingHorizontal: 25,
   },
   decorTop: {
     width: getScreenWidth(),

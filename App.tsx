@@ -41,6 +41,7 @@ import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import Loading from './src/app/components/Overlay/Loading';
 import ToastCustom from './src/app/components/Overlay/ToastCustom';
 import {deliveryAddressData} from './src/app/redux/slices/deliveryAddressSlice';
+import NotificationsDetails from './src/app/screens/NotificationsDetails';
 
 Sentry.init({
   dsn: 'https://2e7732ba44794b38913cb3829622ac0f@o1121885.ingest.sentry.io/6158966',
@@ -75,9 +76,10 @@ export type MainStackParamList = {
   OrderDetails: undefined;
   DeliveryDetails: {addressDetail: deliveryAddressData};
   AddDeliveryAddress: undefined;
-  Reviews: {screenWriteReview: string};
-  ReviewFood: undefined;
+  Reviews: {foodData: any};
+  ReviewFood: {foodData: any};
   ReviewAgency: undefined;
+  NotificationsDetails: {notiId: number};
 };
 
 const optionsAuthScreen = {
@@ -321,9 +323,7 @@ const App = () => {
                   headerShown: true,
                   title: '',
                   headerLeft: () => (
-                    <HeaderBackButton
-                      customStyle={{marginLeft: 14, marginTop: 14}}
-                    />
+                    <HeaderBackButton customStyle={{marginLeft: 14}} />
                   ),
                 }}
               />
@@ -335,9 +335,19 @@ const App = () => {
                   headerShown: true,
                   title: '',
                   headerLeft: () => (
-                    <HeaderBackButton
-                      customStyle={{marginLeft: 14, marginTop: 14}}
-                    />
+                    <HeaderBackButton customStyle={{marginLeft: 14}} />
+                  ),
+                }}
+              />
+              <MainStack.Screen
+                name="NotificationsDetails"
+                component={NotificationsDetails}
+                options={{
+                  headerTransparent: true,
+                  headerShown: true,
+                  title: '',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 14}} />
                   ),
                 }}
               />

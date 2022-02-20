@@ -30,7 +30,7 @@ const dataAgency = [
 
 const Home = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
-
+  
   const renderItemAgency = React.useCallback(
     ({item}) => (
       <ItemAgency

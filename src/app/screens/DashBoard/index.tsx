@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   btnLogout: {
-    width: 117,
+    width: 140,
   },
   label: {
     fontSize: 16,

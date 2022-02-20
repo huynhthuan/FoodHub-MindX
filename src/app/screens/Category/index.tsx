@@ -108,6 +108,7 @@ const Category = () => {
           />
         )}
       </View>
+
       <View paddingH-25>
         <Text white textBold style={styles.title} marginB-25>
           {route.params.CategoryDetail.name}
@@ -117,6 +118,7 @@ const Category = () => {
           {route.params.CategoryDetail.name}
         </Text>
       </View>
+
       <View row spread marginB-20 paddingH-25 centerV>
         <View row>
           <Text white textRegular marginR-5>
@@ -167,6 +169,7 @@ const Category = () => {
           </Button>
         </View>
       </View>
+
       <FlatList
         data={productList.ids}
         renderItem={renderItemCategory}
@@ -174,6 +177,7 @@ const Category = () => {
         refreshing={productLoading}
         onRefresh={() => {}}
         ListEmptyComponent={ListEmptyItem}
+        keyExtractor={(item, index) => index.toString()}
       />
     </View>
   );

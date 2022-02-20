@@ -1,3 +1,5 @@
+import userReviewSlice from './redux/slices/userReviewSlice';
+import favoritesSlice from './redux/slices/favoriteSlice';
 import productSlice from './redux/slices/productSlice/';
 import orderSlice from './redux/slices/orderSlice/';
 import categoriesSlice from './redux/slices/categoriesSlice/';
@@ -30,6 +32,8 @@ const store = configureStore({
     orderUpcommingLoading,
     productSlice,
     noticesSlice,
+    favoritesSlice,
+    userReviewSlice,
   },
 });
 

@@ -37,6 +37,7 @@ const MyProfile = () => {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: {errors},
   } = useForm({
     defaultValues: {
@@ -53,6 +54,7 @@ const MyProfile = () => {
         isShown: true,
       }),
     );
+
     axios
       .post(
         BASE_URL_WP_API_USER + userState.id,
@@ -77,14 +79,12 @@ const MyProfile = () => {
         dispatch(
           showToast({
             isShown: true,
-            msg: `Thay đổi thong tin thành công.`,
+            msg: `Thay đổi thông tin thành công.`,
             preset: Incubator.ToastPresets.SUCCESS,
           }),
         );
       })
       .catch(error => {
-        console.log(error);
-
         dispatch(
           setLoading({
             isShown: false,
@@ -94,7 +94,7 @@ const MyProfile = () => {
         dispatch(
           showToast({
             isShown: true,
-            msg: error.data,
+            msg: 'Đã có lỗi xảy ra, vui lòng thử lại',
             preset: Incubator.ToastPresets.FAILURE,
           }),
         );
@@ -112,6 +112,10 @@ const MyProfile = () => {
       }),
     );
   };
+
+  React.useEffect(() => {
+    setValue('phone', userState.phone);
+  }, [userState.phone]);
 
   return (
     <>
@@ -256,10 +260,6 @@ const MyProfile = () => {
                 value: 32,
                 message: 'Họ của bạn tối đa 32 kí tự.',
               },
-              pattern: {
-                value: /^[A-Za-z\s]+$/,
-                message: 'Họ của bạn phải là chữ cái.',
-              },
             }}
             render={({
               field: {onChange, onBlur, value},
@@ -299,10 +299,6 @@ const MyProfile = () => {
               maxLength: {
                 value: 32,
                 message: 'Tên của bạn tối đa 32 kí tự.',
-              },
-              pattern: {
-                value: /^[A-Za-z\s]+$/,
-                message: 'Tên của bạn phải là chữ cái.',
               },
             }}
             render={({
@@ -357,7 +353,7 @@ const MyProfile = () => {
             name="email"
           />
 
-          {userState.phone === undefined ? (
+          {userState.phone === undefined || !userState.phone ? (
             <>
               <Text style={styles.label}>Số điện thoại</Text>
               <Button

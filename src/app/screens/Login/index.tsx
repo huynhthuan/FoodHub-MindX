@@ -12,6 +12,8 @@ import {useAppDispatch, useAppSelector} from '../../hook';
 import {login} from '../../redux/slices/userSlice';
 import {setLoading} from '../../redux/slices/loadingSlice';
 import {showToast} from '../../redux/slices/toastSlice';
+import WooApi from '../../api/wooApi';
+import {favoritesReceived} from '../../redux/slices/favoriteSlice';
 
 const Login = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -40,7 +42,35 @@ const Login = () => {
       .then(res => {
         dispatch(setLoading({isShown: false}));
         dispatch(login(res.data));
-        navigation.navigate('DashBoard');
+        if (res.data.product_like) {
+          WooApi.get('products', {
+            include: res.data.product_like.split(','),
+          })
+            .then((res: any) => {
+              dispatch(
+                favoritesReceived({
+                  productList: JSON.stringify(res),
+                }),
+              );
+
+              navigation.navigate('DashBoard');
+            })
+            .catch(function (error: any) {
+              dispatch(
+                showToast({
+                  isShown: true,
+                  msg: `Đã có lỗi xảy ra. Vui lòng thử đăng nhập lại`,
+                  preset: Incubator.ToastPresets.FAILURE,
+                }),
+              );
+            });
+        } else {
+          dispatch(
+            favoritesReceived({
+              productList: JSON.stringify([]),
+            }),
+          );
+        }
       })
       .catch(function (error) {
         dispatch(setLoading({isShown: false}));

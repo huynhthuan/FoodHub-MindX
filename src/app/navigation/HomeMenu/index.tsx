@@ -153,7 +153,7 @@ const HomeMenu = () => {
           ),
           headerShown: true,
           headerTransparent: true,
-          title: 'Thông báo',
+          title: 'Tin tức',
           headerRight: () => <Avatar />,
           headerLeft: () => <HeaderBackButton />,
           headerTitleStyle: {

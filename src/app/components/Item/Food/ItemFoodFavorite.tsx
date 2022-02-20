@@ -27,9 +27,9 @@ export interface IItemFoodLarger {
   customStyle?: StyleProp<ViewStyle | Animated.AnimatedProps<ViewStyle>>;
 }
 
-const ItemFood = ({id, customStyle}: IItemFoodLarger) => {
+const ItemFoodFavorite = ({id, customStyle}: IItemFoodLarger) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
-  const entitieProduct = useAppSelector(state => state.productSlice.entities);
+  const entitieProduct = useAppSelector(state => state.favoritesSlice.entities);
   const product: any = entitieProduct[id];
   const dispatch = useAppDispatch();
   const userState = useAppSelector(state => state.userSlice);
@@ -207,7 +207,7 @@ const ItemFood = ({id, customStyle}: IItemFoodLarger) => {
   );
 };
 
-export default ItemFood;
+export default ItemFoodFavorite;
 
 const styles = StyleSheet.create({
   container: {

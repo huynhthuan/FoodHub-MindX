@@ -16,7 +16,7 @@ import auth from '@react-native-firebase/auth';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import {showToast} from '../../redux/slices/toastSlice';
 import axios from 'axios';
-import {BASE_URL} from '../../api/constants';
+import {BASE_URL, BASE_URL_JSON, BASE_URL_WP_API_USER} from '../../api/constants';
 import {setLoading} from '../../redux/slices/loadingSlice';
 
 const BindPhone = () => {
@@ -32,6 +32,7 @@ const BindPhone = () => {
       phone: '',
     },
   });
+
   async function verifyPhoneNumber(phoneNumber: string) {
     try {
       const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
@@ -64,7 +65,7 @@ const BindPhone = () => {
       }),
     );
     axios
-      .get(BASE_URL + 'helper/checkExistPhone', {
+      .get(BASE_URL_JSON + 'helpers/isPhoneExist', {
         params: {
           phone: data.phone,
         },
@@ -75,11 +76,11 @@ const BindPhone = () => {
             isShown: false,
           }),
         );
-        if (res.data.length) {
+        if (res.data.message) {
           dispatch(
             showToast({
               isShown: true,
-              msg: `Phone number is exist. Please try other phone number!`,
+              msg: `Số điện thoại đã tồn tại trên hệ thống. Hãy thử số khác!`,
               preset: Incubator.ToastPresets.FAILURE,
             }),
           );
@@ -89,11 +90,17 @@ const BindPhone = () => {
       })
       .catch(error => {
         console.log(error);
+        
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
 
         dispatch(
           showToast({
             isShown: true,
-            msg: `${error.data}`,
+            msg: `Đã có lỗi xảy ra. Vui lòng thử lại!`,
             preset: Incubator.ToastPresets.FAILURE,
           }),
         );
@@ -120,10 +127,10 @@ const BindPhone = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
         <Text white marginB-20 style={styles.title}>
-          Bind Phone Number
+          Liên kết số điện thoại
         </Text>
         <Text gray2 marginB-32 style={styles.desc}>
-          Enter your phone number to link with your account.
+          Liên kết số điện thoại để nhận nhiều ưu đãi hơn.
         </Text>
         <View>
           <Controller
@@ -131,11 +138,11 @@ const BindPhone = () => {
             rules={{
               required: {
                 value: true,
-                message: 'This field is required.',
+                message: 'Trường này không được để trống.',
               },
               pattern: {
                 value: /(\+84|0[3|5|7|8|9])+([0-9]{9})\b/i,
-                message: 'Your phone incorrect format.',
+                message: 'Định dạng số điện thoại chưa đúng.',
               },
             }}
             render={({field: {onChange, onBlur, value}}) => (
@@ -157,7 +164,7 @@ const BindPhone = () => {
               style={styles.btnLogin}
               onPress={handleSubmit(onSubmit, onInvalid)}>
               <Text white style={styles.btnLoginText}>
-                Send
+                Gửi OTP
               </Text>
             </Button>
           </View>
@@ -169,7 +176,7 @@ const BindPhone = () => {
               onPress={() => {
                 navigation.navigate('DashBoard');
               }}>
-              Skip
+              Bỏ qua
             </Text>
           </TouchableOpacity>
         </View>
