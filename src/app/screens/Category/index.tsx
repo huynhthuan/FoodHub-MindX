@@ -20,7 +20,7 @@ import {BASE_URL_WP_MEDIA, BASE_URL_WP_PRODUCT_CAT} from '../../api/constants';
 import _ from 'lodash';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import WooApi from '../../api/wooApi';
-import {productReceived} from '../../redux/slices/productSlice';
+import {productAddMany, productReceived} from '../../redux/slices/productSlice';
 import {showToast} from '../../redux/slices/toastSlice';
 import ListEmptyItem from '../../components/Item/Food/ListEmptyItem';
 
@@ -30,14 +30,18 @@ const Category = () => {
     [],
   );
 
-  const [sort, setSort] = useState('desc-popularity');
+  const [sort, setSort] = useState({order: 'desc', orderBy: 'popularity'});
+  const [sortLabel, setSortLabel] = useState('desc-popularity');
   const route = useRoute<RouteProp<MainStackParamList, 'Category'>>();
   const [imageDecor, setImageDecor] = React.useState('');
   const dispatch = useAppDispatch();
   const productList = useAppSelector(state => state.productSlice);
   const [productLoading, setProductLoading] = React.useState(false);
 
-  React.useEffect(() => {
+  const [page, setPage] = React.useState(1);
+
+  const getProduct = React.useCallback(() => {
+    setPage(1);
     dispatch(
       productReceived({
         productList: JSON.stringify([]),
@@ -57,9 +61,12 @@ const Category = () => {
       });
 
     setProductLoading(true);
+
     WooApi.get('products', {
       category: route.params.CategoryDetail.id,
-      per_page: 20,
+      page: 1,
+      order: sort.order,
+      orderby: sort.orderBy,
     })
       .then((data: any) => {
         dispatch(
@@ -84,7 +91,39 @@ const Category = () => {
           }),
         );
       });
-  }, [route.params.CategoryDetail.id]);
+  }, [route.params.CategoryDetail.id, sort]);
+
+  React.useEffect(() => {
+    getProduct();
+  }, [route.params.CategoryDetail.id, sort]);
+
+  React.useEffect(() => {
+    setProductLoading(true);
+    WooApi.get('products', {
+      category: route.params.CategoryDetail.id,
+      page,
+      order: sort.order,
+      orderby: sort.orderBy,
+    })
+      .then((data: any) => {
+        dispatch(
+          productAddMany({
+            productList: JSON.stringify(data),
+          }),
+        );
+        setProductLoading(false);
+      })
+      .catch((error: any) => {
+        setProductLoading(false);
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Đã có lỗi xảy ra, vui lòng thử lại!',
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
+  }, [page]);
 
   return (
     <View flex-1 bg-primaryDark paddingT-96>
@@ -126,10 +165,12 @@ const Category = () => {
           </Text>
 
           <Picker
-            value={sort}
+            value={sortLabel}
             placeholder={'Placeholder'}
-            onChange={(item: string) => {
-              setSort(item);
+            onChange={(item: any) => {
+              let sortArr = item.value.split('-');
+              setSort({order: sortArr[0], orderBy: sortArr[1]});
+              setSortLabel(item);
             }}
             renderPicker={(value: PickerItemValue, label: string) => (
               <Text textMedium primary>
@@ -162,12 +203,6 @@ const Category = () => {
               value={'desc-popularity'}></Picker.Item>
           </Picker>
         </View>
-
-        <View>
-          <Button style={styles.btn}>
-            <Image assetName="fillter" assetGroup="icons" />
-          </Button>
-        </View>
       </View>
 
       <FlatList
@@ -175,9 +210,15 @@ const Category = () => {
         renderItem={renderItemCategory}
         contentContainerStyle={styles.content}
         refreshing={productLoading}
-        onRefresh={() => {}}
+        onRefresh={() => {
+          getProduct();
+        }}
         ListEmptyComponent={ListEmptyItem}
         keyExtractor={(item, index) => index.toString()}
+        onEndReachedThreshold={0.5}
+        onEndReached={() => {
+          setPage(page + 1);
+        }}
       />
     </View>
   );
@@ -204,7 +245,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 45,
-    lineHeight: 49.5,
     maxWidth: (getScreenWidth() - 50) / 2,
   },
   desc: {

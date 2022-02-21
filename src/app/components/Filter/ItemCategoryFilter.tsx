@@ -1,13 +1,27 @@
 import {Image, Text, TouchableOpacity, View} from 'react-native-ui-lib';
 import React from 'react';
 import {StyleSheet} from 'react-native';
+import FastImage from 'react-native-fast-image';
 
 export interface ICategory {
-  label: string;
+  data: any[] | undefined;
+  setCategory: any;
 }
 
-const ItemCategoryFilter = ({label}: ICategory) => {
+const ItemCategoryFilter = ({data, setCategory}: ICategory) => {
   const [isSelect, setIsSelect] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isSelect) {
+      setCategory((prev: any) => [...prev, data?.id]);
+    } else {
+      setCategory((prev: any) => {
+        prev.splice(prev.indexOf(data?.id), 1);
+        return prev;
+      });
+    }
+  }, [isSelect]);
+
   return (
     <TouchableOpacity
       centerV
@@ -22,10 +36,19 @@ const ItemCategoryFilter = ({label}: ICategory) => {
         setIsSelect(!isSelect);
       }}>
       <View center marginR-7 bg-white style={styles.imageWrap}>
-        <Image assetName="avatar" assetGroup="images" />
+        <FastImage
+          source={{
+            uri: data?.image.src,
+            priority: 'high',
+          }}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
       </View>
       <Text textMedium white style={styles.text}>
-        {label}
+        {data?.name}
       </Text>
     </TouchableOpacity>
   );
@@ -36,7 +59,6 @@ export default ItemCategoryFilter;
 const styles = StyleSheet.create({
   text: {
     fontSize: 13,
-    lineHeight: 13,
   },
   imageWrap: {
     width: 31.03,

@@ -9,19 +9,11 @@ const ListEmptyItem = () => {
         <Image assetName="myorderEmpty" assetGroup="images" marginB-44 />
       </View>
       <Text textSemiBold white style={styles.title} marginB-12 center>
-        Chuyên mục này chưa có sản phẩm.
+        Cập nhật sản phẩm
       </Text>
       <Text gray2 textRegular style={styles.desc} center>
-        Chúng tôi sẽ cập nhật trong thời gian tới.
+        Chúng tôi đang cập nhật sản phẩm.
       </Text>
-
-      <View center>
-        <Button bg-primary marginT-30 style={styles.btn}>
-          <Text white textSemiBold style={styles.textBtn}>
-            Khám phá danh mục khác
-          </Text>
-        </Button>
-      </View>
     </View>
   );
 };
@@ -31,11 +23,9 @@ export default ListEmptyItem;
 const styles = StyleSheet.create({
   title: {
     fontSize: 20,
-    lineHeight: 20,
   },
   desc: {
     fontSize: 14,
-    lineHeight: 21,
   },
   btn: {
     height: 60,

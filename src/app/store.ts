@@ -1,3 +1,4 @@
+import productFilterSlice from './redux/slices/productFilterSlice/';
 import userReviewSlice from './redux/slices/userReviewSlice';
 import favoritesSlice from './redux/slices/favoriteSlice';
 import productSlice from './redux/slices/productSlice/';
@@ -34,6 +35,7 @@ const store = configureStore({
     noticesSlice,
     favoritesSlice,
     userReviewSlice,
+    productFilterSlice,
   },
 });
 

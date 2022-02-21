@@ -8,6 +8,7 @@ import ItemFoodFavorite from '../../components/Item/Food/ItemFoodFavorite';
 import ListEmptyItemFavorite from '../../components/Item/Food/ListEmptyItemFavorite';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
+import {View} from 'react-native-ui-lib';
 
 const Favorites = () => {
   const renderItemFood = React.useCallback(
@@ -19,18 +20,20 @@ const Favorites = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
 
   return (
-    <FlatList
-      onScroll={({nativeEvent}) => {
-        changeHeaderBackground(nativeEvent, navigation);
-      }}
-      data={favoriteSList.ids}
-      renderItem={renderItemFood}
-      numColumns={1}
-      showsVerticalScrollIndicator={false}
-      keyExtractor={(item, index) => index.toString()}
-      contentContainerStyle={styles.listContentStyle}
-      ListEmptyComponent={ListEmptyItemFavorite}
-    />
+    <View bg-primaryDark paddingT-74>
+      <FlatList
+        onScroll={({nativeEvent}) => {
+          changeHeaderBackground(nativeEvent, navigation);
+        }}
+        data={favoriteSList.ids}
+        renderItem={renderItemFood}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={styles.listContentStyle}
+        ListEmptyComponent={ListEmptyItemFavorite}
+      />
+    </View>
   );
 };
 
@@ -48,7 +51,5 @@ const styles = StyleSheet.create({
   listContentStyle: {
     paddingHorizontal: 25,
     minHeight: getScreenHeight(),
-    paddingTop: 74,
-    backgroundColor: '#2D2D3A',
   },
 });

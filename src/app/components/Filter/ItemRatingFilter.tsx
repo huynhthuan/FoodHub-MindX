@@ -3,11 +3,23 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 
 export interface IRating {
-  label: string;
+  label: number;
+  setRate: any;
 }
 
-const ItemRatingFilter = ({label}: IRating) => {
+const ItemRatingFilter = ({label, setRate}: IRating) => {
   const [isSelect, setIsSelect] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isSelect) {
+      setRate((prev: any) => [...prev, label]);
+    } else {
+      setRate((prev: any) => {
+        prev.splice(prev.indexOf(label), 1);
+        return prev;
+      });
+    }
+  }, [isSelect]);
 
   return (
     <TouchableOpacity

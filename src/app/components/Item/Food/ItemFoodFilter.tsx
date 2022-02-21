@@ -28,9 +28,11 @@ export interface IItemFoodLarger {
   customStyle?: StyleProp<ViewStyle | Animated.AnimatedProps<ViewStyle>>;
 }
 
-const ItemFoodFavorite = ({id, customStyle}: IItemFoodLarger) => {
+const ItemFoodFilter = ({id, customStyle}: IItemFoodLarger) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
-  const entitieProduct = useAppSelector(state => state.favoritesSlice.entities);
+  const entitieProduct = useAppSelector(
+    state => state.productFilterSlice.entities,
+  );
   const product: any = entitieProduct[id];
   const dispatch = useAppDispatch();
   const userState = useAppSelector(state => state.userSlice);
@@ -148,7 +150,7 @@ const ItemFoodFavorite = ({id, customStyle}: IItemFoodLarger) => {
   }, [isLike, userState.product_like]);
 
   return (
-    <View style={[styles.container, customStyle]}>
+    <View style={[styles.container, customStyle]} marginB-20>
       <TouchableOpacity
         onPress={() => {
           navigation.navigate('Reviews', {foodData: product});
@@ -199,16 +201,15 @@ const ItemFoodFavorite = ({id, customStyle}: IItemFoodLarger) => {
         onPress={() => {
           navigation.navigate('FoodDetails');
         }}>
-        <Text white marginB-8 style={styles.name}>
+        <Text white style={styles.name}>
           {product.name}
         </Text>
       </TouchableOpacity>
-      <Text style={styles.desc}>Chicken, Cheese and pineapple</Text>
     </View>
   );
 };
 
-export default ItemFoodFavorite;
+export default ItemFoodFilter;
 
 const styles = StyleSheet.create({
   container: {

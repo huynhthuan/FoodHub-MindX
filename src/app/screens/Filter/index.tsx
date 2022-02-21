@@ -7,12 +7,19 @@ import ItemSortFilter from '../../components/Filter/ItemSortFilter';
 import ItemRatingFilter from '../../components/Filter/ItemRatingFilter';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import {getScreenWidth} from '../../utilities/helpers';
+import {useAppSelector} from '../../hook';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {MainStackParamList} from '../../../../App';
 
 const Filter = () => {
   const [nonCollidingMultiSliderValue, setNonCollidingMultiSliderValue] =
-    React.useState([0, 100]);
-  const nonCollidingMultiSliderValuesChange = values =>
+    React.useState([0, 1000000]);
+  const nonCollidingMultiSliderValuesChange = (values: any) =>
     setNonCollidingMultiSliderValue(values);
+  const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  const categoriesList = useAppSelector(state => state.categoriesSlice);
+  const [category, setCategory] = React.useState([]);
+  const [rate, setRate] = React.useState([]);
 
   return (
     <View flex-1 bg-primaryDark paddingT-70>
@@ -23,59 +30,39 @@ const Filter = () => {
         }}>
         <View paddingH-25>
           <Text marginB-19 textSemiBold white style={styles.title}>
-            Category
+            Danh mục
           </Text>
         </View>
 
         <View row paddingH-25 style={styles.filterBox}>
-          {_.map(
-            ['Fast food', 'Breakfast', 'Aisa', 'Mexican', 'Pizza', 'Donat'],
-            (option, index) => (
-              <ItemCategoryFilter key={index} label={option} />
-            ),
-          )}
+          {_.map(categoriesList.entities, (option, index) => (
+            <ItemCategoryFilter
+              setCategory={setCategory}
+              key={index}
+              data={option}
+            />
+          ))}
         </View>
 
         <View paddingH-25>
           <Text marginB-19 textSemiBold white style={styles.title}>
-            Sort by
-          </Text>
-        </View>
-
-        <View row paddingH-25 style={styles.filterBox}>
-          {_.map(
-            [
-              'Popular',
-              'Free delivery',
-              'Neaerst me',
-              'Cost low to high',
-              'Delivery time',
-            ],
-            (option, index) => (
-              <ItemSortFilter key={index} label={option} />
-            ),
-          )}
-        </View>
-
-        <View paddingH-25>
-          <Text marginB-19 textSemiBold white style={styles.title}>
-            Rating
+            Đánh giá
           </Text>
         </View>
 
         <View paddingH-25 row style={styles.filterBox}>
-          {_.map(['5', '4', '3', '2', '1'], (option, index) => (
-            <ItemRatingFilter key={index} label={option} />
+          {_.map([5, 4, 3, 2, 1], (option, index) => (
+            <ItemRatingFilter setRate={setRate} key={index} label={option} />
           ))}
         </View>
 
         <View row paddingH-25 spread marginB-19>
           <Text textSemiBold white style={styles.title}>
-            Price range
+            Khoảng giá
           </Text>
           <Text white textLight style={styles.priceRange}>
-            {'$' + nonCollidingMultiSliderValue[0]} -{' '}
-            {'$' + nonCollidingMultiSliderValue[1]}
+            {nonCollidingMultiSliderValue[0]} VNĐ -{' '}
+            {nonCollidingMultiSliderValue[1]} VNĐ
           </Text>
         </View>
 
@@ -88,8 +75,8 @@ const Filter = () => {
             sliderLength={getScreenWidth() - 70}
             onValuesChange={nonCollidingMultiSliderValuesChange}
             min={0}
-            max={100}
-            step={1}
+            max={1000000}
+            step={100000}
             allowOverlap={false}
             snapped
             minMarkerOverlapDistance={40}
@@ -105,14 +92,21 @@ const Filter = () => {
       </ScrollView>
 
       <View row spread style={styles.buttonGroup}>
-        <Button bg-dark4 style={styles.btn}>
+        <Button
+          bg-primary
+          style={styles.btn}
+          onPress={() => {
+            navigation.navigate('FilterFood', {
+              filterData: {
+                category: category,
+                rate: rate,
+                min_price: nonCollidingMultiSliderValue[0],
+                max_price: nonCollidingMultiSliderValue[1],
+              },
+            });
+          }}>
           <Text white textSemiBold style={styles.text}>
-            Reset
-          </Text>
-        </Button>
-        <Button bg-primary style={styles.btn}>
-          <Text white textSemiBold style={styles.text}>
-            Apply
+            Lọc
           </Text>
         </Button>
       </View>
@@ -125,7 +119,6 @@ export default Filter;
 const styles = StyleSheet.create({
   title: {
     fontSize: 18,
-    lineHeight: 18,
   },
   filterBox: {
     flexWrap: 'wrap',
@@ -134,15 +127,14 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
   priceRange: {
-    fontSize: 18,
-    lineHeight: 18,
+    fontSize: 14,
   },
   btn: {
-    width: (getScreenWidth() - 50) / 2 - 10,
+    width: getScreenWidth() - 50,
     height: 57,
   },
   text: {
-    fontSize: 15,
+    fontSize: 18,
   },
   buttonGroup: {
     position: 'absolute',

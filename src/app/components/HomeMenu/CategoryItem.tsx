@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: 'SofiaPro',
     fontSize: 11,
-    lineHeight: 11,
     paddingHorizontal: 5,
   },
 });

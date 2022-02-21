@@ -42,6 +42,7 @@ import Loading from './src/app/components/Overlay/Loading';
 import ToastCustom from './src/app/components/Overlay/ToastCustom';
 import {deliveryAddressData} from './src/app/redux/slices/deliveryAddressSlice';
 import NotificationsDetails from './src/app/screens/NotificationsDetails';
+import FilterFood from './src/app/screens/FilterFood';
 
 Sentry.init({
   dsn: 'https://2e7732ba44794b38913cb3829622ac0f@o1121885.ingest.sentry.io/6158966',
@@ -70,6 +71,14 @@ export type MainStackParamList = {
   AgencyDetails: undefined;
   Search: undefined;
   Filter: undefined;
+  FilterFood: {
+    filterData: {
+      category: number[];
+      rate: number[];
+      min_price: number;
+      max_price: number;
+    };
+  };
   Category: {CategoryDetail: any};
   Cart: undefined;
   Payment: undefined;
@@ -108,6 +117,8 @@ const App = () => {
         <MainStack.Navigator
           screenOptions={{
             headerShown: false,
+            animation: 'slide_from_right',
+            animationTypeForReplace: 'push',
           }}>
           {userState.token === undefined ? (
             <>
@@ -200,6 +211,24 @@ const App = () => {
                   headerShown: true,
                   headerTransparent: true,
                   title: 'Lọc sản phẩm',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="FilterFood"
+                component={FilterFood}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: 'Kết quả lọc',
                   headerLeft: () => (
                     <HeaderBackButton customStyle={{marginLeft: 9}} />
                   ),
