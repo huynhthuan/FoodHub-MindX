@@ -196,7 +196,7 @@ const ItemFood = ({id, customStyle}: IItemFoodLarger) => {
       </View>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('FoodDetails');
+          navigation.navigate('FoodDetails', {foodId: id});
         }}>
         <Text white marginB-8 style={styles.name}>
           {product.name}

@@ -21,17 +21,16 @@ import {
   favoritesAddOne,
   favoritesRemoveOne,
 } from '../../../redux/slices/favoriteSlice';
-import {getScreenWidth} from '../../../utilities/helpers';
 
 export interface IItemFoodLarger {
   id: number;
   customStyle?: StyleProp<ViewStyle | Animated.AnimatedProps<ViewStyle>>;
 }
 
-const ItemFoodFilter = ({id, customStyle}: IItemFoodLarger) => {
+const ItemFoodSearch = ({id, customStyle}: IItemFoodLarger) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const entitieProduct = useAppSelector(
-    state => state.productFilterSlice.entities,
+    state => state.productSearchSlice.entities,
   );
   const product: any = entitieProduct[id];
   const dispatch = useAppDispatch();
@@ -150,7 +149,7 @@ const ItemFoodFilter = ({id, customStyle}: IItemFoodLarger) => {
   }, [isLike, userState.product_like]);
 
   return (
-    <View style={[styles.container, customStyle]} marginB-20>
+    <View style={[styles.container, customStyle]}>
       <TouchableOpacity
         onPress={() => {
           navigation.navigate('Reviews', {foodData: product});
@@ -201,15 +200,16 @@ const ItemFoodFilter = ({id, customStyle}: IItemFoodLarger) => {
         onPress={() => {
           navigation.navigate('FoodDetails', {foodId: id});
         }}>
-        <Text white style={styles.name}>
+        <Text white marginB-8 style={styles.name}>
           {product.name}
         </Text>
       </TouchableOpacity>
+      <Text style={styles.desc}>Chicken, Cheese and pineapple</Text>
     </View>
   );
 };
 
-export default ItemFoodFilter;
+export default ItemFoodSearch;
 
 const styles = StyleSheet.create({
   container: {
@@ -217,8 +217,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingBottom: 11,
     overflow: 'hidden',
-    width: getScreenWidth() / 2 - 25 - 10,
-    marginRight: 20,
   },
   reviewWrap: {
     position: 'absolute',

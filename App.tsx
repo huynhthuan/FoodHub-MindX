@@ -67,7 +67,7 @@ export type MainStackParamList = {
   };
   ResetPassword: undefined;
   DashBoard: undefined;
-  FoodDetails: undefined;
+  FoodDetails: {foodId: number};
   AgencyDetails: undefined;
   Search: undefined;
   Filter: undefined;
@@ -170,8 +170,15 @@ const App = () => {
                 options={{
                   headerShown: true,
                   headerTransparent: true,
-                  title: '',
+                  title: 'Chi tiết',
                   headerLeft: () => <HeaderBackButtonDetails />,
+                  headerRight: () => <HeaderCartButton />,
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
                 }}
               />
               <MainStack.Screen

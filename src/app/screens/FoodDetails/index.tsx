@@ -1,87 +1,195 @@
-import {Button, Image, Text, View} from 'react-native-ui-lib';
+import {
+  Button,
+  Image,
+  Incubator,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native-ui-lib';
 import React from 'react';
-import {ScrollView, StyleSheet} from 'react-native';
+import {ActivityIndicator, ScrollView, StyleSheet} from 'react-native';
 import Quantity from '../../components/Cart/Quantity';
-import AddOnItem from '../../components/Item/Food/AddOnItem';
-import {getScreenWidth} from '../../utilities/helpers';
-
-const addOnList = new Array(4).fill(null);
+import {changeHeaderBackground, getScreenWidth} from '../../utilities/helpers';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import {MainStackParamList} from '../../../../App';
+import WooApi from '../../api/wooApi';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import {showToast} from '../../redux/slices/toastSlice';
+import RenderHTML from 'react-native-render-html';
+import FastImage from 'react-native-fast-image';
+import {productCartAddOne} from '../../redux/slices/productCartSlice';
+let numeral = require('numeral');
 
 const FoodDetails = () => {
+  const dispatch = useAppDispatch();
+  const productCartList = useAppSelector(state => state.productCartSlice);
+  const route = useRoute<RouteProp<MainStackParamList, 'FoodDetails'>>();
+  const productId = route.params.foodId;
+  const [data, setData] = React.useState({});
+  const navigation =
+    useNavigation<NavigationProp<MainStackParamList, 'Reviews'>>();
+  const [qty, setQty] = React.useState(1);
+
+  React.useEffect(() => {
+    WooApi.get('products/' + productId)
+      .then((data: any) => {
+        setData(data);
+      })
+      .catch((error: any) => {
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: `Đã có lỗi xảy ra. Vui lòng thử lại`,
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
+  }, [productId]);
+
+  const plusQty = React.useCallback(() => {
+    if (qty === 99) return;
+    setQty(qty + 1);
+  }, [qty]);
+
+  const minusQty = React.useCallback(() => {
+    if (qty === 1) return;
+    setQty(qty - 1);
+  }, [qty]);
+
+  const addToCart = React.useCallback(() => {
+    console.log(data.images[0].src);
+    dispatch(
+      productCartAddOne({
+        product: {
+          product_id: productId,
+          quantity: qty,
+          price: data.price,
+          name: data.name,
+          image: data.images[0].src,
+        },
+      }),
+    );
+    dispatch(
+      showToast({
+        msg: 'Thêm vào giỏ hàng thành công',
+        preset: Incubator.ToastPresets.SUCCESS,
+        isShown: true,
+      }),
+    );
+  }, [qty, productId]);
+
   return (
     <>
-      <ScrollView style={styles.container}>
-        <View marginB-22 style={styles.imageWrap}>
-          <Image
-            assetName="avatar"
-            assetGroup="images"
-            style={styles.image}></Image>
-          <View style={styles.favorite}>
-            <Image assetName="like" assetGroup="icons" />
-          </View>
-        </View>
-        <Text white marginB-16 style={styles.title}>
-          Ground Beef Tacos
-        </Text>
-        <View marginB-16 row style={styles.reviewWrap}>
-          <Image
-            assetName="star"
-            assetGroup="icons"
-            width={17.78}
-            height={17}
-            marginR-8
-          />
-          <Text white style={styles.rate}>
-            4.5
-          </Text>
-
-          <Text style={styles.count}>(25+)</Text>
-
-          <Text primary underline marginL-7 style={styles.reviewLink}>
-            See Review
-          </Text>
-        </View>
-
-        <View row spread marginB-19>
-          <View row style={styles.priceWrap}>
-            <Text white style={styles.currency}>
-              $
+      <ScrollView
+        style={styles.container}
+        onScroll={({nativeEvent}) => {
+          changeHeaderBackground(nativeEvent, navigation);
+        }}>
+        {data.id ? (
+          <>
+            <View marginB-22 style={styles.imageWrap}>
+              <FastImage
+                source={{
+                  uri: data.images[0]?.src,
+                  priority: 'high',
+                }}
+                style={styles.image}
+              />
+              <View style={styles.favorite}>
+                <Image assetName="like" assetGroup="icons" />
+              </View>
+            </View>
+            <Text white marginB-16 style={styles.title}>
+              {data.name}
             </Text>
-            <Text white style={styles.price}>
-              9.50
-            </Text>
-          </View>
+            <View marginB-16 row style={styles.reviewWrap}>
+              <Image
+                assetName="star"
+                assetGroup="icons"
+                width={17.78}
+                height={17}
+                marginR-8
+              />
+              <Text white style={styles.rate}>
+                {data.average_rating}
+              </Text>
 
-          <Quantity />
-        </View>
-        <Text marginB-26 style={styles.desc}>
-          Brown the beef better. Lean ground beef – I like to use 85% lean
-          angus. Garlic – use fresh chopped. Spices – chili powder, cumin, onion
-          powder.
-        </Text>
-        <Text marginB-10 white style={styles.sectionTitle}>
-          Choice of Add On
-        </Text>
-        <View marginB-137>
-          {addOnList.map((item, index) => (
-            <AddOnItem key={index} />
-          ))}
-        </View>
+              <Text style={styles.count}>({data.rating_count}+)</Text>
+
+              <TouchableOpacity>
+                <Text
+                  primary
+                  underline
+                  marginL-7
+                  style={styles.reviewLink}
+                  onPress={() => {
+                    navigation.navigate('Reviews', {
+                      foodData: data,
+                    });
+                  }}>
+                  Xem đánh giá
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View row spread marginB-19>
+              <View style={styles.priceWrap}>
+                <Text white style={styles.price}>
+                  {numeral(data.price).format('0,0')} VNĐ
+                </Text>
+                {data.sale_price ? (
+                  <Text white style={styles.salePrice}>
+                    {numeral(data.regular_price).format('0,0')} VNĐ
+                  </Text>
+                ) : (
+                  <></>
+                )}
+              </View>
+
+              <Quantity qty={qty} minusQty={minusQty} plusQty={plusQty} />
+            </View>
+            <View marginB-137>
+              <RenderHTML
+                contentWidth={getScreenWidth() - 50}
+                systemFonts={['SofiaPro-Bold', 'SofiaPro-Medium', 'SofiaPro']}
+                source={{
+                  html: `<div style="color: white; line-height: 20px;font-family: 'SofiaPro'">${data.description}</div>`,
+                }}
+              />
+            </View>
+          </>
+        ) : (
+          <ActivityIndicator size="large" color="#fff" />
+        )}
       </ScrollView>
-      <Button bg-primary style={styles.btnAddCart}>
-        <View center style={styles.iconWrap}>
-          <Image
-            assetName="cart"
-            assetGroup="icons"
-            width={16}
-            height={17}
-            tintColor="#FE724C"
-          />
-        </View>
-        <Text white style={styles.addCartText}>
-          Add to cart
-        </Text>
-      </Button>
+      {data.id ? (
+        <Button
+          bg-primary
+          style={styles.btnAddCart}
+          onPress={() => {
+            addToCart();
+          }}>
+          <View center style={styles.iconWrap}>
+            <Image
+              assetName="cart"
+              assetGroup="icons"
+              width={16}
+              height={17}
+              tintColor="#FE724C"
+            />
+          </View>
+          <Text white textBold style={styles.addCartText}>
+            Thêm vào giỏ hàng
+          </Text>
+        </Button>
+      ) : (
+        <></>
+      )}
     </>
   );
 };
@@ -93,7 +201,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#2D2D3A',
     paddingHorizontal: 25,
-    paddingTop: 27,
+    paddingTop: 74,
   },
   reviewWrap: {
     alignItems: 'center',
@@ -146,7 +254,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SofiaPro-Medium',
   },
   priceWrap: {
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
   },
   desc: {
     color: '#9796A1',
@@ -154,12 +262,12 @@ const styles = StyleSheet.create({
     lineHeight: 22.5,
   },
   btnAddCart: {
-    width: 167,
+    width: 220,
     height: 53,
     position: 'absolute',
     bottom: 38,
     left: getScreenWidth() / 2,
-    transform: [{translateX: -167 / 2}],
+    transform: [{translateX: -220 / 2}],
     paddingRight: 6,
     paddingLeft: 6,
   },
@@ -171,8 +279,10 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   addCartText: {
-    fontFamily: 'SofiaPro',
     fontSize: 16,
     textTransform: 'uppercase',
+  },
+  salePrice: {
+    textDecorationLine: 'line-through',
   },
 });

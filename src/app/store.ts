@@ -1,4 +1,6 @@
-import productFilterSlice from './redux/slices/productFilterSlice/';
+import productCartSlice from './redux/slices/productCartSlice';
+import productSearchSlice from './redux/slices/productSearchSlice';
+import productFilterSlice from './redux/slices/productFilterSlice';
 import userReviewSlice from './redux/slices/userReviewSlice';
 import favoritesSlice from './redux/slices/favoriteSlice';
 import productSlice from './redux/slices/productSlice/';
@@ -36,6 +38,8 @@ const store = configureStore({
     favoritesSlice,
     userReviewSlice,
     productFilterSlice,
+    productSearchSlice,
+    productCartSlice,
   },
 });
 

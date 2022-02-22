@@ -10,6 +10,8 @@ import ToggleSideMenu from '../../components/HomeMenu/ToggleSideMenu';
 import DeliveryAddressSelect from '../../components/HomeMenu/DeliveryAddressSelect';
 import Avatar from '../../components/HomeMenu/Avatar';
 import HeaderBackButton from '../../components/Buttons/HeaderBackButton';
+import HeaderCartButton from '../../components/Buttons/HeaderCartButton';
+import {useAppSelector} from '../../hook';
 
 const HomeStack = createBottomTabNavigator();
 
@@ -21,6 +23,7 @@ export type HomeMenuStackParamList = {
 };
 
 const HomeMenu = () => {
+  const cartState = useAppSelector(state => state.productCartSlice);
   return (
     <HomeStack.Navigator
       screenOptions={{
@@ -95,7 +98,7 @@ const HomeMenu = () => {
               focused={focused}
             />
           ),
-          tabBarBadge: '3',
+          tabBarBadge: cartState.ids.length,
           tabBarBadgeStyle: {
             backgroundColor: '#FE724C',
             color: '#ffffff',
@@ -107,6 +110,17 @@ const HomeMenu = () => {
             left: 10,
             width: 14.56,
             borderRadius: 6,
+          },
+          headerShown: true,
+          headerTransparent: true,
+          title: 'Giỏ hàng',
+          headerLeft: () => <HeaderBackButton />,
+          headerRight: () => <HeaderCartButton />,
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            color: '#ffffff',
+            fontFamily: 'SofiaPro-Medium',
+            fontSize: 18,
           },
         }}
         name="Cart"

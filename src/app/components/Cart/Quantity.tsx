@@ -2,16 +2,36 @@ import {Button, Image, Text, View} from 'react-native-ui-lib';
 import React from 'react';
 import {StyleSheet} from 'react-native';
 
-const Quantity = () => {
+const Quantity = ({
+  qty,
+  minusQty,
+  plusQty,
+}: {
+  qty: number;
+  minusQty: any;
+  plusQty: any;
+}) => {
   return (
     <View row center>
-      <Button center round style={styles.btn}>
+      <Button
+        center
+        round
+        style={styles.btn}
+        onPress={() => {
+          minusQty();
+        }}>
         <Image assetName="minus" assetGroup="icons" />
       </Button>
       <Text white style={styles.qty}>
-        01
+        {qty}
       </Text>
-      <Button center round style={styles.btn}>
+      <Button
+        center
+        round
+        style={styles.btn}
+        onPress={() => {
+          plusQty();
+        }}>
         <Image assetName="plus" assetGroup="icons" />
       </Button>
     </View>
@@ -33,5 +53,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
     fontFamily: 'SofiaPro-SemiBold',
     fontSize: 16,
+    minWidth: 20,
+    textAlign: 'center',
   },
 });
