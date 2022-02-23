@@ -52,8 +52,8 @@ const MyOrders = () => {
   );
 
   const [indexTab, setIndexTab] = React.useState(0);
-  const [orderUpcommingOffset, setOrderUpcommingOffset] = React.useState(0);
-  const [orderCompletedOffset, setOrderCompletedOffset] = React.useState(0);
+  const [pageUpcomming, setPageUpcomming] = React.useState(1);
+  const [pageOncompleted, setPageOncompleted] = React.useState(1);
 
   const dispatch = useAppDispatch();
   const orderUpcommingList = useAppSelector(state => state.orderSlice);
@@ -72,16 +72,16 @@ const MyOrders = () => {
   );
 
   const getOrdersUpcomming = React.useCallback(() => {
-    setOrderUpcommingOffset(0);
+    setPageUpcomming(1);
     dispatch(
       setOrderUpcommingLoading({
         isLoading: true,
       }),
     );
+
     WooApi.get('orders', {
       customer: userState.id,
-      per_page: 4,
-      status: ['on-hold', 'arrival-shipment'],
+      status: ['on-hold', 'arrival-shipment', 'pending'],
     })
       .then((data: any) => {
         dispatch(
@@ -124,9 +124,8 @@ const MyOrders = () => {
     );
     WooApi.get('orders', {
       customer: userState.id,
-      per_page: 4,
-      offset: orderUpcommingOffset,
-      status: ['on-hold', 'arrival-shipment'],
+      page: pageUpcomming,
+      status: ['on-hold', 'arrival-shipment', 'pending'],
     })
       .then((data: any) => {
         dispatch(
@@ -157,7 +156,7 @@ const MyOrders = () => {
   };
 
   const getOrdersCompleted = React.useCallback(() => {
-    setOrderCompletedOffset(0);
+    setPageOncompleted(1);
     dispatch(
       setOrderCompletedLoading({
         isLoading: true,
@@ -165,7 +164,7 @@ const MyOrders = () => {
     );
     WooApi.get('orders', {
       customer: userState.id,
-      per_page: 4,
+      page: pageOncompleted,
       status: ['completed', 'cancelled'],
     })
       .then((data: any) => {
@@ -210,8 +209,7 @@ const MyOrders = () => {
     );
     WooApi.get('orders', {
       customer: userState.id,
-      per_page: 4,
-      offset: orderCompletedOffset,
+      page: pageOncompleted,
       status: ['completed', 'cancelled'],
     })
       .then((data: any) => {
@@ -251,12 +249,16 @@ const MyOrders = () => {
   }, [indexTab]);
 
   React.useEffect(() => {
-    orderUpcommingLoadmore();
-  }, [orderUpcommingOffset]);
+    if (pageUpcomming > 1) {
+      orderUpcommingLoadmore();
+    }
+  }, [pageUpcomming]);
 
   React.useEffect(() => {
-    ordersCompletedLoadmore();
-  }, [orderCompletedOffset]);
+    if (pageOncompleted > 1) {
+      ordersCompletedLoadmore();
+    }
+  }, [pageOncompleted]);
 
   return (
     <View flex-1 bg-primaryDark paddingT-70>
@@ -303,7 +305,7 @@ const MyOrders = () => {
               ListEmptyComponent={ListEmptyComponent}
               onEndReachedThreshold={0.5}
               onEndReached={() => {
-                setOrderUpcommingOffset(orderUpcommingOffset + 4);
+                setPageUpcomming(pageUpcomming + 1);
               }}
             />
           </TabController.TabPage>
@@ -323,7 +325,7 @@ const MyOrders = () => {
               ListEmptyComponent={ListEmptyComponentCompleted}
               onEndReachedThreshold={0.5}
               onEndReached={() => {
-                setOrderCompletedOffset(orderCompletedOffset + 4);
+                setPageOncompleted(pageOncompleted + 1);
               }}
             />
           </TabController.TabPage>

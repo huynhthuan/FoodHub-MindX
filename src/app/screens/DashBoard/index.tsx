@@ -20,6 +20,17 @@ import _ from 'lodash';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import {logout} from '../../redux/slices/userSlice';
 import FastImage from 'react-native-fast-image';
+import {productFilterReceived} from '../../redux/slices/productFilterSlice';
+import {productSearchReceived} from '../../redux/slices/productSearchSlice';
+import {favoritesReceived} from '../../redux/slices/favoriteSlice';
+import {productReceived} from '../../redux/slices/productSlice';
+import {productCartReviced} from '../../redux/slices/productCartSlice';
+import {deliveryAddressReceived} from '../../redux/slices/deliveryAddressSlice';
+import {setAddressChoseen} from '../../redux/slices/addressChoseenSlice';
+import {selectDeliveryAddressReceived} from '../../redux/slices/addressSelectSlice';
+import {ordersCompletedReceived} from '../../redux/slices/orderCompletedSlice';
+import {ordersReceived} from '../../redux/slices/orderSlice';
+import { updateCouponCart } from '../../redux/slices/couponCartSlice';
 
 export type SideMenuStackList = {
   HomeMenu: undefined;
@@ -99,7 +110,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         labelStyle={styles.label}
         style={styles.item}
       />
-      <DrawerItem
+      {/* <DrawerItem
         label="Thanh toán"
         onPress={() => {
           props.navigation.navigate('PaymentMethods');
@@ -107,7 +118,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         icon={() => <Image assetName="wallet" assetGroup="icons" />}
         labelStyle={styles.label}
         style={styles.item}
-      />
+      /> */}
       <DrawerItem
         label="Liên hệ"
         onPress={() => {
@@ -117,7 +128,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         labelStyle={styles.label}
         style={styles.item}
       />
-      <DrawerItem
+      {/* <DrawerItem
         label="Cài đặt"
         onPress={() => {
           props.navigation.navigate('Settings');
@@ -125,8 +136,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         icon={() => <Image assetName="settings" assetGroup="icons" />}
         labelStyle={styles.label}
         style={styles.item}
-      />
-      <DrawerItem
+      /> */}
+      {/* <DrawerItem
         label="Giúp đỡ & Hỏi đáp"
         onPress={() => {
           props.navigation.navigate('HelpsFaqs');
@@ -134,7 +145,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         icon={() => <Image assetName="faq" assetGroup="icons" />}
         labelStyle={styles.label}
         style={styles.item}
-      />
+      /> */}
 
       {/* <DrawerItemList {...props} /> */}
 
@@ -145,6 +156,63 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         style={styles.btnLogout}
         marginB-32
         onPress={() => {
+          dispatch(
+            productFilterReceived({
+              productList: JSON.stringify([]),
+            }),
+          );
+          dispatch(
+            productSearchReceived({
+              productList: JSON.stringify([]),
+            }),
+          );
+          dispatch(
+            favoritesReceived({
+              productList: JSON.stringify([]),
+            }),
+          );
+          dispatch(
+            productReceived({
+              productList: JSON.stringify([]),
+            }),
+          );
+          dispatch(
+            productCartReviced({
+              productList: JSON.stringify([]),
+            }),
+          );
+          dispatch(
+            deliveryAddressReceived({
+              deliveryAddressList: [],
+            }),
+          );
+          dispatch(
+            setAddressChoseen({
+              id: '0',
+            }),
+          );
+          dispatch(
+            selectDeliveryAddressReceived({
+              deliveryAddressList: [],
+            }),
+          );
+          dispatch(
+            ordersCompletedReceived({
+              orderList: JSON.stringify([]),
+            }),
+          );
+          dispatch(
+            ordersReceived({
+              orderList: JSON.stringify([]),
+            }),
+          );
+          dispatch(
+            updateCouponCart({
+              code: '',
+              desc: '',
+              amount: 0,
+            }),
+          );
           dispatch(logout());
         }}>
         <Image assetName="logout" marginR-9 assetGroup="icons" />
@@ -227,6 +295,11 @@ const DashBoard = () => {
         component={ContactUs}
         options={{
           drawerIcon: () => <Image assetName="message" assetGroup="icons" />,
+          headerShown: true,
+          headerTransparent: true,
+          headerLeft: () => <HeaderBackButton />,
+          headerTitle: 'Gửi liên hệ',
+          headerTitleStyle: {color: '#fff'},
         }}
       />
       <SideMenuDrawer.Screen

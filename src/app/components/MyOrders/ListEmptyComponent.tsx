@@ -14,14 +14,6 @@ const ListEmptyComponent = () => {
       <Text gray2 textRegular style={styles.desc} center>
         Hãy ăn thêm nhiều nhaaa!!!
       </Text>
-
-      <View center>
-        <Button bg-primary marginT-30 style={styles.btn}>
-          <Text white textSemiBold style={styles.textBtn}>
-            Đặt đồ ngay
-          </Text>
-        </Button>
-      </View>
     </View>
   );
 };
@@ -31,11 +23,9 @@ export default ListEmptyComponent;
 const styles = StyleSheet.create({
   title: {
     fontSize: 20,
-    lineHeight: 20,
   },
   desc: {
     fontSize: 14,
-    lineHeight: 21,
   },
   btn: {
     height: 60,

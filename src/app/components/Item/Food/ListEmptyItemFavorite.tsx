@@ -14,14 +14,6 @@ const ListEmptyItemFavorite = () => {
       <Text gray2 textRegular style={styles.desc} center>
         Hãy yêu thích thêm nhiều sản phẩm nha.
       </Text>
-
-      <View center>
-        <Button bg-primary marginT-30 style={styles.btn}>
-          <Text white textSemiBold style={styles.textBtn}>
-            Khám phá các sản phẩm
-          </Text>
-        </Button>
-      </View>
     </View>
   );
 };

@@ -74,7 +74,7 @@ const ItemOrderUpcoming = ({id, getOrdersUpcomming}: IItemOrderUpcoming) => {
           <View>
             <View row spread marginB-9>
               <Text gray2 textRegular style={styles.text}>
-                {order.line_items.length} đồ ăn
+                {order.line_items.length} món
               </Text>
             </View>
 
@@ -138,7 +138,12 @@ const ItemOrderUpcoming = ({id, getOrdersUpcomming}: IItemOrderUpcoming) => {
             Hủy đơn
           </Text>
         </Button>
-        <Button bg-primary style={styles.btn}>
+        <Button
+          bg-primary
+          style={styles.btn}
+          onPress={() => {
+            navigation.navigate('OrderDetails', {id: order.id});
+          }}>
           <Text white textMedium style={styles.btnText}>
             Kiểm tra
           </Text>

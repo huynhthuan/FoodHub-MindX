@@ -45,6 +45,8 @@ import NotificationsDetails from './src/app/screens/NotificationsDetails';
 import FilterFood from './src/app/screens/FilterFood';
 import Coupon from './src/app/screens/Coupon';
 import CouponDetails from './src/app/screens/CouponDetails';
+import CheckOut from './src/app/screens/Checkout';
+import OrderDetailsCompleted from './src/app/screens/OrderDetailsCompleted';
 
 Sentry.init({
   dsn: 'https://2e7732ba44794b38913cb3829622ac0f@o1121885.ingest.sentry.io/6158966',
@@ -85,8 +87,10 @@ export type MainStackParamList = {
   Cart: undefined;
   Coupon: undefined;
   CouponDetails: {couponData: any};
+  Checkout: {orderData: any};
   Payment: undefined;
-  OrderDetails: undefined;
+  OrderDetails: {id: number};
+  OrderDetailsCompleted: {id: number};
   DeliveryDetails: {addressDetail: deliveryAddressData};
   AddDeliveryAddress: undefined;
   Reviews: {foodData: any};
@@ -314,8 +318,46 @@ const App = () => {
                 }}
               />
               <MainStack.Screen
+                name="Checkout"
+                component={CheckOut}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: 'Thanh toán',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerRight: () => <HeaderCartButton />,
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
                 name="OrderDetails"
                 component={OrderDetails}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: 'Chi tiết đơn hàng',
+                  headerRight: () => <Avatar customStyle={{marginRight: 9}} />,
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="OrderDetailsCompleted"
+                component={OrderDetailsCompleted}
                 options={{
                   headerShown: true,
                   headerTransparent: true,

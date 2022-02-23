@@ -1,26 +1,32 @@
 import {Image, Text, View} from 'react-native-ui-lib';
 import React from 'react';
 import {StyleSheet} from 'react-native';
-
+import FastImage from 'react-native-fast-image';
+let numeral = require('numeral');
 export interface IIemOrder {
   data: any;
+  quantity: number;
 }
 
-const ItemOrder = ({data}: IIemOrder) => {
+const ItemOrder = ({data, quantity}: IIemOrder) => {
   return (
     <View row marginB-20 paddingH-25>
       <View style={styles.imageWrap} marginR-27>
-        <Image assetName="avatar" assetGroup="images" style={styles.image} />
+        <FastImage
+          source={{
+            uri: data.images[0].src,
+            priority: 'high',
+          }}
+          style={styles.image}
+        />
       </View>
       <View>
         <Text white textSemiBold marginB-8 style={styles.name}>
-          Red n hot pizza <Text primary>x 1</Text>
-        </Text>
-        <Text gray2 textLight marginB-10 style={styles.addOn}>
-          Spicy chicken <Text primary>x 1</Text>, beef <Text primary>x 1</Text>
+          {data.name}
+          <Text primary> x {quantity}</Text>
         </Text>
         <Text white textSemiBold style={styles.price}>
-          $9.50
+          {numeral(data.price).format('0,0')} VNĐ
         </Text>
       </View>
     </View>

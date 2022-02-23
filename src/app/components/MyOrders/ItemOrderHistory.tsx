@@ -3,9 +3,10 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
-import {getScreenWidth} from '../../utilities/helpers';
+import {getScreenWidth, getStatusOrder} from '../../utilities/helpers';
 import {useAppSelector} from '../../hook';
-
+import moment from 'moment';
+let numeral = require('numeral');
 export interface IItemOrderHistory {
   id: number;
 }
@@ -16,7 +17,7 @@ const ItemOrderHistory = ({id}: IItemOrderHistory) => {
     state => state.orderCompletedSlice.entities,
   );
   const order: any = entitieOrders[id];
-  
+
   if (!order) return null;
 
   return (
@@ -26,7 +27,7 @@ const ItemOrderHistory = ({id}: IItemOrderHistory) => {
       marginB-20
       style={styles.container}
       onPress={() => {
-        navigation.navigate('OrderDetails');
+        navigation.navigate('OrderDetailsCompleted', {id: order.id});
       }}>
       <View row spread marginB-24>
         <View row>
@@ -40,11 +41,11 @@ const ItemOrderHistory = ({id}: IItemOrderHistory) => {
           <View>
             <View row spread center marginB-9>
               <Text gray2 textRegular style={styles.text}>
-                20 Jun, 10:30
+                {moment(order.date_created).format('DD/MM/YY')}
               </Text>
               <View style={styles.dot}></View>
               <Text gray2 textRegular style={styles.text}>
-                3 Items
+                {order.line_items.length} món
               </Text>
             </View>
 
@@ -56,7 +57,7 @@ const ItemOrderHistory = ({id}: IItemOrderHistory) => {
               onPress={() => {
                 navigation.navigate('AgencyDetails');
               }}>
-              McDonald’s{' '}
+              FoodHub{' '}
               <Image
                 assetName="verify"
                 width={8}
@@ -68,28 +69,28 @@ const ItemOrderHistory = ({id}: IItemOrderHistory) => {
             <View row centerV>
               <View marginR-6 style={styles.dotStatus}></View>
               <Text textRegular style={styles.textStatus}>
-                Order Delivered
+                {getStatusOrder(order.status)}
               </Text>
             </View>
           </View>
         </View>
 
         <Text yellow textRegular style={styles.price}>
-          $15.30 {order.id}
+          {numeral(order.total).format('0,0')} VNĐ
         </Text>
       </View>
-      <View row spread>
+      {/* <View row spread>
         <Button bg-dark4 style={styles.btn}>
           <Text white textMedium style={styles.btnText}>
-            Rate
+            Đánh giá
           </Text>
         </Button>
         <Button bg-primary style={styles.btn}>
           <Text white textMedium style={styles.btnText}>
-            Re-Order
+            Đặt lại
           </Text>
         </Button>
-      </View>
+      </View> */}
     </TouchableOpacity>
   );
 };

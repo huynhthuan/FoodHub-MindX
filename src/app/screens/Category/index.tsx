@@ -219,6 +219,7 @@ const Category = () => {
         onEndReached={() => {
           setPage(page + 1);
         }}
+        numColumns={2}
       />
     </View>
   );

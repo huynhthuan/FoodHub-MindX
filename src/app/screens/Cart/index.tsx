@@ -1,4 +1,11 @@
-import {Button, Colors, Incubator, Text, View} from 'react-native-ui-lib';
+import {
+  Button,
+  Colors,
+  Incubator,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native-ui-lib';
 import React from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import _ from 'lodash';
@@ -10,44 +17,61 @@ import {
 } from '../../utilities/helpers';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
-import {useAppSelector} from '../../hook';
+import {useAppDispatch, useAppSelector} from '../../hook';
 import ListEmptyCart from '../../components/Cart/ListEmptyCart';
 import WooApi from '../../api/wooApi';
-import {useDispatch} from 'react-redux';
 import {showToast} from '../../redux/slices/toastSlice';
 import {setLoading} from '../../redux/slices/loadingSlice';
 import moment from 'moment';
 import {EntityId} from '@reduxjs/toolkit';
+import {updateCouponCart} from '../../redux/slices/couponCartSlice';
 let numeral = require('numeral');
 
 const Cart = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const productCartList = useAppSelector(state => state.productCartSlice);
-  const [coupon, setCoupon] = React.useState('');
-  const [couponData, setCouponData] = React.useState({
+  const couponCart = useAppSelector(state => state.couponCartSlice);
+  const [couponInCart, setCouponInCart] = React.useState({
     code: '',
-    desc: '',
-    discount_type: '',
     amount: 0,
+    desc: '',
   });
+  const [total, setTotal] = React.useState(0);
   const userState = useAppSelector(state => state.userSlice);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const getTotal = React.useCallback(
-    (accumulator: number = 0) => {
-      let total = _.reduce(
-        _.map(
-          productCartList.entities,
-          product => product?.price * product?.quantity,
-        ),
-        (sum, n) => sum + n,
-        accumulator,
-      );
+  React.useEffect(() => {
+    let total = _.reduce(
+      _.map(
+        productCartList.entities,
+        product => product?.price * product?.quantity,
+      ),
+      (sum, n) => sum + n,
+      20000,
+    );
 
-      return total;
-    },
-    [productCartList.ids],
-  );
+    total -= couponInCart.amount;
+    console.log(total);
+
+    if (total < 0) {
+      setTotal(0);
+    } else {
+      setTotal(numeral(total).format('0,0'));
+    }
+  }, [productCartList.ids, couponInCart.amount, productCartList.entities]);
+
+  const getTotalIncart = React.useCallback(() => {
+    let total = _.reduce(
+      _.map(
+        productCartList.entities,
+        product => product?.price * product?.quantity,
+      ),
+      (sum, n) => sum + n,
+      0,
+    );
+
+    return total;
+  }, [productCartList.ids, productCartList.entities]);
 
   const checkProductIncludes = React.useCallback(
     (idsAvaible: EntityId[]) => {
@@ -65,37 +89,14 @@ const Cart = () => {
   );
 
   const getCoupon = React.useCallback(() => {
-    setCouponData({
-      code: '',
-      desc: '',
-      discount_type: '',
-      amount: 0,
-    });
-
     dispatch(
       setLoading({
         isShown: true,
       }),
     );
 
-    if (coupon === '') {
-      dispatch(
-        setLoading({
-          isShown: false,
-        }),
-      );
-      dispatch(
-        showToast({
-          isShown: true,
-          msg: 'Mã giảm giá không tồn tại.',
-          preset: Incubator.ToastPresets.FAILURE,
-        }),
-      );
-      return;
-    }
-
     WooApi.get('coupons', {
-      code: coupon,
+      code: couponCart.code,
     }).then((data: any) => {
       let couponData = data[0];
       dispatch(
@@ -104,7 +105,6 @@ const Cart = () => {
         }),
       );
 
-      console.log(couponData);
       if (data.length === 0) {
         dispatch(
           showToast({
@@ -140,7 +140,7 @@ const Cart = () => {
         }
       }
 
-      if (getTotal() < Number(couponData.minimum_amount)) {
+      if (getTotalIncart() < Number(couponData.minimum_amount)) {
         dispatch(
           showToast({
             isShown: true,
@@ -152,7 +152,7 @@ const Cart = () => {
       }
 
       if (Number(couponData.maximum_amount) > 0) {
-        if (getTotal() > Number(couponData.maximum_amount)) {
+        if (getTotalIncart() > Number(couponData.maximum_amount)) {
           dispatch(
             showToast({
               isShown: true,
@@ -177,14 +177,29 @@ const Cart = () => {
         }
       }
 
-      setCouponData({
-        code: couponData.code,
+      setCouponInCart({
         amount: couponData.amount,
         desc: couponData.description,
-        discount_type: couponData.discount_type,
+        code: couponData.code,
       });
+
+      dispatch(
+        showToast({
+          isShown: true,
+          msg: 'Áp dụng mã giảm giá thành công.',
+          preset: Incubator.ToastPresets.SUCCESS,
+        }),
+      );
     });
-  }, [coupon]);
+  }, [couponCart]);
+
+  React.useEffect(() => {
+    setCouponInCart({
+      code: '',
+      amount: 0,
+      desc: '',
+    });
+  }, [couponCart.code]);
 
   return (
     <ScrollView
@@ -201,7 +216,10 @@ const Cart = () => {
           })}
 
           <View paddingH-25 marginB-10>
-            <View
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Coupon');
+              }}
               row
               style={styles.promoWrap}
               bg-dark
@@ -212,15 +230,17 @@ const Cart = () => {
               centerV>
               <View>
                 <Incubator.TextField
-                  onPressIn={() => {
-                    navigation.navigate('Coupon');
-                  }}
-                  placeholder="Promo Code"
+                  placeholder="Chọn mã giảm giá"
                   placeholderTextColor={Colors.gray2}
                   color={Colors.white}
                   style={styles.textInput}
+                  value={couponCart.code}
+                  editable={false}
+                  onChange={value => {
+                    console.log(value);
+                  }}
                   onChangeText={value => {
-                    setCoupon(value);
+                    console.log(value);
                   }}
                 />
               </View>
@@ -233,7 +253,7 @@ const Cart = () => {
                   Áp dụng
                 </Text>
               </Button>
-            </View>
+            </TouchableOpacity>
           </View>
 
           <View paddingH-25 marginB-82>
@@ -248,7 +268,7 @@ const Cart = () => {
               </View>
               <View row centerV>
                 <Text white textLight style={styles.price} marginR-6>
-                  {numeral(getTotal()).format('0,0')}
+                  {numeral(getTotalIncart()).format('0,0')}
                 </Text>
                 <Text gray6 textRegular style={styles.unit}>
                   VNĐ
@@ -268,19 +288,22 @@ const Cart = () => {
                 </Text>
               </View>
             </View>
-            {couponData.code !== '' ? (
+            {couponInCart.code !== '' ? (
               <View style={styles.section} row spread centerV>
-                <View>
+                <View paddingV-5>
                   <Text white textMedium style={styles.title}>
                     Mã giảm giá
                   </Text>
                   <Text gray2 textRegular style={styles.unit}>
-                    {couponData.code}
+                    {couponInCart.code}
+                  </Text>
+                  <Text primary textBold style={styles.unit}>
+                    {couponInCart.desc}
                   </Text>
                 </View>
                 <View row centerV>
                   <Text white textLight style={styles.price} marginR-6>
-                    - {numeral(Number(couponData.amount)).format('0,0')}
+                    - {numeral(Number(couponInCart.amount)).format('0,0')}
                   </Text>
                   <Text gray6 textRegular style={styles.unit}>
                     VNĐ
@@ -296,7 +319,7 @@ const Cart = () => {
               </Text>
               <View row centerV>
                 <Text white textBold style={styles.price} marginR-6>
-                  {numeral(getTotal(20000) - couponData.amount).format('0,0')}
+                  {total}
                 </Text>
                 <Text gray6 textRegular style={styles.unit}>
                   VNĐ
@@ -306,9 +329,18 @@ const Cart = () => {
           </View>
 
           <View center>
-            <Button bg-primary style={styles.btnCheckOut}>
+            <Button
+              bg-primary
+              style={styles.btnCheckOut}
+              onPress={() => {
+                navigation.navigate('Checkout', {
+                  orderData: {
+                    total,
+                  },
+                });
+              }}>
               <Text white textSemiBold style={styles.btnCheckoutText}>
-                Checkout
+                Thanh toán
               </Text>
             </Button>
           </View>
@@ -344,7 +376,7 @@ const styles = StyleSheet.create({
   },
   section: {
     height: 64,
-    borderBottomColor: Colors.dark4,
+    borderBottomColor: '#474755',
     borderBottomWidth: 1,
     borderStyle: 'solid',
   },

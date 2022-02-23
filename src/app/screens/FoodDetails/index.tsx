@@ -23,17 +23,29 @@ import {showToast} from '../../redux/slices/toastSlice';
 import RenderHTML from 'react-native-render-html';
 import FastImage from 'react-native-fast-image';
 import {productCartAddOne} from '../../redux/slices/productCartSlice';
+import {logout, updateProductLike} from '../../redux/slices/userSlice';
+import {BASE_URL_WP_API_USER} from '../../api/constants';
+import axios from 'axios';
+import {setLoading} from '../../redux/slices/loadingSlice';
+import {
+  favoritesAddOne,
+  favoritesRemoveOne,
+} from '../../redux/slices/favoriteSlice';
 let numeral = require('numeral');
 
 const FoodDetails = () => {
   const dispatch = useAppDispatch();
-  const productCartList = useAppSelector(state => state.productCartSlice);
   const route = useRoute<RouteProp<MainStackParamList, 'FoodDetails'>>();
   const productId = route.params.foodId;
   const [data, setData] = React.useState({});
+
   const navigation =
     useNavigation<NavigationProp<MainStackParamList, 'Reviews'>>();
   const [qty, setQty] = React.useState(1);
+
+  const userState = useAppSelector(state => state.userSlice);
+  const [isLike, setIsLike] = React.useState(false);
+  const entitieProduct = useAppSelector(state => state.productSlice.entities);
 
   React.useEffect(() => {
     WooApi.get('products/' + productId)
@@ -62,7 +74,6 @@ const FoodDetails = () => {
   }, [qty]);
 
   const addToCart = React.useCallback(() => {
-    console.log(data.images[0].src);
     dispatch(
       productCartAddOne({
         product: {
@@ -81,7 +92,116 @@ const FoodDetails = () => {
         isShown: true,
       }),
     );
-  }, [qty, productId]);
+  }, [qty, productId, data]);
+
+  const updateProductLikeUser = React.useCallback((productLike: string) => {
+    axios
+      .post(
+        BASE_URL_WP_API_USER + userState.id,
+        {
+          acf: {
+            product_like: productLike,
+          },
+        },
+        {
+          headers: {
+            Authorization: 'Bearer ' + userState.token,
+          },
+        },
+      )
+      .then(res => {
+        console.log('done', res.data.acf.product_like);
+        dispatch(updateProductLike(productLike));
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+      })
+      .catch(error => {
+        console.log(error);
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+
+        if (error.response?.data?.data.status === 403) {
+          dispatch(
+            showToast({
+              isShown: true,
+              msg: 'Phiên đăng nhập của bạn đã hết hạn. Vui Lòng đăng nhập lại!',
+              preset: Incubator.ToastPresets.OFFLINE,
+            }),
+          );
+          dispatch(logout());
+          return;
+        }
+
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Đã có lỗi xảy ra. Vui lòng thử lại !',
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
+  }, []);
+
+  const likeProduct = React.useCallback(() => {
+    let newProductLine = [];
+    let productLike = userState.product_like?.split(',');
+
+    dispatch(
+      setLoading({
+        isShown: true,
+      }),
+    );
+
+    if (userState.product_like?.split(',')) {
+      if (isLike) {
+        if (productLike) {
+          let index = productLike.indexOf(productId.toString());
+          productLike.splice(index, 1);
+          setIsLike(false);
+          updateProductLikeUser(productLike.join(','));
+          dispatch(
+            favoritesRemoveOne({
+              productId: productId,
+            }),
+          );
+        }
+      } else {
+        if (productLike) {
+          productLike.push(productId.toString());
+          setIsLike(true);
+          updateProductLikeUser(productLike.join(','));
+          dispatch(
+            favoritesAddOne({
+              product: JSON.stringify(entitieProduct[productId]),
+            }),
+          );
+        }
+      }
+    } else {
+      newProductLine.push(productId.toString());
+      setIsLike(true);
+      updateProductLikeUser(newProductLine.join(','));
+      dispatch(
+        favoritesAddOne({
+          product: JSON.stringify(entitieProduct[productId]),
+        }),
+      );
+    }
+  }, [isLike, userState.product_like]);
+
+  React.useEffect(() => {
+    if (userState.product_like?.split(',')) {
+      if (userState.product_like?.split(',').includes(productId.toString())) {
+        setIsLike(true);
+      }
+    }
+  }, [productId]);
 
   return (
     <>
@@ -100,9 +220,17 @@ const FoodDetails = () => {
                 }}
                 style={styles.image}
               />
-              <View style={styles.favorite}>
-                <Image assetName="like" assetGroup="icons" />
-              </View>
+              <TouchableOpacity
+                style={styles.favorite}
+                onPress={() => {
+                  likeProduct();
+                }}>
+                {isLike ? (
+                  <Image assetName="like" tintColor="red" assetGroup="icons" />
+                ) : (
+                  <Image assetName="like" assetGroup="icons" />
+                )}
+              </TouchableOpacity>
             </View>
             <Text white marginB-16 style={styles.title}>
               {data.name}

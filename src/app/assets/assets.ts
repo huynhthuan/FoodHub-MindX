@@ -43,6 +43,7 @@ Assets.loadAssetsGroup('icons', {
   arrowRightNormal: require('./icons/arrow-right-normal.png'),
   bubbleMessage: require('./icons/bubble-message.png'),
   addressShipping: require('./icons/addressShipping.png'),
+  coupon: require('./icons/coupon.png'),
 });
 
 Assets.loadAssetsGroup('images', {
@@ -58,4 +59,5 @@ Assets.loadAssetsGroup('images', {
   welcomeBg: require('./img/welcom-bg.png'),
   decorProfile: require('./img/decor-profile.png'),
   categoryDecor: require('./img/category-decor.png'),
+  couponBG: require('./img/coupon-bg.png'),
 });

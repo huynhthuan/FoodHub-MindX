@@ -8,6 +8,14 @@ import ItemAgency from '../../components/Item/Agency/ItemAgency';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {changeHeaderBackground} from '../../utilities/helpers';
+import WooApi from '../../api/wooApi';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import {productFeatureReceived} from '../../redux/slices/productFeatureSlice';
+import {productSaleReceived} from '../../redux/slices/productSaleSlice';
+import {productPopularReceived} from '../../redux/slices/productPopularSlice';
+import ItemFoodSale from '../../components/Item/Food/ItemFoodSale';
+import ItemFoodPopular from '../../components/Item/Food/ItemFoodPopular';
+import ItemFoodFeature from '../../components/Item/Food/ItemFoodFeature';
 
 const dataAgency = [
   {
@@ -30,23 +38,14 @@ const dataAgency = [
 
 const Home = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
-  
-  const renderItemAgency = React.useCallback(
-    ({item}) => (
-      <ItemAgency
-        customStyle={{
-          width: 266,
-          marginRight: 15,
-        }}
-        data={item}
-      />
-    ),
-    [],
-  );
+  const dispatch = useAppDispatch();
+  const productFeature = useAppSelector(state => state.productFeatureSlice);
+  const productSale = useAppSelector(state => state.productSaleSlice);
+  const productPopular = useAppSelector(state => state.productPopularSlice);
 
-  const renderItemFood = React.useCallback(
+  const renderItemFeature = React.useCallback(
     ({item}) => (
-      <ItemFood
+      <ItemFoodFeature
         customStyle={{
           width: 154,
           marginRight: 15,
@@ -56,6 +55,75 @@ const Home = () => {
     ),
     [],
   );
+
+  const renderItemSale = React.useCallback(
+    ({item}) => (
+      <ItemFoodSale
+        customStyle={{
+          width: 154,
+          marginRight: 15,
+        }}
+        id={item}
+      />
+    ),
+    [],
+  );
+
+  const renderItemPopular = React.useCallback(
+    ({item}) => (
+      <ItemFoodPopular
+        customStyle={{
+          width: 154,
+          marginRight: 15,
+        }}
+        id={item}
+      />
+    ),
+    [],
+  );
+
+  const getProductFeature = React.useCallback(() => {
+    WooApi.get('products', {
+      featured: true,
+    }).then((res: any) => {
+      dispatch(
+        productFeatureReceived({
+          productList: JSON.stringify(res),
+        }),
+      );
+    });
+  }, []);
+
+  const getProductSale = React.useCallback(() => {
+    WooApi.get('products', {
+      on_sale: true,
+    }).then((res: any) => {
+      dispatch(
+        productSaleReceived({
+          productList: JSON.stringify(res),
+        }),
+      );
+    });
+  }, []);
+
+  const getProductPopular = React.useCallback(() => {
+    WooApi.get('products', {
+      order: 'desc',
+      orderby: 'popularity',
+    }).then((res: any) => {
+      dispatch(
+        productPopularReceived({
+          productList: JSON.stringify(res),
+        }),
+      );
+    });
+  }, []);
+
+  React.useEffect(() => {
+    getProductFeature();
+    getProductPopular();
+    getProductSale();
+  }, []);
 
   return (
     <ScrollView
@@ -93,12 +161,12 @@ const Home = () => {
 
         <View paddingL-25>
           <FlatList
-            renderItem={renderItemAgency}
-            data={dataAgency}
+            renderItem={renderItemFeature}
+            data={productFeature.ids}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             style={styles.list}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => index.toString()}
           />
         </View>
 
@@ -110,12 +178,29 @@ const Home = () => {
 
         <View paddingL-25>
           <FlatList
-            renderItem={renderItemFood}
-            data={dataAgency}
+            renderItem={renderItemPopular}
+            data={productPopular.ids}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             style={styles.list}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </View>
+
+        <View paddingH-25>
+          <Text marginB-15 white style={styles.sectionTitle}>
+            Đang được giảm giá
+          </Text>
+        </View>
+
+        <View paddingL-25>
+          <FlatList
+            renderItem={renderItemSale}
+            data={productSale.ids}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            style={styles.list}
+            keyExtractor={(item, index) => index.toString()}
           />
         </View>
       </View>
@@ -130,7 +215,6 @@ const styles = StyleSheet.create({
     fontFamily: 'SofiaPro-SemiBold',
     fontSize: 30,
     lineHeight: 30,
-    maxWidth: 272,
   },
   container: {
     flex: 1,

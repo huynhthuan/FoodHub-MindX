@@ -21,13 +21,20 @@ export const favoritesSlice = createSlice({
     favoritesAddOne(state, action: PayloadAction<{product: string}>) {
       favoritesAdapter.addOne(state, JSON.parse(action.payload.product));
     },
+    favoritesAddMany(state, action: PayloadAction<{productList: string}>) {
+      favoritesAdapter.addMany(state, JSON.parse(action.payload.productList));
+    },
     favoritesRemoveOne(state, action: PayloadAction<{productId: number}>) {
       favoritesAdapter.removeOne(state, action.payload.productId);
     },
   },
 });
 
-export const {favoritesReceived, favoritesAddOne, favoritesRemoveOne} =
-  favoritesSlice.actions;
+export const {
+  favoritesReceived,
+  favoritesAddOne,
+  favoritesRemoveOne,
+  favoritesAddMany,
+} = favoritesSlice.actions;
 
 export default favoritesSlice.reducer;

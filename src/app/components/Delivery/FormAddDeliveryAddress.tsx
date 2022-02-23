@@ -35,6 +35,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {HomeMenuStackParamList} from '../../navigation/HomeMenu';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import {selectDeliveryAddressAddOne} from '../../redux/slices/addressSelectSlice';
 
 const FormAddDeliveryAddress = () => {
   const provincesState = useAppSelector(state => state.provincesSlice);
@@ -68,8 +69,6 @@ const FormAddDeliveryAddress = () => {
       note: '',
     },
   });
-
-  console.log(deliveryAddressList);
 
   const onSubmit = (data: any) => {
     dispatch(
@@ -110,9 +109,19 @@ const FormAddDeliveryAddress = () => {
         },
       )
       .then(res => {
+        console.log();
+
         dispatch(
           deliveryAddressReceived({
             deliveryAddressList: res.data.acf.shipping_address,
+          }),
+        );
+        dispatch(
+          selectDeliveryAddressAddOne({
+            address:
+              res.data.acf.shipping_address[
+                res.data.acf.shipping_address.length - 1
+              ],
           }),
         );
         dispatch(

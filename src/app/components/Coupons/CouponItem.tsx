@@ -3,14 +3,15 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
-import {useAppSelector} from '../../hook';
+import {useAppDispatch, useAppSelector} from '../../hook';
 import moment from 'moment';
+import {updateCouponCart} from '../../redux/slices/couponCartSlice';
 
 const CouponItem = ({id}: {id: number}) => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const entitieCoupon = useAppSelector(state => state.coupontSlice.entities);
   const coupon: any = entitieCoupon[id];
-
+  const dispatch = useAppDispatch();
   return (
     <TouchableOpacity
       disabled={false}
@@ -23,12 +24,12 @@ const CouponItem = ({id}: {id: number}) => {
       paddingV-10
       paddingH-10
       bg-dark
-      marginB-20
+      marginB-24
       spread
       centerV
       style={styles.container}>
       <View style={styles.imageWrap} marginR-10>
-        <Image assetName="avatar" assetGroup="images" style={styles.image} />
+        <Image assetName="coupon" assetGroup="icons" style={styles.image} />
       </View>
       <View flex-1 marginR-10 paddingB-20>
         <Text textBold primary style={styles.title}>
@@ -43,7 +44,19 @@ const CouponItem = ({id}: {id: number}) => {
           <></>
         )}
       </View>
-      <Button bg-primary style={styles.btn}>
+      <Button
+        bg-primary
+        style={styles.btn}
+        onPress={() => {
+          dispatch(
+            updateCouponCart({
+              code: coupon.code,
+              amount: Number(coupon.amount),
+              desc: coupon.description,
+            }),
+          );
+          navigation.navigate('Cart');
+        }}>
         <Text textBold white>
           Chọn
         </Text>
@@ -71,7 +84,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   title: {
-    fontSize: 16,
+    fontSize: 15,
   },
   desc: {
     fontSize: 14,

@@ -1,3 +1,9 @@
+import productSaleSlice from './redux/slices/productSaleSlice';
+import productPopularSlice from './redux/slices/productPopularSlice';
+import productFeatureSlice from './redux/slices/productFeatureSlice';
+import addressChoseenSlice from './redux/slices/addressChoseenSlice';
+import selectDeliveryAddressSlice from './redux/slices/addressSelectSlice';
+import couponCartSlice from './redux/slices/couponCartSlice';
 import coupontSlice from './redux/slices/couponSlice';
 import productCartSlice from './redux/slices/productCartSlice';
 import productSearchSlice from './redux/slices/productSearchSlice';
@@ -42,6 +48,12 @@ const store = configureStore({
     productSearchSlice,
     productCartSlice,
     coupontSlice,
+    couponCartSlice,
+    selectDeliveryAddressSlice,
+    addressChoseenSlice,
+    productFeatureSlice,
+    productPopularSlice,
+    productSaleSlice,
   },
 });
 

@@ -21,7 +21,7 @@ import {
   favoritesAddOne,
   favoritesRemoveOne,
 } from '../../../redux/slices/favoriteSlice';
-
+let numeral = require('numeral');
 export interface IItemFoodLarger {
   id: number;
   customStyle?: StyleProp<ViewStyle | Animated.AnimatedProps<ViewStyle>>;
@@ -182,11 +182,6 @@ const ItemFoodSearch = ({id, customStyle}: IItemFoodLarger) => {
           <Image assetName="like" assetGroup="icons" />
         )}
       </TouchableOpacity>
-      <View bg-white row style={styles.priceWrap}>
-        <Text primaryDark style={styles.priceText}>
-          {product.price} VNĐ
-        </Text>
-      </View>
       <View marginB-22 style={styles.imagesWrap}>
         <FastImage
           source={{
@@ -204,7 +199,18 @@ const ItemFoodSearch = ({id, customStyle}: IItemFoodLarger) => {
           {product.name}
         </Text>
       </TouchableOpacity>
-      <Text style={styles.desc}>Chicken, Cheese and pineapple</Text>
+      <View paddingH-10>
+        <Text white style={styles.priceText}>
+          {numeral(product.price).format('0,0')} VNĐ
+        </Text>
+        {product.sale_price ? (
+          <Text white style={styles.salePrice}>
+            {numeral(product.regular_price).format('0,0')} VNĐ
+          </Text>
+        ) : (
+          <></>
+        )}
+      </View>
     </View>
   );
 };
@@ -285,5 +291,8 @@ const styles = StyleSheet.create({
     right: 11,
     top: 10,
     zIndex: 22,
+  },
+  salePrice: {
+    textDecorationLine: 'line-through',
   },
 });

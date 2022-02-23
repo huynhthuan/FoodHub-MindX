@@ -18,7 +18,7 @@ const HeaderBackButtonDetails = () => {
       <Image
         assetName="arrowLeftNormal"
         assetGroup="icons"
-        tintColor="#111719"
+        tintColor="#fff"
       />
     </Button>
   );
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   buttonBack: {
     width: 38,
     height: 38,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#393948',
     minWidth: 0,
     borderRadius: 11,
   },

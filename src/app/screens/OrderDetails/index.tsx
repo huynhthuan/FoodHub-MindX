@@ -1,4 +1,11 @@
-import {Button, Image, Text, TouchableOpacity, View} from 'react-native-ui-lib';
+import {
+  Button,
+  Image,
+  Incubator,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native-ui-lib';
 import React from 'react';
 import {
   FlatList,
@@ -8,47 +15,79 @@ import {
   VirtualizedList,
 } from 'react-native';
 import {MainStackParamList} from '../../../../App';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import ItemOrder from '../../components/MyOrders/ItemOrder';
-import {changeHeaderBackground, getScreenWidth} from '../../utilities/helpers';
-
-const data = [
-  {
-    name: 'Burger',
-    id: '1',
-  },
-  {
-    name: 'Chicken',
-    id: '2',
-  },
-  {
-    name: 'Fast Food',
-    id: '3',
-  },
-  {
-    name: 'Fast Food Hub',
-    id: '4',
-  },
-  {
-    name: 'Burger',
-    id: '5',
-  },
-  {
-    name: 'Chicken',
-    id: '6',
-  },
-  {
-    name: 'Fast Food',
-    id: '7',
-  },
-  {
-    name: 'Fast Food Hub',
-    id: '8',
-  },
-];
+import {
+  changeHeaderBackground,
+  getPaymentMethod,
+  getScreenWidth,
+  getStatusOrder,
+} from '../../utilities/helpers';
+import {useAppDispatch, useAppSelector} from '../../hook';
+import moment from 'moment';
+let numeral = require('numeral');
+import WooApi from '../../api/wooApi';
+import _ from 'lodash';
+import {setLoading} from '../../redux/slices/loadingSlice';
+import {showToast} from '../../redux/slices/toastSlice';
 
 const OrderDetails = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  const route = useRoute<RouteProp<MainStackParamList, 'OrderDetails'>>();
+  const entitieOrders = useAppSelector(state => state.orderSlice.entities);
+  const order: any = entitieOrders[route.params.id];
+  const [data, setData] = React.useState([]);
+  const dispatch = useAppDispatch();
+
+  console.log(order);
+
+  React.useEffect(() => {
+    dispatch(
+      setLoading({
+        isShown: true,
+      }),
+    );
+    WooApi.get('products', {
+      include: _.map(order.line_items, item => {
+        return item.product_id;
+      }),
+    })
+      .then((res: any) => {
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+        setData(res);
+      })
+      .catch((error: any) => {
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Đã có lỗi xảy ra. Vui lòng thử lại',
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+      });
+  }, [route.params.id]);
+
+  const getQty = React.useCallback((productId: number) => {
+    return _.filter(order.line_items, item => item.product_id === productId)[0]
+      .quantity;
+  }, []);
+
+  console.log(order.status);
 
   return (
     <ScrollView
@@ -71,7 +110,7 @@ const OrderDetails = () => {
           <View>
             <View row spread marginB-9>
               <Text gray2 textRegular style={styles.text}>
-                20 Jun, 10:30
+                {moment(order.date_created).format('DD MMM, hh:mm')}
               </Text>
             </View>
 
@@ -83,7 +122,7 @@ const OrderDetails = () => {
               onPress={() => {
                 navigation.navigate('AgencyDetails');
               }}>
-              McDonald’s{' '}
+              FoodHub{' '}
               <Image
                 assetName="verify"
                 width={8}
@@ -95,27 +134,33 @@ const OrderDetails = () => {
             <View row centerV>
               <View marginR-6 style={styles.dotStatus}></View>
               <Text textRegular style={styles.textStatus}>
-                Order Delivered
+                {getStatusOrder(order.status)}
               </Text>
             </View>
           </View>
         </View>
 
         <Text yellow textRegular style={styles.price}>
-          #2641000
+          #{order.id}
         </Text>
       </View>
 
       <View paddingH-25>
         <Text white textSemiBold marginB-15 style={styles.title}>
-          Details
+          Địa chỉ giao hàng
         </Text>
         <Text textMedium gray2 marginB-22 style={styles.shipAddress}>
-          6391 Elgin St. Celina, Delaware 10299
+          {order.shipping.address_1}
+        </Text>
+        <Text white textSemiBold marginB-15 style={styles.title}>
+          Số điện thoại
+        </Text>
+        <Text textMedium gray2 marginB-22 style={styles.shipAddress}>
+          {order.billing.phone}
         </Text>
       </View>
 
-      <View row centerV spread paddingH-25 marginB-32>
+      {/* <View row centerV spread paddingH-25 marginB-32>
         <View row centerV>
           <View style={styles.imagesWrap} marginR-17>
             <Image
@@ -142,47 +187,47 @@ const OrderDetails = () => {
             Call
           </Text>
         </View>
-      </View>
+      </View> */}
 
       <View marginB-30>
         <View paddingH-25>
           <Text white textSemiBold marginB-15 style={styles.headerTitle}>
-            Orders food
+            Các món ăn
           </Text>
         </View>
         <View>
-          {data.map((item, index) => (
-            <ItemOrder key={index} data={item} />
+          {data.map((item: any, index: number) => (
+            <ItemOrder key={index} data={item} quantity={getQty(item.id)} />
           ))}
         </View>
       </View>
 
       <View paddingH-25>
         <Text white textSemiBold marginB-15 style={styles.headerTitle}>
-          Payment Method
+          Phương thức thanh toán
         </Text>
 
         <Text textMedium gray2 marginB-22 style={styles.shipAddress}>
-          6391 Elgin St. Celina, Delaware 10299
+          {getPaymentMethod(order.payment_method)}
         </Text>
       </View>
 
       <View row centerV spread paddingH-25>
         <Text white textSemiBold style={styles.totalTitle}>
-          Total
+          Tổng cộng
         </Text>
 
         <View row centerV>
           <Text white textSemiBold style={styles.priceTotal} marginR-6>
-            $59.08
+            {numeral(order.total).format('0,0')}
           </Text>
           <Text textMedium gray2 style={styles.priceTotalUnit}>
-            USD
+            VNĐ
           </Text>
         </View>
       </View>
 
-      <View row spread marginT-78 paddingH-25>
+      {/* <View row spread marginT-78 paddingH-25>
         <Button white bg-dark4 style={styles.btn}>
           <Text white textSemiBold style={styles.btnText}>
             RATE
@@ -193,7 +238,7 @@ const OrderDetails = () => {
             RE-ORDER
           </Text>
         </Button>
-      </View>
+      </View> */}
     </ScrollView>
   );
 };

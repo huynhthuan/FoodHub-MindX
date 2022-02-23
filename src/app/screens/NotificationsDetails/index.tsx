@@ -5,7 +5,11 @@ import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {ScrollView, StyleSheet} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {changeHeaderBackground, getScreenHeight, getScreenWidth} from '../../utilities/helpers';
+import {
+  changeHeaderBackground,
+  getScreenHeight,
+  getScreenWidth,
+} from '../../utilities/helpers';
 import moment from 'moment';
 import axios from 'axios';
 import {BASE_URL_WP_MEDIA} from '../../api/constants';
@@ -35,8 +39,7 @@ const NotificationsDetails = () => {
       showsVerticalScrollIndicator={false}
       onScroll={({nativeEvent}) => {
         changeHeaderBackground(nativeEvent, navigation);
-      }}
-    >
+      }}>
       <View style={styles.imageWrap}>
         <FastImage
           source={{
@@ -68,7 +71,7 @@ const NotificationsDetails = () => {
           contentWidth={getScreenWidth() - 50}
           systemFonts={['SofiaPro-Bold', 'SofiaPro-Medium', 'SofiaPro']}
           source={{
-            html: `<div style="color: white; text-align: justify; line-height: 20px;font-family: 'SofiaPro'; font-size: 16px;">${notice.content.rendered}</div>`,
+            html: `<div style="color: white; line-height: 20px;font-family: 'SofiaPro'; font-size: 16px;">${notice.content.rendered}</div>`,
           }}
         />
       </View>

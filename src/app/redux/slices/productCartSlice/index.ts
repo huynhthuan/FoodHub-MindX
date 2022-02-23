@@ -22,6 +22,9 @@ export const productCartSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState: productCartAdapter.getInitialState(),
   reducers: {
+    productCartReviced(state, action: PayloadAction<{productList: string}>) {
+      productCartAdapter.setAll(state, JSON.parse(action.payload.productList));
+    },
     productCartRemoveOne(state, action: PayloadAction<{id: number}>) {
       productCartAdapter.removeOne(state, action.payload.id);
     },
@@ -37,7 +40,11 @@ export const productCartSlice = createSlice({
   },
 });
 
-export const {productCartRemoveOne, productCartAddOne, productCartUpdateOne} =
-  productCartSlice.actions;
+export const {
+  productCartRemoveOne,
+  productCartAddOne,
+  productCartUpdateOne,
+  productCartReviced,
+} = productCartSlice.actions;
 
 export default productCartSlice.reducer;

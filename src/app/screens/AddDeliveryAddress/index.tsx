@@ -1,9 +1,9 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {ScrollView, StyleSheet} from 'react-native';
+import {Platform, ScrollView, StyleSheet} from 'react-native';
 import {MainStackParamList} from '../../../../App';
 import FormAddDeliveryAddress from '../../components/Delivery/FormAddDeliveryAddress';
-import {changeHeaderBackground} from '../../utilities/helpers';
+import {changeHeaderBackground, getScreenHeight} from '../../utilities/helpers';
 
 const AddDeliveryAddress = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -27,5 +27,6 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     paddingHorizontal: 25,
     backgroundColor: '#2D2D3A',
+    minHeight: getScreenHeight(),
   },
 });

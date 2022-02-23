@@ -39,8 +39,13 @@ const getStatusOrder = (statusCode: string) => {
     case 'on-hold':
       statusName = 'Đang chuẩn bị';
       break;
+    case 'completed':
+      statusName = 'Đã hoàn thành';
+      break;
     case 'arrival-shipment':
       statusName = 'Đang giao đồ';
+    case 'pending':
+      statusName = 'Chờ thanh toán';
       break;
     default:
       break;
@@ -49,9 +54,28 @@ const getStatusOrder = (statusCode: string) => {
   return statusName;
 };
 
+const getPaymentMethod = (paymentMethod: string) => {
+  let paymentName = '';
+  switch (paymentMethod) {
+    case 'bacs':
+      paymentName = 'Chuyển khoản ngân hàng';
+      break;
+    case 'cod':
+      paymentName = 'Tiền mặt';
+    case 'cheque':
+      paymentName = 'Kiểm tra thanh toán';
+      break;
+    default:
+      break;
+  }
+
+  return paymentName;
+};
+
 export {
   getScreenHeight,
   getScreenWidth,
   changeHeaderBackground,
   getStatusOrder,
+  getPaymentMethod,
 };
