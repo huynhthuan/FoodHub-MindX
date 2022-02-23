@@ -1,3 +1,4 @@
+import coupontSlice from './redux/slices/couponSlice';
 import productCartSlice from './redux/slices/productCartSlice';
 import productSearchSlice from './redux/slices/productSearchSlice';
 import productFilterSlice from './redux/slices/productFilterSlice';
@@ -40,6 +41,7 @@ const store = configureStore({
     productFilterSlice,
     productSearchSlice,
     productCartSlice,
+    coupontSlice,
   },
 });
 

@@ -98,7 +98,8 @@ const HomeMenu = () => {
               focused={focused}
             />
           ),
-          tabBarBadge: cartState.ids.length,
+          tabBarBadge:
+            cartState.ids.length > 0 ? cartState.ids.length : undefined,
           tabBarBadgeStyle: {
             backgroundColor: '#FE724C',
             color: '#ffffff',

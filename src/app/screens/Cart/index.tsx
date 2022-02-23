@@ -15,17 +15,75 @@ import ListEmptyCart from '../../components/Cart/ListEmptyCart';
 import WooApi from '../../api/wooApi';
 import {useDispatch} from 'react-redux';
 import {showToast} from '../../redux/slices/toastSlice';
+import {setLoading} from '../../redux/slices/loadingSlice';
+import moment from 'moment';
+import {EntityId} from '@reduxjs/toolkit';
 let numeral = require('numeral');
 
 const Cart = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const productCartList = useAppSelector(state => state.productCartSlice);
   const [coupon, setCoupon] = React.useState('');
-  const [couponData, setCouponData] = React.useState({});
+  const [couponData, setCouponData] = React.useState({
+    code: '',
+    desc: '',
+    discount_type: '',
+    amount: 0,
+  });
   const userState = useAppSelector(state => state.userSlice);
   const dispatch = useDispatch();
+
+  const getTotal = React.useCallback(
+    (accumulator: number = 0) => {
+      let total = _.reduce(
+        _.map(
+          productCartList.entities,
+          product => product?.price * product?.quantity,
+        ),
+        (sum, n) => sum + n,
+        accumulator,
+      );
+
+      return total;
+    },
+    [productCartList.ids],
+  );
+
+  const checkProductIncludes = React.useCallback(
+    (idsAvaible: EntityId[]) => {
+      console.log(idsAvaible, productCartList.ids);
+      let isAllproductAvaible = false;
+      productCartList.ids.forEach(id => {
+        if (idsAvaible.includes(id)) {
+          isAllproductAvaible = true;
+          return;
+        }
+      });
+      return isAllproductAvaible;
+    },
+    [productCartList.ids],
+  );
+
   const getCoupon = React.useCallback(() => {
+    setCouponData({
+      code: '',
+      desc: '',
+      discount_type: '',
+      amount: 0,
+    });
+
+    dispatch(
+      setLoading({
+        isShown: true,
+      }),
+    );
+
     if (coupon === '') {
+      dispatch(
+        setLoading({
+          isShown: false,
+        }),
+      );
       dispatch(
         showToast({
           isShown: true,
@@ -39,7 +97,14 @@ const Cart = () => {
     WooApi.get('coupons', {
       code: coupon,
     }).then((data: any) => {
-      console.log(data);
+      let couponData = data[0];
+      dispatch(
+        setLoading({
+          isShown: false,
+        }),
+      );
+
+      console.log(couponData);
       if (data.length === 0) {
         dispatch(
           showToast({
@@ -51,7 +116,7 @@ const Cart = () => {
         return;
       }
 
-      if (data.used_by.includes(userState.id)) {
+      if (couponData.used_by.includes(userState.id)) {
         dispatch(
           showToast({
             isShown: true,
@@ -61,6 +126,63 @@ const Cart = () => {
         );
         return;
       }
+
+      if (couponData.date_expires !== null) {
+        if (!moment().isBefore(couponData.date_expires)) {
+          dispatch(
+            showToast({
+              isShown: true,
+              msg: 'Mã đã hết hạn sử dụng.',
+              preset: Incubator.ToastPresets.FAILURE,
+            }),
+          );
+          return;
+        }
+      }
+
+      if (getTotal() < Number(couponData.minimum_amount)) {
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Giá trị đơn hàng tối thiểu chưa đủ điều kiện.',
+            preset: Incubator.ToastPresets.FAILURE,
+          }),
+        );
+        return;
+      }
+
+      if (Number(couponData.maximum_amount) > 0) {
+        if (getTotal() > Number(couponData.maximum_amount)) {
+          dispatch(
+            showToast({
+              isShown: true,
+              msg: 'Giá trị đơn hàng vượt mức tối đa.',
+              preset: Incubator.ToastPresets.FAILURE,
+            }),
+          );
+          return;
+        }
+      }
+
+      if (couponData.product_ids.length > 0) {
+        if (!checkProductIncludes(couponData.product_ids)) {
+          dispatch(
+            showToast({
+              isShown: true,
+              msg: 'Chưa có món ăn theo điều kiện của mã giảm giá.',
+              preset: Incubator.ToastPresets.FAILURE,
+            }),
+          );
+          return;
+        }
+      }
+
+      setCouponData({
+        code: couponData.code,
+        amount: couponData.amount,
+        desc: couponData.description,
+        discount_type: couponData.discount_type,
+      });
     });
   }, [coupon]);
 
@@ -90,6 +212,9 @@ const Cart = () => {
               centerV>
               <View>
                 <Incubator.TextField
+                  onPressIn={() => {
+                    navigation.navigate('Coupon');
+                  }}
                   placeholder="Promo Code"
                   placeholderTextColor={Colors.gray2}
                   color={Colors.white}
@@ -113,12 +238,17 @@ const Cart = () => {
 
           <View paddingH-25 marginB-82>
             <View style={styles.section} row spread centerV>
-              <Text white textMedium style={styles.title}>
-                Phí ship
-              </Text>
+              <View>
+                <Text white textMedium style={styles.title}>
+                  Tạm tính
+                </Text>
+                <Text gray2 textRegular style={styles.unit}>
+                  {productCartList.ids.length} món
+                </Text>
+              </View>
               <View row centerV>
                 <Text white textLight style={styles.price} marginR-6>
-                  20.000
+                  {numeral(getTotal()).format('0,0')}
                 </Text>
                 <Text gray6 textRegular style={styles.unit}>
                   VNĐ
@@ -127,23 +257,46 @@ const Cart = () => {
             </View>
             <View style={styles.section} row spread centerV>
               <Text white textMedium style={styles.title}>
+                Phí ship
+              </Text>
+              <View row centerV>
+                <Text white textLight style={styles.price} marginR-6>
+                  20,000
+                </Text>
+                <Text gray6 textRegular style={styles.unit}>
+                  VNĐ
+                </Text>
+              </View>
+            </View>
+            {couponData.code !== '' ? (
+              <View style={styles.section} row spread centerV>
+                <View>
+                  <Text white textMedium style={styles.title}>
+                    Mã giảm giá
+                  </Text>
+                  <Text gray2 textRegular style={styles.unit}>
+                    {couponData.code}
+                  </Text>
+                </View>
+                <View row centerV>
+                  <Text white textLight style={styles.price} marginR-6>
+                    - {numeral(Number(couponData.amount)).format('0,0')}
+                  </Text>
+                  <Text gray6 textRegular style={styles.unit}>
+                    VNĐ
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <></>
+            )}
+            <View style={styles.section} row spread centerV>
+              <Text white textMedium style={styles.title}>
                 Tổng cộng
               </Text>
               <View row centerV>
-                <Text white textRegular marginR-11>
-                  ({productCartList.ids.length} đồ ăn)
-                </Text>
                 <Text white textBold style={styles.price} marginR-6>
-                  {numeral(
-                    _.reduce(
-                      _.map(
-                        productCartList.entities,
-                        product => product?.price * product?.quantity,
-                      ),
-                      (sum, n) => sum + n,
-                      20000,
-                    ),
-                  ).format('0,0')}
+                  {numeral(getTotal(20000) - couponData.amount).format('0,0')}
                 </Text>
                 <Text gray6 textRegular style={styles.unit}>
                   VNĐ

@@ -35,60 +35,66 @@ const Search = () => {
   );
 
   const searchItem = React.useCallback(() => {
-    setIsLoading(true);
     dispatch(
       productSearchReceived({
         productList: JSON.stringify([]),
       }),
     );
-    WooApi.get('products', {
-      page: 1,
-      search: keyWord,
-    })
-      .then((data: any) => {
-        setIsLoading(false);
-        dispatch(
-          productSearchReceived({
-            productList: JSON.stringify(data),
-          }),
-        );
+    if (keyWord !== '') {
+      setIsLoading(true);
+      WooApi.get('products', {
+        page: 1,
+        search: keyWord,
       })
-      .catch(() => {
-        setIsLoading(false);
-        dispatch(
-          showToast({
-            msg: 'Đã có lỗi xảy ra. Vui lòng thử lại!',
-            preset: Incubator.ToastPresets.FAILURE,
-            isShown: true,
-          }),
-        );
-      });
+        .then((data: any) => {
+          setIsLoading(false);
+          dispatch(
+            productSearchReceived({
+              productList: JSON.stringify(data),
+            }),
+          );
+        })
+        .catch(() => {
+          setIsLoading(false);
+          dispatch(
+            showToast({
+              msg: 'Đã có lỗi xảy ra. Vui lòng thử lại!',
+              preset: Incubator.ToastPresets.FAILURE,
+              isShown: true,
+            }),
+          );
+        });
+    }
   }, [keyWord]);
 
   React.useEffect(() => {
-    setIsLoading(true);
-    WooApi.get('products', {
-      page: page,
-      search: keyWord,
-    })
-      .then((data: any) => {
-        setIsLoading(false);
-        dispatch(
-          productSearchAddMany({
-            productList: JSON.stringify(data),
-          }),
-        );
+    if (page > 1) {
+      console.log('inpage');
+
+      setIsLoading(true);
+      WooApi.get('products', {
+        page: page,
+        search: keyWord,
       })
-      .catch(() => {
-        setIsLoading(false);
-        dispatch(
-          showToast({
-            msg: 'Đã có lỗi xảy ra. Vui lòng thử lại!',
-            preset: Incubator.ToastPresets.FAILURE,
-            isShown: true,
-          }),
-        );
-      });
+        .then((data: any) => {
+          setIsLoading(false);
+          dispatch(
+            productSearchAddMany({
+              productList: JSON.stringify(data),
+            }),
+          );
+        })
+        .catch(() => {
+          setIsLoading(false);
+          dispatch(
+            showToast({
+              msg: 'Đã có lỗi xảy ra. Vui lòng thử lại!',
+              preset: Incubator.ToastPresets.FAILURE,
+              isShown: true,
+            }),
+          );
+        });
+    }
   }, [page]);
 
   return (
@@ -110,7 +116,9 @@ const Search = () => {
       </View>
       <View flex>
         <Text white marginB-16 style={styles.title}>
-          Kết quả cho: {keyWord}
+          {keyWord === ''
+            ? 'Nhập từ khóa món ăn cần tìm'
+            : `Kết quả cho: ${keyWord}`}
         </Text>
         <FlatList
           data={productList.ids}

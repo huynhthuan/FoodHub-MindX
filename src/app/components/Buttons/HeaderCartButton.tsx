@@ -24,9 +24,13 @@ const HeaderCartButton = () => {
         height={17.64}
         tintColor={'#fff'}
       />
-      <Text textSemiBold center white style={styles.text}>
-        {productCartList.ids.length}
-      </Text>
+      {productCartList.ids.length > 0 ? (
+        <Text textSemiBold center white style={styles.text}>
+          {productCartList.ids.length}
+        </Text>
+      ) : (
+        <></>
+      )}
     </TouchableOpacity>
   );
 };

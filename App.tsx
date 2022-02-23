@@ -43,6 +43,8 @@ import ToastCustom from './src/app/components/Overlay/ToastCustom';
 import {deliveryAddressData} from './src/app/redux/slices/deliveryAddressSlice';
 import NotificationsDetails from './src/app/screens/NotificationsDetails';
 import FilterFood from './src/app/screens/FilterFood';
+import Coupon from './src/app/screens/Coupon';
+import CouponDetails from './src/app/screens/CouponDetails';
 
 Sentry.init({
   dsn: 'https://2e7732ba44794b38913cb3829622ac0f@o1121885.ingest.sentry.io/6158966',
@@ -81,6 +83,8 @@ export type MainStackParamList = {
   };
   Category: {CategoryDetail: any};
   Cart: undefined;
+  Coupon: undefined;
+  CouponDetails: {couponData: any};
   Payment: undefined;
   OrderDetails: undefined;
   DeliveryDetails: {addressDetail: deliveryAddressData};
@@ -276,6 +280,37 @@ const App = () => {
                     fontFamily: 'SofiaPro-Medium',
                     fontSize: 18,
                   },
+                }}
+              />
+              <MainStack.Screen
+                name="Coupon"
+                component={Coupon}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: 'Mã giảm giá',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
+                  headerRight: () => <HeaderCartButton />,
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    color: '#ffffff',
+                    fontFamily: 'SofiaPro-Medium',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <MainStack.Screen
+                name="CouponDetails"
+                component={CouponDetails}
+                options={{
+                  headerShown: true,
+                  headerTransparent: true,
+                  title: '',
+                  headerLeft: () => (
+                    <HeaderBackButton customStyle={{marginLeft: 9}} />
+                  ),
                 }}
               />
               <MainStack.Screen
