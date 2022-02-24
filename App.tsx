@@ -47,6 +47,8 @@ import Coupon from './src/app/screens/Coupon';
 import CouponDetails from './src/app/screens/CouponDetails';
 import CheckOut from './src/app/screens/Checkout';
 import OrderDetailsCompleted from './src/app/screens/OrderDetailsCompleted';
+import SetNewPassword from './src/app/screens/SetNewPassWord';
+import LiveStreamView from './src/app/screens/LiveStreamView';
 
 Sentry.init({
   dsn: 'https://2e7732ba44794b38913cb3829622ac0f@o1121885.ingest.sentry.io/6158966',
@@ -70,6 +72,7 @@ export type MainStackParamList = {
     phoneNumber: string;
   };
   ResetPassword: undefined;
+  SetNewPassword: {email: string};
   DashBoard: undefined;
   FoodDetails: {foodId: number};
   AgencyDetails: undefined;
@@ -97,6 +100,8 @@ export type MainStackParamList = {
   ReviewFood: {foodData: any};
   ReviewAgency: undefined;
   NotificationsDetails: {notiId: number};
+  PlayGame: undefined;
+  PlayGameDetails: {gameUrl: string};
 };
 
 const optionsAuthScreen = {
@@ -157,6 +162,11 @@ const App = () => {
                 options={optionsAuthScreen}
                 name="ResetPassword"
                 component={ResetPassword}
+              />
+              <MainStack.Screen
+                options={optionsAuthScreen}
+                name="SetNewPassword"
+                component={SetNewPassword}
               />
             </>
           ) : (

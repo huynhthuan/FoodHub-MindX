@@ -2,18 +2,27 @@ import {Button, Image, Incubator, Text, View} from 'react-native-ui-lib';
 import React from 'react';
 import {Alert, KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
 import {getScreenWidth} from '../../utilities/helpers';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {Controller, useForm} from 'react-hook-form';
 import axios from 'axios';
-import {BASE_URL_RESETPASS_GET_CODE} from '../../api/constants';
+import {
+  BASE_URL_RESETPASS_GET_CODE,
+  BASE_URL_RESETPASS_SET_PASS,
+} from '../../api/constants';
 import {useAppDispatch} from '../../hook';
 import {showToast} from '../../redux/slices/toastSlice';
 import {setLoading} from '../../redux/slices/loadingSlice';
 
-const ResetPassword = () => {
+const SetNewPassword = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
   const dispatch = useAppDispatch();
+  const route = useRoute<RouteProp<MainStackParamList, 'SetNewPassword'>>();
 
   const {
     control,
@@ -21,7 +30,9 @@ const ResetPassword = () => {
     formState: {errors},
   } = useForm({
     defaultValues: {
-      email: '',
+      email: route.params.email,
+      code: '',
+      password: '',
     },
   });
 
@@ -32,8 +43,10 @@ const ResetPassword = () => {
       }),
     );
     axios
-      .post(BASE_URL_RESETPASS_GET_CODE, {
+      .post(BASE_URL_RESETPASS_SET_PASS, {
         email: data.email,
+        code: data.code,
+        password: data.password,
       })
       .then((res: any) => {
         dispatch(
@@ -43,12 +56,12 @@ const ResetPassword = () => {
         );
         dispatch(
           showToast({
-            msg: 'Chúng tôi đã gửi mã xác nhận qua email của bạn. Vui lòng kiểm tra email.',
+            msg: 'Đặt lại mật khẩu thành công. Vui lòng thử đăng nhập lại!',
             preset: Incubator.ToastPresets.SUCCESS,
             isShown: true,
           }),
         );
-        navigation.navigate('SetNewPassword', {email: data.email});
+        navigation.navigate('Login');
       })
       .catch((error: any) => {
         dispatch(
@@ -57,9 +70,13 @@ const ResetPassword = () => {
           }),
         );
         let msg = 'Đã có lỗi xảy ra. Vui lòng thử lại!';
-        switch (error.response.status) {
-          case 500:
+        console.log(error.response);
+
+        switch (error.response.data.code) {
+          case 'bad_email':
             msg = 'Không tìm thấy người dùng với địa chỉ email này.';
+          case 'bad_request':
+            msg = 'Mã đặt lại được cung cấp không hợp lệ. Bạn còn 2 lần thử.';
             break;
         }
         dispatch(
@@ -92,10 +109,13 @@ const ResetPassword = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
         <Text white marginB-20 style={styles.title}>
-          Lấy lại mật khẩu
+          Đặt lại mật khẩu
         </Text>
         <Text gray2 marginB-32 style={styles.desc}>
-          Hãy nhập email của tài khoản của bạn để nhận mật khẩu mới
+          Hãy nhập mật khẩu với và mã code đã nhận được ở email{' '}
+          <Text primary textBold>
+            {route.params.email}
+          </Text>
         </Text>
         <View>
           <Controller
@@ -106,8 +126,7 @@ const ResetPassword = () => {
                 message: 'Trường này không được bỏ trống',
               },
               pattern: {
-                value:
-                  /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
                 message: 'Định dạng email chưa đúng.',
               },
             }}
@@ -121,9 +140,60 @@ const ResetPassword = () => {
                 labelStyle={styles.label}
                 placeholder={'Nhập email của bạn'}
                 placeholderTextColor={'#ADADB8'}
+                editable={false}
               />
             )}
             name="email"
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: {
+                value: true,
+                message: 'Trường này không được bỏ trống',
+              },
+            }}
+            render={({field: {onChange, onBlur, value}}) => (
+              <Incubator.TextField
+                floatOnFocus={true}
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                labelStyle={styles.label}
+                placeholder={'Nhập code nhận ở email của bạn'}
+                placeholderTextColor={'#ADADB8'}
+              />
+            )}
+            name="code"
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: {
+                value: true,
+                message: 'Trường này không được bỏ trống',
+              },
+              pattern: {
+                value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+                message:
+                  'Mật khẩu phải có ít nhất 8 ký tự, bao gồm 1 ký tự viết hoa, 1 số và 1 ký tự đặc biệt.',
+              },
+            }}
+            render={({field: {onChange, onBlur, value}}) => (
+              <Incubator.TextField
+                floatOnFocus={true}
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                labelStyle={styles.label}
+                placeholder={'Nhập mật khẩu mới của bạn'}
+                placeholderTextColor={'#ADADB8'}
+                secureTextEntry={true}
+              />
+            )}
+            name="password"
           />
 
           <View center>
@@ -132,7 +202,7 @@ const ResetPassword = () => {
               style={styles.btnLogin}
               onPress={handleSubmit(onSubmit, onInvalid)}>
               <Text white style={styles.btnLoginText}>
-                Gửi mật khẩu mới
+                Đặt lại mật khẩu
               </Text>
             </Button>
           </View>
@@ -142,7 +212,7 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default SetNewPassword;
 
 const styles = StyleSheet.create({
   container: {
