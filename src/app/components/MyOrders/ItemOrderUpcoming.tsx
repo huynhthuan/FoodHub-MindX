@@ -31,8 +31,6 @@ const ItemOrderUpcoming = ({id, getOrdersUpcomming}: IItemOrderUpcoming) => {
       }),
     );
 
-    console.log('ID order cancel', id);
-
     WooApi.put('orders/' + order.id, {
       status: 'cancelled',
     })

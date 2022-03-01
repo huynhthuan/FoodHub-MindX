@@ -12,12 +12,13 @@ import _ from 'lodash';
 import {rateText} from '../../utilities/constant';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
-import WooApi from '../../api/wooApi';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import {setLoading} from '../../redux/slices/loadingSlice';
 import {showToast} from '../../redux/slices/toastSlice';
 import FastImage from 'react-native-fast-image';
 import {Controller, useForm} from 'react-hook-form';
+import axios from 'axios';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
 
 const ReviewFood = () => {
   const {
@@ -75,21 +76,48 @@ const ReviewFood = () => {
         isShown: true,
       }),
     );
-    WooApi.post('products/reviews', {
-      product_id: route.params.foodData.id,
-      review: data.review,
-      reviewer: userState.user_nicename,
-      reviewer_email: userState.user_email,
-      rating: rateNumber,
-    })
-      .then((res: any) => {
+    axios
+      .post(
+        BASE_URL_WOOCOMMERCE +
+          'products/reviews?consumer_key=' +
+          WOO_KEY +
+          '&consumer_secret=' +
+          WOO_SECRET,
+        {
+          product_id: route.params.foodData.id,
+          review: data.review,
+          reviewer: userState.user_nicename,
+          reviewer_email: userState.user_email,
+          rating: rateNumber,
+        },
+      )
+      .then(res => {
         console.log(res);
         dispatch(
           setLoading({
             isShown: false,
           }),
         );
-        if (res.code === 'woocommerce_rest_comment_duplicate') {
+
+        setRateNumber(1);
+        setValue('review', '');
+        dispatch(
+          showToast({
+            isShown: true,
+            msg: 'Đánh giá thành công',
+            preset: Incubator.ToastPresets.SUCCESS,
+          }),
+        );
+      })
+      .catch(error => {
+        console.log(error.response.data);
+        dispatch(
+          setLoading({
+            isShown: false,
+          }),
+        );
+
+        if (error.response.data.code === 'woocommerce_rest_comment_duplicate') {
           dispatch(
             showToast({
               isShown: true,
@@ -98,33 +126,14 @@ const ReviewFood = () => {
             }),
           );
         } else {
-          setRateNumber(1);
-          setValue('review', '');
           dispatch(
             showToast({
               isShown: true,
-              msg: 'Đánh giá thành công',
-              preset: Incubator.ToastPresets.SUCCESS,
+              msg: 'Đã có lỗi xảy ra, vui lòng thử lại',
+              preset: Incubator.ToastPresets.FAILURE,
             }),
           );
         }
-      })
-      .catch((error: any) => {
-        console.log(error);
-
-        dispatch(
-          setLoading({
-            isShown: false,
-          }),
-        );
-
-        dispatch(
-          showToast({
-            isShown: true,
-            msg: 'Đã có lỗi xảy ra, vui lòng thử lại',
-            preset: Incubator.ToastPresets.FAILURE,
-          }),
-        );
       });
   };
 
@@ -154,7 +163,7 @@ const ReviewFood = () => {
         </View>
       </View>
 
-      <Text white textLight style={styles.titleReview} marginB-30 center>
+      <Text white textBold style={styles.titleReview} marginB-30 center>
         Bạn cảm thấy thế nào về món ăn {route.params.foodData.name}
       </Text>
 

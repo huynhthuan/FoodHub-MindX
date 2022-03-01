@@ -1,4 +1,4 @@
-import {Incubator, Text, View} from 'react-native-ui-lib';
+import {Incubator, View} from 'react-native-ui-lib';
 import React from 'react';
 import {FlatList, StyleSheet} from 'react-native';
 import {
@@ -8,7 +8,6 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
-import WooApi from '../../api/wooApi';
 import _ from 'lodash';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import ListEmptyItem from '../../components/Item/Food/ListEmptyItem';
@@ -19,6 +18,8 @@ import {
 } from '../../redux/slices/productFilterSlice';
 import {showToast} from '../../redux/slices/toastSlice';
 import ItemFoodFilter from '../../components/Item/Food/ItemFoodFilter';
+import axios from 'axios';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
 
 const FilterFood = () => {
   const route = useRoute<RouteProp<MainStackParamList, 'FilterFood'>>();
@@ -41,13 +42,18 @@ const FilterFood = () => {
         productList: JSON.stringify([]),
       }),
     );
-    WooApi.get('products', {
-      category: route.params.filterData.category.join(','),
-      min_price: route.params.filterData.min_price.toString(),
-      max_price: route.params.filterData.max_price.toString(),
-      page: 1,
-    })
-      .then((data: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products', {
+        params: {
+          category: route.params.filterData.category.join(','),
+          min_price: route.params.filterData.min_price.toString(),
+          max_price: route.params.filterData.max_price.toString(),
+          page: 1,
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         let maxRate = _.max(route.params.filterData.rate)
           ? _.max(route.params.filterData.rate)
           : 5;
@@ -56,7 +62,7 @@ const FilterFood = () => {
           : 0;
 
         let dataFilterRating = _.filter(
-          data,
+          res.data,
           o => o.average_rating >= minRate && o.average_rating <= maxRate,
         );
 
@@ -86,13 +92,18 @@ const FilterFood = () => {
 
   React.useEffect(() => {
     setRefresh(true);
-    WooApi.get('products', {
-      category: route.params.filterData.category.join(','),
-      min_price: route.params.filterData.min_price.toString(),
-      max_price: route.params.filterData.max_price.toString(),
-      page: page,
-    })
-      .then((data: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products', {
+        params: {
+          category: route.params.filterData.category.join(','),
+          min_price: route.params.filterData.min_price.toString(),
+          max_price: route.params.filterData.max_price.toString(),
+          page: page,
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         let maxRate = _.max(route.params.filterData.rate)
           ? _.max(route.params.filterData.rate)
           : 5;
@@ -100,7 +111,7 @@ const FilterFood = () => {
           ? _.min(route.params.filterData.rate)
           : 0;
         let dataFilterRating = _.filter(
-          data,
+          res.data,
           o => o.average_rating >= minRate && o.average_rating <= maxRate,
         );
         dispatch(

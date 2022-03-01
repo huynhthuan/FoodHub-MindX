@@ -3,10 +3,11 @@ import React from 'react';
 import {FlatList, StyleSheet} from 'react-native';
 import {getScreenHeight} from '../../utilities/helpers';
 import {useAppDispatch, useAppSelector} from '../../hook';
-import WooApi from '../../api/wooApi';
 import {couponAddMany, couponReceived} from '../../redux/slices/couponSlice';
 import {showToast} from '../../redux/slices/toastSlice';
 import CouponItem from '../../components/Coupons/CouponItem';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
+import axios from 'axios';
 
 const Coupon = () => {
   const couponList = useAppSelector(state => state.coupontSlice);
@@ -26,12 +27,18 @@ const Coupon = () => {
       }),
     );
     setIsLoading(true);
-    WooApi.get('coupons')
-      .then((data: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'coupons', {
+        params: {
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         setIsLoading(false);
         dispatch(
           couponReceived({
-            couponList: JSON.stringify(data),
+            couponList: JSON.stringify(res.data),
           }),
         );
       })
@@ -51,14 +58,19 @@ const Coupon = () => {
   React.useEffect(() => {
     if (page > 1) {
       setIsLoading(true);
-      WooApi.get('coupons', {
-        page,
-      })
-        .then((data: any) => {
+      axios
+        .get(BASE_URL_WOOCOMMERCE + 'coupons', {
+          params: {
+            page,
+            consumer_key: WOO_KEY,
+            consumer_secret: WOO_SECRET,
+          },
+        })
+        .then(res => {
           setIsLoading(false);
           dispatch(
             couponAddMany({
-              couponList: JSON.stringify(data),
+              couponList: JSON.stringify(res.data),
             }),
           );
         })

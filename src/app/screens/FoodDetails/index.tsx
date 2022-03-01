@@ -17,14 +17,18 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
-import WooApi from '../../api/wooApi';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import {showToast} from '../../redux/slices/toastSlice';
 import RenderHTML from 'react-native-render-html';
 import FastImage from 'react-native-fast-image';
 import {productCartAddOne} from '../../redux/slices/productCartSlice';
 import {logout, updateProductLike} from '../../redux/slices/userSlice';
-import {BASE_URL_WP_API_USER} from '../../api/constants';
+import {
+  BASE_URL_WOOCOMMERCE,
+  BASE_URL_WP_API_USER,
+  WOO_KEY,
+  WOO_SECRET,
+} from '../../api/constants';
 import axios from 'axios';
 import {setLoading} from '../../redux/slices/loadingSlice';
 import {
@@ -48,9 +52,15 @@ const FoodDetails = () => {
   const entitieProduct = useAppSelector(state => state.productSlice.entities);
 
   React.useEffect(() => {
-    WooApi.get('products/' + productId)
-      .then((data: any) => {
-        setData(data);
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products/' + productId, {
+        params: {
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
+        setData(res.data);
       })
       .catch((error: any) => {
         dispatch(

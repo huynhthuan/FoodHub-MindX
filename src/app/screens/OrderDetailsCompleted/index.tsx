@@ -1,19 +1,6 @@
-import {
-  Button,
-  Image,
-  Incubator,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native-ui-lib';
+import {Image, Incubator, Text, View} from 'react-native-ui-lib';
 import React from 'react';
-import {
-  FlatList,
-  ScrollView,
-  SectionList,
-  StyleSheet,
-  VirtualizedList,
-} from 'react-native';
+import {ScrollView, StyleSheet} from 'react-native';
 import {MainStackParamList} from '../../../../App';
 import {
   NavigationProp,
@@ -31,10 +18,11 @@ import {
 import {useAppDispatch, useAppSelector} from '../../hook';
 import moment from 'moment';
 let numeral = require('numeral');
-import WooApi from '../../api/wooApi';
 import _ from 'lodash';
 import {setLoading} from '../../redux/slices/loadingSlice';
 import {showToast} from '../../redux/slices/toastSlice';
+import axios from 'axios';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
 
 const OrderDetailsCompleted = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -54,18 +42,23 @@ const OrderDetailsCompleted = () => {
         isShown: true,
       }),
     );
-    WooApi.get('products', {
-      include: _.map(order.line_items, item => {
-        return item.product_id;
-      }),
-    })
-      .then((res: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products', {
+        params: {
+          include: _.map(order.line_items, item => {
+            return item.product_id;
+          }),
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         dispatch(
           setLoading({
             isShown: false,
           }),
         );
-        setData(res);
+        setData(res.data);
       })
       .catch((error: any) => {
         dispatch(

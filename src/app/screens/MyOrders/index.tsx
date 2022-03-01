@@ -10,7 +10,6 @@ import {getScreenWidth} from '../../utilities/helpers';
 import ItemOrderHistory from '../../components/MyOrders/ItemOrderHistory';
 import ItemOrderUpcoming from '../../components/MyOrders/ItemOrderUpcoming';
 import ListEmptyComponent from '../../components/MyOrders/ListEmptyComponent';
-import WooApi from '../../api/wooApi';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import {ordersAddMany, ordersReceived} from '../../redux/slices/orderSlice';
 import {showToast} from '../../redux/slices/toastSlice';
@@ -22,6 +21,8 @@ import ListEmptyComponentCompleted from '../../components/MyOrders/ListEmptyComp
 import _ from 'lodash';
 import {setOrderCompletedLoading} from '../../redux/slices/orderCompletedLoading';
 import {setOrderUpcommingLoading} from '../../redux/slices/orderUpcommingLoading';
+import axios from 'axios';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
 
 const items: TabControllerItemProps[] = [
   {
@@ -79,14 +80,19 @@ const MyOrders = () => {
       }),
     );
 
-    WooApi.get('orders', {
-      customer: userState.id,
-      status: ['on-hold', 'arrival-shipment', 'pending'],
-    })
-      .then((data: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'orders', {
+        params: {
+          customer: userState.id,
+          status: ['on-hold', 'arrival-shipment', 'pending'],
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         dispatch(
           ordersReceived({
-            orderList: JSON.stringify(data),
+            orderList: JSON.stringify(res.data),
           }),
         );
         dispatch(
@@ -122,15 +128,20 @@ const MyOrders = () => {
         isLoading: true,
       }),
     );
-    WooApi.get('orders', {
-      customer: userState.id,
-      page: pageUpcomming,
-      status: ['on-hold', 'arrival-shipment', 'pending'],
-    })
-      .then((data: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'orders', {
+        params: {
+          customer: userState.id,
+          page: pageUpcomming,
+          status: ['on-hold', 'arrival-shipment', 'pending'],
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         dispatch(
           ordersAddMany({
-            orderList: JSON.stringify(data),
+            orderList: JSON.stringify(res.data),
           }),
         );
         dispatch(
@@ -162,15 +173,22 @@ const MyOrders = () => {
         isLoading: true,
       }),
     );
-    WooApi.get('orders', {
-      customer: userState.id,
-      page: pageOncompleted,
-      status: ['completed', 'cancelled'],
-    })
-      .then((data: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'orders', {
+        params: {
+          customer: userState.id,
+          page: pageOncompleted,
+          status: ['completed', 'cancelled'],
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
+        console.log(res.data);
+        
         dispatch(
           ordersCompletedReceived({
-            orderList: JSON.stringify(data),
+            orderList: JSON.stringify(res.data),
           }),
         );
 
@@ -181,6 +199,8 @@ const MyOrders = () => {
         );
       })
       .catch((error: any) => {
+        console.log(error);
+        
         dispatch(
           ordersCompletedReceived({
             orderList: JSON.stringify([]),
@@ -207,15 +227,20 @@ const MyOrders = () => {
         isLoading: true,
       }),
     );
-    WooApi.get('orders', {
-      customer: userState.id,
-      page: pageOncompleted,
-      status: ['completed', 'cancelled'],
-    })
-      .then((data: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'orders', {
+        params: {
+          customer: userState.id,
+          page: pageOncompleted,
+          status: ['completed', 'cancelled'],
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         dispatch(
           ordersCompletedAddMany({
-            orderList: JSON.stringify(data),
+            orderList: JSON.stringify(res.data),
           }),
         );
         dispatch(

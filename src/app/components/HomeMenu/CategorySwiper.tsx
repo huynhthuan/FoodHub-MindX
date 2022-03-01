@@ -1,7 +1,8 @@
+import axios from 'axios';
 import React from 'react';
 import {FlatList, StyleSheet} from 'react-native';
 import {Incubator} from 'react-native-ui-lib';
-import WooApi from '../../api/wooApi';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import {categoriesReceived} from '../../redux/slices/categoriesSlice';
 import {showToast} from '../../redux/slices/toastSlice';
@@ -17,13 +18,18 @@ const CategorySwiper = () => {
 
   const dispatch = useAppDispatch();
 
-  WooApi.get('products/categories', {
-    exclude: [15],
-  })
-    .then((data: any) => {
+  axios
+    .get(BASE_URL_WOOCOMMERCE + 'products/categories', {
+      params: {
+        exclude: [15],
+        consumer_key: WOO_KEY,
+        consumer_secret: WOO_SECRET,
+      },
+    })
+    .then(res => {
       dispatch(
         categoriesReceived({
-          categoriesList: JSON.stringify(data),
+          categoriesList: JSON.stringify(res.data),
         }),
       );
     })

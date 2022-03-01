@@ -1,4 +1,4 @@
-import {Image, Text, TouchableOpacity, View} from 'react-native-ui-lib';
+import {Text, TouchableOpacity, View} from 'react-native-ui-lib';
 import React from 'react';
 import {FlatList, StyleSheet} from 'react-native';
 import ItemReview from '../../components/Reviews/ItemReview';
@@ -11,14 +11,14 @@ import {
 import {MainStackParamList} from '../../../../App';
 import FastImage from 'react-native-fast-image';
 import {useAppSelector} from '../../hook';
-import WooApi from '../../api/wooApi';
 import {useDispatch} from 'react-redux';
 import {
   userReviewAddMany,
-  userReviewAddOne,
   userReviewReceived,
 } from '../../redux/slices/userReviewSlice';
 import _ from 'lodash';
+import axios from 'axios';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
 
 const Reviews = () => {
   const renderItemReview = React.useCallback(
@@ -43,17 +43,22 @@ const Reviews = () => {
     );
 
     setIsLoadingReview(true);
-    WooApi.get('products/reviews', {
-      per_page: 5,
-      product: route.params.foodData.id,
-      orderby: 'date_gmt',
-      order: 'desc',
-    })
-      .then((res: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products/reviews', {
+        params: {
+          per_page: 5,
+          product: route.params.foodData.id,
+          orderby: 'date_gmt',
+          order: 'desc',
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         setIsLoadingReview(false);
         dispatch(
           userReviewReceived({
-            reviewList: JSON.stringify(res),
+            reviewList: JSON.stringify(res.data),
           }),
         );
       })
@@ -74,18 +79,23 @@ const Reviews = () => {
   const loadMoreReview = React.useCallback(() => {
     console.log('Get load more');
     setIsLoadingReview(true);
-    WooApi.get('products/reviews', {
-      per_page: 5,
-      offset: offset,
-      product: route.params.foodData.id,
-      orderby: 'date',
-      order: 'desc',
-    })
-      .then((res: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products/reviews', {
+        params: {
+          per_page: 5,
+          offset: offset,
+          product: route.params.foodData.id,
+          orderby: 'date',
+          order: 'desc',
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         setIsLoadingReview(false);
         dispatch(
           userReviewAddMany({
-            reviewList: JSON.stringify(res),
+            reviewList: JSON.stringify(res.data),
           }),
         );
       })

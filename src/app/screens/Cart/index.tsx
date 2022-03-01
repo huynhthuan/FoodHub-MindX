@@ -19,12 +19,12 @@ import {useNavigation, NavigationProp} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import ListEmptyCart from '../../components/Cart/ListEmptyCart';
-import WooApi from '../../api/wooApi';
 import {showToast} from '../../redux/slices/toastSlice';
 import {setLoading} from '../../redux/slices/loadingSlice';
 import moment from 'moment';
 import {EntityId} from '@reduxjs/toolkit';
-import {updateCouponCart} from '../../redux/slices/couponCartSlice';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
+import axios from 'axios';
 let numeral = require('numeral');
 
 const Cart = () => {
@@ -95,102 +95,108 @@ const Cart = () => {
       }),
     );
 
-    WooApi.get('coupons', {
-      code: couponCart.code,
-    }).then((data: any) => {
-      let couponData = data[0];
-      dispatch(
-        setLoading({
-          isShown: false,
-        }),
-      );
-
-      if (data.length === 0) {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'coupons', {
+        params: {
+          code: couponCart.code,
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
+        let couponData = res.data[0];
         dispatch(
-          showToast({
-            isShown: true,
-            msg: 'Mã giảm giá không tồn tại.',
-            preset: Incubator.ToastPresets.FAILURE,
+          setLoading({
+            isShown: false,
           }),
         );
-        return;
-      }
 
-      if (couponData.used_by.includes(userState.id)) {
-        dispatch(
-          showToast({
-            isShown: true,
-            msg: 'Bạn đã sử dụng mã này.',
-            preset: Incubator.ToastPresets.FAILURE,
-          }),
-        );
-        return;
-      }
-
-      if (couponData.date_expires !== null) {
-        if (!moment().isBefore(couponData.date_expires)) {
+        if (res.data.length === 0) {
           dispatch(
             showToast({
               isShown: true,
-              msg: 'Mã đã hết hạn sử dụng.',
+              msg: 'Mã giảm giá không tồn tại.',
               preset: Incubator.ToastPresets.FAILURE,
             }),
           );
           return;
         }
-      }
 
-      if (getTotalIncart() < Number(couponData.minimum_amount)) {
+        if (couponData.used_by.includes(userState.id)) {
+          dispatch(
+            showToast({
+              isShown: true,
+              msg: 'Bạn đã sử dụng mã này.',
+              preset: Incubator.ToastPresets.FAILURE,
+            }),
+          );
+          return;
+        }
+
+        if (couponData.date_expires !== null) {
+          if (!moment().isBefore(couponData.date_expires)) {
+            dispatch(
+              showToast({
+                isShown: true,
+                msg: 'Mã đã hết hạn sử dụng.',
+                preset: Incubator.ToastPresets.FAILURE,
+              }),
+            );
+            return;
+          }
+        }
+
+        if (getTotalIncart() < Number(couponData.minimum_amount)) {
+          dispatch(
+            showToast({
+              isShown: true,
+              msg: 'Giá trị đơn hàng tối thiểu chưa đủ điều kiện.',
+              preset: Incubator.ToastPresets.FAILURE,
+            }),
+          );
+          return;
+        }
+
+        if (Number(couponData.maximum_amount) > 0) {
+          if (getTotalIncart() > Number(couponData.maximum_amount)) {
+            dispatch(
+              showToast({
+                isShown: true,
+                msg: 'Giá trị đơn hàng vượt mức tối đa.',
+                preset: Incubator.ToastPresets.FAILURE,
+              }),
+            );
+            return;
+          }
+        }
+
+        if (couponData.product_ids.length > 0) {
+          if (!checkProductIncludes(couponData.product_ids)) {
+            dispatch(
+              showToast({
+                isShown: true,
+                msg: 'Chưa có món ăn theo điều kiện của mã giảm giá.',
+                preset: Incubator.ToastPresets.FAILURE,
+              }),
+            );
+            return;
+          }
+        }
+
+        setCouponInCart({
+          amount: couponData.amount,
+          desc: couponData.description,
+          code: couponData.code,
+        });
+
         dispatch(
           showToast({
             isShown: true,
-            msg: 'Giá trị đơn hàng tối thiểu chưa đủ điều kiện.',
-            preset: Incubator.ToastPresets.FAILURE,
+            msg: 'Áp dụng mã giảm giá thành công.',
+            preset: Incubator.ToastPresets.SUCCESS,
           }),
         );
-        return;
-      }
-
-      if (Number(couponData.maximum_amount) > 0) {
-        if (getTotalIncart() > Number(couponData.maximum_amount)) {
-          dispatch(
-            showToast({
-              isShown: true,
-              msg: 'Giá trị đơn hàng vượt mức tối đa.',
-              preset: Incubator.ToastPresets.FAILURE,
-            }),
-          );
-          return;
-        }
-      }
-
-      if (couponData.product_ids.length > 0) {
-        if (!checkProductIncludes(couponData.product_ids)) {
-          dispatch(
-            showToast({
-              isShown: true,
-              msg: 'Chưa có món ăn theo điều kiện của mã giảm giá.',
-              preset: Incubator.ToastPresets.FAILURE,
-            }),
-          );
-          return;
-        }
-      }
-
-      setCouponInCart({
-        amount: couponData.amount,
-        desc: couponData.description,
-        code: couponData.code,
       });
-
-      dispatch(
-        showToast({
-          isShown: true,
-          msg: 'Áp dụng mã giảm giá thành công.',
-          preset: Incubator.ToastPresets.SUCCESS,
-        }),
-      );
-    });
   }, [couponCart]);
 
   React.useEffect(() => {

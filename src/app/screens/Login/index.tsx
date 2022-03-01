@@ -7,12 +7,16 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import axios from 'axios';
-import {BASE_URL_JWT_AUTH_GET_TOKEN} from '../../api/constants';
-import {useAppDispatch, useAppSelector} from '../../hook';
+import {
+  BASE_URL_JWT_AUTH_GET_TOKEN,
+  BASE_URL_WOOCOMMERCE,
+  WOO_KEY,
+  WOO_SECRET,
+} from '../../api/constants';
+import {useAppDispatch} from '../../hook';
 import {login} from '../../redux/slices/userSlice';
 import {setLoading} from '../../redux/slices/loadingSlice';
 import {showToast} from '../../redux/slices/toastSlice';
-import WooApi from '../../api/wooApi';
 import {favoritesReceived} from '../../redux/slices/favoriteSlice';
 
 const Login = () => {
@@ -43,13 +47,18 @@ const Login = () => {
         dispatch(setLoading({isShown: false}));
         dispatch(login(res.data));
         if (res.data.product_like) {
-          WooApi.get('products', {
-            include: res.data.product_like.split(','),
-          })
-            .then((res: any) => {
+          axios
+            .get(BASE_URL_WOOCOMMERCE + 'products', {
+              params: {
+                include: res.data.product_like.split(','),
+                consumer_key: WOO_KEY,
+                consumer_secret: WOO_SECRET,
+              },
+            })
+            .then(res => {
               dispatch(
                 favoritesReceived({
-                  productList: JSON.stringify(res),
+                  productList: JSON.stringify(res.data),
                 }),
               );
 

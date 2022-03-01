@@ -18,12 +18,6 @@ import {showToast} from '../../redux/slices/toastSlice';
 import {selectDeliveryAddressReceived} from '../../redux/slices/addressSelectSlice';
 import {setAddressChoseen} from '../../redux/slices/addressChoseenSlice';
 
-const address = [
-  {label: 'ABAP1222', value: 'ABAP1'},
-  {label: 'ABAP2222', value: 'ABAP2'},
-  {label: 'ABAP3222', value: 'ABAP3'},
-];
-
 const DeliveryAddressSelect = () => {
   const [addressDelivery, setAddressDelivery] = React.useState('');
   const userState = useAppSelector(state => state.userSlice);

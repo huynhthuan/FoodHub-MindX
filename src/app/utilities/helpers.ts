@@ -44,8 +44,12 @@ const getStatusOrder = (statusCode: string) => {
       break;
     case 'arrival-shipment':
       statusName = 'Đang giao đồ';
+      break;
     case 'pending':
       statusName = 'Chờ thanh toán';
+      break;
+    case 'cancelled':
+      statusName = 'Đã hủy';
       break;
     default:
       break;

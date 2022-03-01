@@ -20,6 +20,9 @@ const ItemOrderHistory = ({id}: IItemOrderHistory) => {
 
   if (!order) return null;
 
+  console.log(order.status);
+  
+
   return (
     <TouchableOpacity
       bg-dark
@@ -29,7 +32,7 @@ const ItemOrderHistory = ({id}: IItemOrderHistory) => {
       onPress={() => {
         navigation.navigate('OrderDetailsCompleted', {id: order.id});
       }}>
-      <View row spread marginB-24>
+      <View row spread>
         <View row>
           <View center style={styles.imageWrap} marginR-15>
             <Image

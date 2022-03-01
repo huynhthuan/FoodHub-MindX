@@ -4,7 +4,6 @@ import {FlatList, StyleSheet} from 'react-native';
 import {getScreenWidth} from '../../utilities/helpers';
 import _ from 'lodash';
 import {useAppDispatch, useAppSelector} from '../../hook';
-import WooApi from '../../api/wooApi';
 import {
   productSearchAddMany,
   productSearchReceived,
@@ -12,6 +11,8 @@ import {
 import {showToast} from '../../redux/slices/toastSlice';
 import ItemFoodSearch from '../../components/Item/Food/ItemFoodSearch';
 import SearchBarOnpage from '../../components/HomeMenu/SearchBarOnpage';
+import axios from 'axios';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
 
 const Search = () => {
   const dispatch = useAppDispatch();
@@ -42,15 +43,20 @@ const Search = () => {
     );
     if (keyWord !== '') {
       setIsLoading(true);
-      WooApi.get('products', {
-        page: 1,
-        search: keyWord,
-      })
-        .then((data: any) => {
+      axios
+        .get(BASE_URL_WOOCOMMERCE + 'products', {
+          params: {
+            page: 1,
+            search: keyWord,
+            consumer_key: WOO_KEY,
+            consumer_secret: WOO_SECRET,
+          },
+        })
+        .then(res => {
           setIsLoading(false);
           dispatch(
             productSearchReceived({
-              productList: JSON.stringify(data),
+              productList: JSON.stringify(res.data),
             }),
           );
         })
@@ -72,15 +78,20 @@ const Search = () => {
       console.log('inpage');
 
       setIsLoading(true);
-      WooApi.get('products', {
-        page: page,
-        search: keyWord,
-      })
-        .then((data: any) => {
+      axios
+        .get(BASE_URL_WOOCOMMERCE + 'products', {
+          params: {
+            page: page,
+            search: keyWord,
+            consumer_key: WOO_KEY,
+            consumer_secret: WOO_SECRET,
+          },
+        })
+        .then(res => {
           setIsLoading(false);
           dispatch(
             productSearchAddMany({
-              productList: JSON.stringify(data),
+              productList: JSON.stringify(res.data),
             }),
           );
         })

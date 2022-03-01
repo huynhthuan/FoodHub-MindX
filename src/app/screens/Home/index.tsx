@@ -3,12 +3,9 @@ import React from 'react';
 import {FlatList, ScrollView, StyleSheet} from 'react-native';
 import SearchBar from '../../components/HomeMenu/SearchBar';
 import CategorySwiper from '../../components/HomeMenu/CategorySwiper';
-import ItemFood from '../../components/Item/Food/ItemFood';
-import ItemAgency from '../../components/Item/Agency/ItemAgency';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import {changeHeaderBackground} from '../../utilities/helpers';
-import WooApi from '../../api/wooApi';
 import {useAppDispatch, useAppSelector} from '../../hook';
 import {productFeatureReceived} from '../../redux/slices/productFeatureSlice';
 import {productSaleReceived} from '../../redux/slices/productSaleSlice';
@@ -16,25 +13,8 @@ import {productPopularReceived} from '../../redux/slices/productPopularSlice';
 import ItemFoodSale from '../../components/Item/Food/ItemFoodSale';
 import ItemFoodPopular from '../../components/Item/Food/ItemFoodPopular';
 import ItemFoodFeature from '../../components/Item/Food/ItemFoodFeature';
-
-const dataAgency = [
-  {
-    name: 'Burger',
-    id: '1',
-  },
-  {
-    name: 'Chicken',
-    id: '2',
-  },
-  {
-    name: 'Fast Food',
-    id: '3',
-  },
-  {
-    name: 'Fast Food Hub',
-    id: '4',
-  },
-];
+import axios from 'axios';
+import {BASE_URL_WOOCOMMERCE, WOO_KEY, WOO_SECRET} from '../../api/constants';
 
 const Home = () => {
   const navigation = useNavigation<NavigationProp<MainStackParamList>>();
@@ -83,40 +63,58 @@ const Home = () => {
   );
 
   const getProductFeature = React.useCallback(() => {
-    WooApi.get('products', {
-      featured: true,
-    }).then((res: any) => {
-      dispatch(
-        productFeatureReceived({
-          productList: JSON.stringify(res),
-        }),
-      );
-    });
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products/', {
+        params: {
+          featured: true,
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
+        dispatch(
+          productFeatureReceived({
+            productList: JSON.stringify(res.data),
+          }),
+        );
+      });
   }, []);
 
   const getProductSale = React.useCallback(() => {
-    WooApi.get('products', {
-      on_sale: true,
-    }).then((res: any) => {
-      dispatch(
-        productSaleReceived({
-          productList: JSON.stringify(res),
-        }),
-      );
-    });
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products/', {
+        params: {
+          on_sale: true,
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then((res) => {
+        dispatch(
+          productSaleReceived({
+            productList: JSON.stringify(res.data),
+          }),
+        );
+      });
   }, []);
 
   const getProductPopular = React.useCallback(() => {
-    WooApi.get('products', {
-      order: 'desc',
-      orderby: 'popularity',
-    }).then((res: any) => {
-      dispatch(
-        productPopularReceived({
-          productList: JSON.stringify(res),
-        }),
-      );
-    });
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products/', {
+        params: {
+          order: 'desc',
+          orderby: 'popularity',
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then((res) => {
+        dispatch(
+          productPopularReceived({
+            productList: JSON.stringify(res.data),
+          }),
+        );
+      });
   }, []);
 
   React.useEffect(() => {

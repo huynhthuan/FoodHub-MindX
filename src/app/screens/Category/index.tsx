@@ -1,14 +1,12 @@
 import {
-  Button,
   Image,
   Incubator,
   Picker,
   PickerItemValue,
   Text,
   View,
-  WheelPicker,
 } from 'react-native-ui-lib';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {FlatList, StyleSheet} from 'react-native';
 import ItemFood from '../../components/Item/Food/ItemFood';
 import {getScreenWidth} from '../../utilities/helpers';
@@ -16,10 +14,15 @@ import {RouteProp, useRoute} from '@react-navigation/native';
 import {MainStackParamList} from '../../../../App';
 import FastImage from 'react-native-fast-image';
 import axios from 'axios';
-import {BASE_URL_WP_MEDIA, BASE_URL_WP_PRODUCT_CAT} from '../../api/constants';
+import {
+  BASE_URL_WOOCOMMERCE,
+  BASE_URL_WP_MEDIA,
+  BASE_URL_WP_PRODUCT_CAT,
+  WOO_KEY,
+  WOO_SECRET,
+} from '../../api/constants';
 import _ from 'lodash';
 import {useAppDispatch, useAppSelector} from '../../hook';
-import WooApi from '../../api/wooApi';
 import {productAddMany, productReceived} from '../../redux/slices/productSlice';
 import {showToast} from '../../redux/slices/toastSlice';
 import ListEmptyItem from '../../components/Item/Food/ListEmptyItem';
@@ -62,16 +65,21 @@ const Category = () => {
 
     setProductLoading(true);
 
-    WooApi.get('products', {
-      category: route.params.CategoryDetail.id,
-      page: 1,
-      order: sort.order,
-      orderby: sort.orderBy,
-    })
-      .then((data: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products', {
+        params: {
+          category: route.params.CategoryDetail.id,
+          page: 1,
+          order: sort.order,
+          orderby: sort.orderBy,
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         dispatch(
           productReceived({
-            productList: JSON.stringify(data),
+            productList: JSON.stringify(res.data),
           }),
         );
         setProductLoading(false);
@@ -99,16 +107,21 @@ const Category = () => {
 
   React.useEffect(() => {
     setProductLoading(true);
-    WooApi.get('products', {
-      category: route.params.CategoryDetail.id,
-      page,
-      order: sort.order,
-      orderby: sort.orderBy,
-    })
-      .then((data: any) => {
+    axios
+      .get(BASE_URL_WOOCOMMERCE + 'products', {
+        params: {
+          category: route.params.CategoryDetail.id,
+          page,
+          order: sort.order,
+          orderby: sort.orderBy,
+          consumer_key: WOO_KEY,
+          consumer_secret: WOO_SECRET,
+        },
+      })
+      .then(res => {
         dispatch(
           productAddMany({
-            productList: JSON.stringify(data),
+            productList: JSON.stringify(res.data),
           }),
         );
         setProductLoading(false);
